@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+    </data>
+
+    <RelativeLayout
+        android:background="@drawable/bg_splash"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".ui.component.splash.SplashActivity">
+
+        <com.airbnb.lottie.LottieAnimationView
+            android:id="@+id/laAnimation"
+            android:layout_marginLeft="30dp"
+            android:layout_marginRight="30dp"
+            android:layout_width="@dimen/_200sdp"
+            android:layout_height="@dimen/_200sdp"
+            android:layout_centerInParent="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="10dp"
+            app:lottie_autoPlay="true"
+            app:lottie_loop="true" />
+
+
+        <LinearLayout
+            android:layout_above="@id/tvSplashVersion"
+            android:layout_centerHorizontal="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            >
+            <ImageView
+                android:layout_gravity="center"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_pdf"
+                />
+            <TextView
+                android:layout_marginLeft="5dp"
+                android:gravity="center"
+                android:layout_gravity="center"
+                android:textSize="@dimen/_20ssp"
+                android:fontFamily="@font/font4"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/tv_app_name"
+                android:textColor="#FFFFFF"
+                android:textStyle="bold"
+                />
+        </LinearLayout>
+
+        <TextView
+            android:text="v 4.0.0"
+            android:fontFamily="@font/font1"
+            android:textColor="#FFFFFF"
+            android:textSize="14sp"
+            android:layout_centerHorizontal="true"
+            android:id="@+id/tvSplashVersion"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="15dp"
+            android:layout_alignParentBottom="true"
+            />
+
+
+    </RelativeLayout>
+</layout>

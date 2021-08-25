@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.example.pdf_scanner">
+
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.FLASHLIGHT" />
+
+    <uses-feature android:name="android.hardware.camera" />
+    <uses-feature android:name="android.hardware.camera.autofocus" />
+
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission
+        android:name="android.permission.WRITE_SETTINGS"
+        tools:ignore="ProtectedPermissions" />
+
+    <application
+        android:name=".App"
+        android:allowBackup="true"
+        android:hardwareAccelerated="false"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.PDF_Scanner">
+        <activity android:name=".ui.component.detail.DetailActivity"></activity>
+        <activity android:name=".ui.component.search.SearchActivity" />
+        <activity
+            android:name=".ui.component.ocr.OCRActivity"
+            android:theme="@style/ScanScreenTheme" />
+        <activity
+            android:name=".ui.component.image.ImageActivity"
+            android:theme="@style/AppFullScreenTheme" />
+        <activity
+            android:name=".ui.component.history.HistoryActivity"
+            android:theme="@style/AppFullScreenTheme" />
+        <activity
+            android:name=".ui.component.settings.SettingsActivity"
+            android:theme="@style/AppFullScreenTheme" />
+        <activity
+            android:name=".ui.component.purchase.PurchaseActivity"
+            android:theme="@style/AppFullScreenTheme" />
+        <activity
+            android:name=".ui.component.scan.ScanActivity"
+            android:theme="@style/ScanScreenTheme"
+            android:windowSoftInputMode="stateAlwaysHidden|adjustResize|adjustPan" />
+        <activity
+            android:name=".ui.component.main.MainActivity"
+            android:label=""
+            android:theme="@style/AppFullScreenTheme" />
+        <activity
+            android:name=".ui.component.splash.SplashActivity"
+            android:theme="@style/AppFullScreenTheme">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
+
+</manifest>

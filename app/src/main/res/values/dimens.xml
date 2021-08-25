@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="tvTitle">10dp</dimen>
+    
+    <dimen name="tvDialogRate">17sp</dimen>
+</resources>

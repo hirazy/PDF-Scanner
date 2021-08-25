@@ -1,0 +1,3 @@
+rootProject.name = "PDF_Scanner"
+include ':app'
+include ':photoeditor'

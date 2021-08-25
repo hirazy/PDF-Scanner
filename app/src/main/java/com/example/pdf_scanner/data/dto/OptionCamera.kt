@@ -1,0 +1,10 @@
+package com.example.pdf_scanner.data.dto
+
+import kotlinx.parcelize.Parcelize
+
+@Parcelize
+data class OptionCamera(
+    val name: String,
+
+    var isSelected: Boolean
+): OBase()

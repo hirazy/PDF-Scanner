@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+    </data>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#151515"
+        tools:context=".ui.component.main.MainActivity">
+
+        <com.google.android.material.appbar.AppBarLayout
+            android:id="@+id/appBarMain"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/colorStatus">
+
+            <androidx.appcompat.widget.Toolbar
+                android:id="@+id/tbMain"
+                app:title=""
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:menu="@menu/item_action_main"
+                app:navigationIcon="@drawable/ic_crown"
+                app:titleTextColor="@color/white"
+                tools:targetApi="lollipop" />
+        </com.google.android.material.appbar.AppBarLayout>
+
+
+        <LinearLayout
+            android:id="@+id/layoutTakeMain"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:background="@color/colorStatus"
+            android:orientation="vertical"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <ImageButton
+                    android:id="@+id/btnDocument"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="20dp"
+                    android:background="@null"
+                    android:padding="5dp"
+                    android:src="@drawable/ic_document"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintRight_toLeftOf="@+id/btnMainCapture"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <RelativeLayout
+                    android:id="@+id/btnMainCapture"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:layout_centerInParent="true"
+                    android:background="@drawable/bg_btn_capture"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <LinearLayout
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:layout_centerInParent="true"
+                        android:background="@drawable/bg_btn_capture1" />
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="20dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintLeft_toRightOf="@id/btnMainCapture"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <ImageButton
+                        android:id="@+id/btnImage"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:background="@null"
+                        android:padding="5dp"
+                        android:src="@drawable/ic_image"
+                        />
+
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/layoutBadgeImage"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:visibility="gone"
+                        android:padding="5dp">
+
+                        <de.hdodenhof.circleimageview.CircleImageView
+                            android:id="@+id/circleImg"
+                            android:background="@drawable/bg_circle_img"
+                            android:layout_width="26dp"
+                            android:layout_height="26dp"
+                            android:src="@mipmap/wpp_2"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <androidx.cardview.widget.CardView
+                            android:layout_width="10dp"
+                            android:layout_height="10dp"
+                            android:background="@color/red"
+                            app:cardBackgroundColor="@color/red"
+                            app:cardCornerRadius="5dp"
+                            app:layout_constraintEnd_toEndOf="@id/circleImg"
+                            app:layout_constraintTop_toTopOf="@id/circleImg" >
+
+                            <TextView
+                                android:id="@+id/tvCountImage"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text=""
+                                />
+                        </androidx.cardview.widget.CardView>
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                </RelativeLayout>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="20dp"
+                android:src="@drawable/ic_selection_round" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rcclvMain"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp" />
+        </LinearLayout>
+
+        <com.camerakit.CameraKitView
+            android:id="@+id/cameraKit"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_above="@+id/layoutTakeMain"
+            android:layout_below="@id/appBarMain"
+            android:adjustViewBounds="true"
+            android:keepScreenOn="true"
+            app:camera_facing="back"
+            app:camera_flash="auto"
+            app:camera_focus="continuous"
+            app:camera_permissions="camera" />
+
+    </RelativeLayout>
+</layout>

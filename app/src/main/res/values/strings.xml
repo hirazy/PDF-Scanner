@@ -1,0 +1,89 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="app_name">PDF_Scanner</string>
+
+    <string name="tv_app_name">PDF Scanner</string>
+
+    <string name="tvHistory">History</string>
+
+    <string name="no_internet">Please check your internet connection</string>
+    <string name="network_error">Network error, could get data,please try again!</string>
+
+    <string name="tv_save">Save</string>
+    <string name="tvRecognized">Recognized</string>
+
+    <string name="tvWhiteBoard">Focus your phone on the whiteboard and take pictures for scanning.</string>
+    <string name="tvOCR">Hold your Phone over document and take a picture.</string>
+    <string name="tvSingle">Hold your Phone over a document and take a picture.</string>
+    <string name="tvBatch">Hold your Phone over a document and Continuous shooting.</string>
+    <string name="tvCard">Hold your phone over the ID Card/Passport/Business Card to take pictures.</string>
+
+    <string name="tvAdd">Add</string>
+    <string name="tvRotate">Rotate</string>
+    <string name="tvCrop">Crop</string>
+    <string name="tvFilter">Filter</string>
+    <string name="tvSign">Sign</string>
+    <string name="tvText">Text</string>
+    <string name="tvEraser">Eraser</string>
+    <string name="tvDelete">Delete</string>
+
+    <string name="tvRename">Rename</string>
+    <string name="tvMore">More</string>
+    <string name="tvMove">Move</string>
+    <string name="tvCopy">Copy</string>
+    <string name="tvShare">Share</string>
+
+    <string name="tvDragItem">Tap the item to rearrange them:</string>
+    <string name="tvDone">Done</string>
+
+    <string name="tvLeaveScanning">Leave Scanning</string>
+    <string name="tvContentLeave">This will delete all scanned pages. Are you sure?</string>
+
+    <string name="tvLanguage">Language:</string>
+
+    <string name="tvOCRLanguage">OCR Language</string>
+
+    <string name="tvAddPage">Add Page:</string>
+    <string name="tvTakePhoto">Take another photo</string>
+    <string name="tvSelectAlbum">Select from Album</string>
+
+    <string name="tvSearch">Search</string>
+
+    <string name="label_brush">Brush</string>
+    <string name="label_shape">Shape</string>
+    <string name="label_oval">Oval</string>
+    <string name="label_rectangle">Rectangle</string>
+    <string name="label_line">Line</string>
+    <string name="label_emoji">Emoji</string>
+    <string name="label_sticker">Sticker</string>
+    <string name="label_eraser">Eraser</string>
+    <string name="label_eraser_mode">Eraser Mode</string>
+    <string name="label_text">Text</string>
+    <string name="label_filter">Filter</string>
+    <string name="label_adjust">Adjust</string>
+    <string name="msg_save_image">Are you want to exit without saving image ?</string>
+    <string name="app_intent_name">PhotoEditor</string>
+    <string name="msg_save_image_to_share">Please save image to share</string>
+    <string name="msg_share_image">Share Image</string>
+
+    <string name="tvNewFolder">New Folder</string>
+    <string name="tvNewScan">New Scan</string>
+
+    <string name="tvSettings">Settings</string>
+
+    <string name="tvStartCamera">Start with Camera</string>
+
+    <string name="contentRate">We \'re a tiny team working extremely hard to giv you the best apps for free. Your 5-Stars are better than anything in the world!</string>
+
+    <string name="giveStars">GIVE 5 STARS</string>
+    <string name="tvSuggestion">Suggestion</string>
+
+    <string name="tvNoMatches">Your search did not return any matches</string>
+
+    <string name="tvPDF">PDF</string>
+    <string name="saveDoc">Saving Document...</string>
+    <string name="tvWait">Please wait...</string>
+
+    <string name="tvCancel">Cancel</string>
+    <string name="tvConfirm">Confirm</string>
+
+</resources>

@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:paddingBottom="15dp"
+        android:paddingTop="15dp"
+        android:background="@drawable/bg_dialog_leave"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+
+        >
+
+        <TextView
+            android:id="@+id/tvContentLeave"
+            android:textSize="18dp"
+            android:textStyle="bold"
+            android:textColor="@color/black"
+            android:layout_marginLeft="20dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/tvLeaveScanning" />
+
+        <TextView
+            android:textColor="@color/colorTextContent"
+            android:layout_marginTop="30dp"
+            android:layout_marginLeft="20dp"
+            android:text="@string/tvContentLeave"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <LinearLayout
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:layout_marginTop="20dp"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            >
+            <Button
+                android:textSize="17sp"
+                android:textAllCaps="false"
+                android:textColor="@color/white"
+                android:layout_weight="1"
+                android:background="@drawable/bg_btn_decline"
+                android:id="@+id/btnDecline"
+                android:text="No"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                />
+
+            <LinearLayout
+                android:layout_width="25dp"
+                android:layout_height="wrap_content" />
+            <Button
+                android:textSize="17sp"
+                android:textAllCaps="false"
+                android:layout_weight="1"
+                android:id="@+id/btnAcceptLeave"
+                android:text="Yes"
+                android:textColor="@color/white"
+                android:background="@drawable/bg_btn_accept"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                />
+        </LinearLayout>
+    </LinearLayout>
+</RelativeLayout>
