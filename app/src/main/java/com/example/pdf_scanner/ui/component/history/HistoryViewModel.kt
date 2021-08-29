@@ -18,4 +18,5 @@ class HistoryViewModel @Inject constructor(var context: CoroutineContext): BaseV
     fun fetchData(list: ArrayList<ImageFolder>){
         listData.value = Resource.Success(list)
     }
+
 }

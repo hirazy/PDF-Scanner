@@ -72,7 +72,7 @@
 
     <string name="tvStartCamera">Start with Camera</string>
 
-    <string name="contentRate">We \'re a tiny team working extremely hard to giv you the best apps for free. Your 5-Stars are better than anything in the world!</string>
+    <string name="contentRate">We \'re a tiny team working extremely hard to give you the best apps for free. Your 5-Stars are better than anything in the world!</string>
 
     <string name="giveStars">GIVE 5 STARS</string>
     <string name="tvSuggestion">Suggestion</string>
@@ -85,5 +85,17 @@
 
     <string name="tvCancel">Cancel</string>
     <string name="tvConfirm">Confirm</string>
+    
+    <string name="tvPremium">Premium</string>
+    <string name="tvFeedBack">Feedback &amp; Support</string>
+    <string name="tvAbout">About Us</string>
+    <string name="tvList">list</string>
+    
+    <string name="tvComment">Comment</string>
+    <string name="tvEmail">Email</string>
+    <string name="tvSave">Save</string>
+    <string name="tvPrint">Print</string>
+    
+    <string name="tvNoResultSearch">Your search did not return any matches</string>
 
 </resources>

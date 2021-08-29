@@ -247,15 +247,17 @@
             </RelativeLayout>
         </HorizontalScrollView>
 
-        <androidx.viewpager.widget.ViewPager
+        <androidx.viewpager2.widget.ViewPager2
             android:id="@+id/vpgImg"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_above="@+id/hscvScan"
-            android:layout_below="@id/appBarScan"
+            android:layout_below="@id/layoutScanLanguage"
             android:layout_marginBottom="32dp" />
 
         <com.airbnb.lottie.LottieAnimationView
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
             android:id="@+id/animScan"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -305,9 +307,10 @@
         </LinearLayout>
 
         <LinearLayout
+            android:visibility="gone"
+            android:id="@+id/layoutScanLanguage"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_above="@+id/vpgImg"
             android:layout_below="@+id/appBarScan"
             android:gravity="center"
             android:orientation="horizontal">
@@ -326,7 +329,6 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginLeft="15dp"
-
                 />
         </LinearLayout>
 

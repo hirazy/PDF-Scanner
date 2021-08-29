@@ -141,11 +141,36 @@
                 android:layout_marginTop="20dp"
                 android:src="@drawable/ic_selection_round" />
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rcclvMain"
+<!--            <androidx.recyclerview.widget.RecyclerView-->
+<!--                android:id="@+id/rcclvMain"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_marginTop="10dp" />-->
+
+            <ScrollView
+                android:layout_marginTop="5dp"
                 android:layout_width="match_parent"
+                android:fadeScrollbars="false"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp" />
+                >
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    >
+                    <net.lucode.hackware.magicindicator.MagicIndicator
+                        android:background="@color/colorStatus"
+                        android:id="@+id/vpgMain"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/common_navigator_height"
+                       />
+                </LinearLayout>
+            </ScrollView>
+
+            <androidx.viewpager.widget.ViewPager
+                android:id="@+id/vpgM"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                />
         </LinearLayout>
 
         <com.camerakit.CameraKitView

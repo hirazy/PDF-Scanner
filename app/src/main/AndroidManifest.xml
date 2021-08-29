@@ -26,8 +26,13 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.PDF_Scanner">
-        <activity android:name=".ui.component.detail.DetailActivity"></activity>
-        <activity android:name=".ui.component.search.SearchActivity" />
+        <activity android:name=".ui.component.detail.DetailActivity"
+            android:windowSoftInputMode="stateAlwaysHidden|adjustResize|adjustPan"
+            android:theme="@style/ScanScreenTheme"
+            />
+        <activity android:name=".ui.component.search.SearchActivity"
+            android:theme="@style/ScanScreenTheme"
+            />
         <activity
             android:name=".ui.component.ocr.OCRActivity"
             android:theme="@style/ScanScreenTheme" />

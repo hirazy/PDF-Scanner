@@ -11,6 +11,6 @@ import com.example.pdf_scanner.utils.LayoutId
 @LayoutId(R.layout.card_language)
 class LanguageAdapter(e: RecyclerItemListener): AdapterBase<LanguageOCR, CardLanguageBinding> (e) {
     override fun bindView(itemBinding: BaseHolder<CardLanguageBinding>, position: Int) {
-
+        itemBinding.itemBinding.o = listData[position]
     }
 }

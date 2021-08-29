@@ -1,7 +1,6 @@
 package com.example.pdf_scanner.ui.component.scan
 
 import android.Manifest
-import android.annotation.SuppressLint
 import android.app.Dialog
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -12,38 +11,56 @@ import android.os.Handler
 import android.util.Log
 import android.view.*
 import android.widget.Button
+import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.*
-import androidx.viewpager.widget.ViewPager
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.viewpager2.widget.ViewPager2
 import com.airbnb.lottie.LottieAnimationView
 import com.example.pdf_scanner.*
 import com.example.pdf_scanner.R
+import com.example.pdf_scanner.data.Resource
 import com.example.pdf_scanner.data.dto.DataImage
+import com.example.pdf_scanner.data.dto.DataOCR
 import com.example.pdf_scanner.data.dto.DataScan
+import com.example.pdf_scanner.data.dto.LanguageOCR
 import com.example.pdf_scanner.databinding.ActivityScanBinding
 import com.example.pdf_scanner.ui.base.BaseActivity
 import com.example.pdf_scanner.ui.component.image.ImageActivity
+import com.example.pdf_scanner.ui.component.ocr.OCRActivity
+import com.example.pdf_scanner.ui.component.scan.adapter.LanguageAdapter
 import com.example.pdf_scanner.ui.component.scan.dialog.BottomScan
 import com.example.pdf_scanner.ui.component.scan.dialog.BottomScanEvent
 import com.example.pdf_scanner.ui.component.scan.dialog.ShapeBSFragment
 import com.example.pdf_scanner.ui.component.scan.dialog.TextEditorDialogFragment
 import com.example.pdf_scanner.utils.FileUtil
 import com.example.pdf_scanner.utils.toObject
+import com.google.android.gms.tasks.OnFailureListener
+import com.google.android.gms.tasks.OnSuccessListener
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.google.firebase.ml.vision.FirebaseVision
+import com.google.firebase.ml.vision.common.FirebaseVisionImage
+import com.google.firebase.ml.vision.text.FirebaseVisionText
+import com.google.firebase.ml.vision.text.FirebaseVisionTextRecognizer
+import com.oneadx.vpnclient.utils.observe
 import ja.burhanrashid52.photoeditor.*
 import ja.burhanrashid52.photoeditor.shape.ShapeBuilder
 import ja.burhanrashid52.photoeditor.shape.ShapeType
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.collections.ArrayList
 
 
 class ScanActivity : BaseActivity(), ShapeBSFragment.Properties {
 
     lateinit var binding: ActivityScanBinding
-
-    // lateinit var adapterImg: ImagePageAdapter
+    val viewModel: ScanViewModel by viewModels()
+    lateinit var adapterImg: ImagePageAdapter
+    lateinit var adapterLanguage: LanguageAdapter
     lateinit var listImg: ArrayList<String>
+    lateinit var listOCR : ArrayList<String>
     lateinit var dataScan: DataScan
     lateinit var handler: Handler
     var optionSelected = 0
@@ -58,12 +75,24 @@ class ScanActivity : BaseActivity(), ShapeBSFragment.Properties {
             window.statusBarColor = resources.getColor(R.color.color_app)
         }
 
+        binding = ActivityScanBinding.inflate(layoutInflater)
+
         dataScan = intent.getStringExtra(KEY_DATA_SCAN)!!.toObject() as DataScan
 
+        if(dataScan.status == KEY_OCR){
+            binding.layoutScanLanguage.visibility = View.VISIBLE
+
+            binding.rcclvScanLanguage.layoutManager = LinearLayoutManager(this@ScanActivity, LinearLayoutManager.HORIZONTAL, false)
+
+            viewModel.fetchLanguage()
+            binding.layoutScanLanguage.setOnClickListener {
+                var intent = Intent(this@ScanActivity, OCRActivity::class.java)
+                // intent.putExtra(KEY_DATA_OCR, DataOCR(listOCR).toJSON())
+                startActivityForResult(intent, KEY_RESULT_OCR)
+            }
+        }
 
         listImg = dataScan.listImg
-
-        binding = ActivityScanBinding.inflate(layoutInflater)
 
         binding.tvCountPage.text = "1 / " + listImg.size.toString()
 
@@ -102,8 +131,10 @@ class ScanActivity : BaseActivity(), ShapeBSFragment.Properties {
 //            }
 //        })
 
-        adapterPager = ImageStateAdapter(supportFragmentManager, listImg)
-        binding.vpgImg.adapter = adapterPager
+        adapterImg = ImagePageAdapter(supportFragmentManager, listImg)
+
+        // binding.vpgImg.adapter = adapterPager
+        // binding.vpgImg.adapter = adapterPager
 
         // binding.vpgImg.adapter = adapterImg
 
@@ -123,8 +154,9 @@ class ScanActivity : BaseActivity(), ShapeBSFragment.Properties {
             bottomDialog.show(supportFragmentManager, bottomDialog.tag)
         }
 
-        binding.animScan.setAnimation(R.raw.animation_scanner)
+        binding.animScan.setAnimation(R.raw.scanner)
         binding.animScan.playAnimation()
+        binding.animScan.repeatCount = 1
 
         handler = Handler()
         handler.postDelayed({
@@ -210,31 +242,72 @@ class ScanActivity : BaseActivity(), ShapeBSFragment.Properties {
 
         binding.vpgImg.offscreenPageLimit = listImg.size
 
-        binding.vpgImg.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
-            override fun onPageScrolled(
-                position: Int,
-                positionOffset: Float,
-                positionOffsetPixels: Int
-            ) {
-
-            }
-
-            @SuppressLint("SetTextI18n")
-            override fun onPageSelected(position: Int) {
-                var pos = position + 1
-                binding.tvCountPage.text = pos.toString() + " / " + listImg.size
-            }
-
+        binding.vpgImg.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageScrollStateChanged(state: Int) {
-            }
 
+                super.onPageScrollStateChanged(state)
+            }
         })
+
+//        binding.vpgImg.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
+//            override fun onPageScrolled(
+//                position: Int,
+//                positionOffset: Float,
+//                positionOffsetPixels: Int
+//            ) {
+//
+//            }
+//
+//            @SuppressLint("SetTextI18n")
+//            override fun onPageSelected(position: Int) {
+//                var pos = position + 1
+//                binding.tvCountPage.text = pos.toString() + " / " + listImg.size
+//            }
+//
+//            override fun onPageScrollStateChanged(state: Int) {
+//            }
+//
+//        })
 
         setContentView(binding.root)
     }
 
-    interface onEditPhoto {
+//    private fun detectTxt(imageBitmap: BitMap) {
+//
+//        val image = FirebaseVisionImage.fromBitmap(imageBitmap)
+//
+//        val languageIdentifier = FirebaseNaturalLanguage.getInstance()
+//            .languageIdentification
+//
+//        val detector: FirebaseVisionTextRecognizer =
+//            FirebaseVision.getInstance().getVisionTextDetector()
+//
+//        detector.detectInImage(image)
+//            .addOnSuccessListener(OnSuccessListener<FirebaseVisionText?> { firebaseVisionText ->
+//                processTxt(firebaseVisionText)
+//            }).addOnFailureListener(OnFailureListener { // handling an error listener.
+//                Toast.makeText(
+//                    this@MainActivity,
+//                    "Fail to detect the text from image..",
+//                    Toast.LENGTH_SHORT
+//                ).show()
+//            })
+//    }
 
+    private fun processTxt(text: FirebaseVisionText) {
+        val blocks: List<FirebaseVisionText.TextBlock> = text.textBlocks
+
+        if (blocks.isEmpty()) {
+            // Toast.makeText(this@MainActivity, "No Text ", Toast.LENGTH_LONG).show()
+            return
+        }
+        for (block in blocks) {
+            val txt: String = block.text
+            // textview.setText(txt)
+        }
+    }
+
+    interface onEditPhoto {
 
         fun addText(inputText: String, styleBuilder: TextStyleBuilder)
 
@@ -247,7 +320,15 @@ class ScanActivity : BaseActivity(), ShapeBSFragment.Properties {
     }
 
     override fun observeViewModel() {
+        observe(viewModel.listLanguage, ::handleLanguageOCR)
+    }
 
+    private fun handleLanguageOCR(list: Resource<ArrayList<String>>){
+        when(list){
+            is Resource.Success ->{
+
+            }
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -261,7 +342,7 @@ class ScanActivity : BaseActivity(), ShapeBSFragment.Properties {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.itemActionScan -> {
+            R.id.itemActionSave -> {
                 var dialog = Dialog(this)
                 dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
                 dialog.window!!.setBackgroundDrawableResource(android.R.color.transparent)
@@ -318,6 +399,18 @@ class ScanActivity : BaseActivity(), ShapeBSFragment.Properties {
         // adapterImg.shapePicked(shapeType!!)
     }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if(requestCode == KEY_RESULT_OCR){
+            // viewModel.fetchLanguage()
+
+            // Reset OCR Language
+            if(dataScan.status == KEY_OCR){
+                viewModel.fetchLanguage()
+            }
+        }
+        super.onActivityResult(requestCode, resultCode, data)
+    }
+
     class ImageStateAdapter(fm: FragmentManager, val list: ArrayList<String>) :
         FragmentPagerAdapter(fm, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
 
@@ -339,6 +432,7 @@ class ScanActivity : BaseActivity(), ShapeBSFragment.Properties {
     class ImageFragment(val list: ArrayList<String>) : ListFragment(), OnPhotoEditorListener,
         onEditPhoto {
 
+
         lateinit var mPhotoEditor: PhotoEditor
         lateinit var mPhotoEditorView: PhotoEditorView
         lateinit var mShapeBuilder: ShapeBuilder
@@ -347,7 +441,7 @@ class ScanActivity : BaseActivity(), ShapeBSFragment.Properties {
 
         fun newInstance(number: Int): ImageFragment? {
             val args = Bundle()
-            args.putInt("number", number)
+            args.putInt(NUMBER, number)
             val fragment = ImageFragment(list)
             fragment.arguments = args
             position = number
@@ -360,7 +454,7 @@ class ScanActivity : BaseActivity(), ShapeBSFragment.Properties {
         override fun onCreate(savedInstanceState: Bundle?) {
             super.onCreate(savedInstanceState)
             Log.e("onCreate", mNum.toString())
-            mNum = if (arguments != null) requireArguments().getInt("number") else 1
+            mNum = if (arguments != null) requireArguments().getInt(NUMBER) else 1
         }
 
         override fun onCreateView(
@@ -369,7 +463,7 @@ class ScanActivity : BaseActivity(), ShapeBSFragment.Properties {
             savedInstanceState: Bundle?
         ): View? {
             val root: View = inflater.inflate(R.layout.item_page_image, container, false)
-            val number = requireArguments().getInt("number")
+            val number = requireArguments().getInt(NUMBER)
             mPhotoEditorView = root!!.findViewById(R.id.photoEditor)
 
             var file = File(list[number])
@@ -391,7 +485,7 @@ class ScanActivity : BaseActivity(), ShapeBSFragment.Properties {
             var act = activity as ScanActivity
             act.setOnEdit(object : onEditPhoto {
                 override fun addText(inputText: String, styleBuilder: TextStyleBuilder) {
-                    if (mNum == requireArguments().getInt("number")) {
+                    if (mNum == requireArguments().getInt(NUMBER)) {
                         mPhotoEditor!!.addText(inputText, styleBuilder)
                     }
                 }
@@ -401,7 +495,7 @@ class ScanActivity : BaseActivity(), ShapeBSFragment.Properties {
                 }
             })
 
-            container!!.addView(root)
+            //!!.addView(root)
 
             return root
         }
@@ -514,5 +608,33 @@ class ScanActivity : BaseActivity(), ShapeBSFragment.Properties {
         }
     }
 
+
+    class ImagePageAdapter(fm: FragmentManager, var list: ArrayList<String>) :
+        FragmentStatePagerAdapter(fm) {
+
+
+        override fun getCount(): Int {
+            return list.size
+        }
+
+        override fun instantiateItem(container: ViewGroup, position: Int): Any {
+
+            return super.instantiateItem(container, position)
+        }
+
+        override fun getItem(position: Int): Fragment {
+            var fragment: Fragment? = null
+            try {
+                fragment = ImageFragment(list).newInstance(position)
+            } catch (e: Exception) {
+            }
+            return fragment!!
+        }
+
+        override fun destroyItem(container: ViewGroup, position: Int, `object`: Any) {
+
+            super.destroyItem(container, position, `object`)
+        }
+    }
 
 }

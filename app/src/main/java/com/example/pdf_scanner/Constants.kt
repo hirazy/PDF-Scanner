@@ -6,6 +6,13 @@ import com.example.pdf_scanner.data.dto.OptionCamera
  * Created by Nguyen Manh Tien
  */
 
+/**
+ * KEY_INTENT_... : Key use for
+ * KEY_RESULT_...: only key use for detect result
+ * KEY_DATA_...: key use for data
+ */
+
+const val KEY_CONNECTION_DATA = "connection_data"
 
 const val APP_NAME = "PDF Scanner"
 
@@ -25,7 +32,9 @@ const val ADMOB_AD_UNIT_ID = "ca-app-pub-3940256099942544/2247696110"
 
 const val KEY_DATABASE = "key_database"
 const val DATA_CONFIG_APP = "data_config"
-const val KEY_CONNECTION_DATA = "connection_data"
+
+// KEY Data save set string language ocr
+const val KEY_LANGUAGE_OCR = "key_language_ocr"
 
 const val FIRST_LOG = "first_log"
 
@@ -44,6 +53,8 @@ const val KEY_CITY = "city"
 
 const val KEY_SIZE_TEXT = "key_size_text"
 
+const val NUMBER = "number"
+
 /**
  * Constant key Nation
  */
@@ -56,11 +67,14 @@ const val KEY_MANAGE_APPS = "key_manage_apps"
 const val KEY_SAVE_PURCHASE = "key_save_purchase"
 
 const val KEY_DATA_SCAN = "key_data_scan"
+const val KEY_DATA_OCR = "key_data_ocr"
 
 const val LIST_SERVER = "list_server"
 const val KEY_INTENT_SERVER = "key_intent_server"
 const val KEY_INTENT_APPLICATION = "key_intent_application"
 const val KEY_INTENT_IMAGE = "key_intent_image"
+
+const val KEY_DATA_DETAIL = "key_data_detail"
 
 const val SIGN = "Sign"
 const val ERASER = "Eraser"
@@ -122,8 +136,75 @@ const val KEY_CARD = 4
 // KEY INTENT
 const val KEY_INTENT_LISTIMG = "key_intent_listimg"
 
+// KEY_RESULT
+const val KEY_RESULT_OCR = 1
+
+
 const val DIALOG_TITLE_LEAVE = "Leave Scanning"
 const val DIALOG_CONTENT_LEAVE = "This will delete all scanned pages. Are you sure?"
 
 const val DIALOG_TITLE_DELETE = "Delete"
 const val DIALOG_CONTENT_DELETE = "Are you sure that you want to delete this page?"
+
+// LANGUAGE
+const val English = "English"
+
+const val Afrikaans = "Afrikaans"
+const val Albanian = "shqip"
+const val Arabic = "العربية"
+const val Armenian = "Հայ"
+const val Belorussian = "беларускі"
+const val Bengali = "বাংলা"
+const val Bulgarian = "български"
+const val Catalan = "Català"
+const val Chinese = "普通话"
+const val Croatian = "Hrvatski"
+const val Czech = "Čeština"
+const val Danish = "Dansk"
+const val Dutch = "Nederlands"
+const val Estonian = "Eesti keel"
+const val Filipino = "Filipino"
+const val Finnish = "Suomi"
+const val French = "Français"
+const val German = "Deutsch"
+const val Greek = "Ελληνικά"
+const val Gujarati = "ગુજરાતી"
+const val Hebrew = "עברית"
+const val Hindi = "हिन्दी"
+const val Hungarian = "Magyar"
+const val Icelandic = "Íslenska"
+const val Indonesian = "Bahasa Indonesia"
+const val Italian = "Italiano"
+const val Japanese = "日本語"
+const val Kannada = "ಕನ್ನಡ"
+const val Khmer = "ភាសាខ្មែរ"
+const val Korean = "한국어"
+const val Lao = "ລາວ"
+const val Latvian = "Latviešu"
+const val Lithuanian = "Lietuvių"
+const val Macedonian = "Македонски"
+const val Malay = "Bahasa Melayu"
+const val Malayalam	= "മലയാളം"
+const val Marathi = "मराठी"
+const val Nepali = "नेपाली"
+const val Norwegian = "Norsk"
+const val Persian = "فارسی"
+const val Polish = "Polski"
+const val Portuguese = "Português"
+const val Punjabi = "ਪੰਜਾਬੀ"
+const val Romanian = "Română"
+const val Russian1 = "Русский"
+const val Russian2 = "Русский (старая орфография)"
+const val Serbian1 = "Српски"
+const val Serbian2 = "Српски (латиница)"
+const val Slovak = "Slovenčina"
+const val Slovenian = "Slovenščina"
+const val Spanish = "Español"
+const val Swedish = "Svenska"
+const val Tamil = "தமிழ்"
+const val Telugu = "తెలుగు"
+const val Thai = "ไทย"
+const val Turkish = "Türkçe"
+const val Ukrainian = "Українська"
+const val Vietnamese = "Tiếng Việt"
+const val Yiddish = "Yiddish"

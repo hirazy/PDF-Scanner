@@ -1,5 +1,11 @@
 package com.example.pdf_scanner.data
 
-interface DataRepositorySource {
+import kotlinx.coroutines.flow.Flow
 
+interface DataRepositorySource {
+    suspend fun requestLanguageOCR(): Flow<Resource<Set<String>>>
+
+    suspend fun addLanguageOCR(language: String): Flow<Resource<Boolean>>
+
+    suspend fun removeLanguageOCR(language: String): Flow<Resource<Boolean>>
 }

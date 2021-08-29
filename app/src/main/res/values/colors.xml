@@ -58,4 +58,8 @@
     
     <color name="colorBorderReName">#757575</color>
 
+    <color name="colorPageFolder">#868686</color>
+    
+    <color name="colorLanguageSelected">#1A1A1A</color>
+
 </resources>

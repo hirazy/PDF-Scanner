@@ -1,16 +1,16 @@
 package com.example.pdf_scanner.ui.component.main
 
 import android.Manifest
-import android.R.attr.path
 import android.app.Dialog
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Color
 import android.os.Build
 import android.util.Base64
 import android.util.DisplayMetrics
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -23,7 +23,6 @@ import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.camerakit.CameraKitView
 import com.camerakit.type.CameraFlash
 import com.example.pdf_scanner.*
@@ -37,6 +36,7 @@ import com.example.pdf_scanner.ui.base.BaseActivity
 import com.example.pdf_scanner.ui.base.listener.RecyclerItemListener
 import com.example.pdf_scanner.ui.component.history.HistoryActivity
 import com.example.pdf_scanner.ui.component.image.ImageActivity
+import com.example.pdf_scanner.ui.component.main.adapter.OptionAdapter
 import com.example.pdf_scanner.ui.component.main.adapter.OptionCameraAdapter
 import com.example.pdf_scanner.ui.component.purchase.PurchaseActivity
 import com.example.pdf_scanner.ui.component.scan.ScanActivity
@@ -46,6 +46,13 @@ import com.kaopiz.kprogresshud.KProgressHUD
 import com.oneadx.vpnclient.utils.observe
 import com.oneadx.vpnclient.utils.observeEvent
 import dagger.hilt.android.AndroidEntryPoint
+import net.lucode.hackware.magicindicator.ViewPagerHelper
+import net.lucode.hackware.magicindicator.buildins.UIUtil
+import net.lucode.hackware.magicindicator.buildins.commonnavigator.CommonNavigator
+import net.lucode.hackware.magicindicator.buildins.commonnavigator.abs.CommonNavigatorAdapter
+import net.lucode.hackware.magicindicator.buildins.commonnavigator.abs.IPagerIndicator
+import net.lucode.hackware.magicindicator.buildins.commonnavigator.abs.IPagerTitleView
+import net.lucode.hackware.magicindicator.buildins.commonnavigator.titles.ClipPagerTitleView
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
@@ -68,6 +75,8 @@ class MainActivity : BaseActivity() {
     private var hud: KProgressHUD? = null
     var statusCamera = 0 // FLASH OR AUTO-FLASH
     var statusOption = 0 // WHITEBOARD, SINGLE, BATCH,...
+    var listOption = ArrayList<OptionCamera>()
+    private lateinit var mExamplePagerAdapter: OptionAdapter
 
 
     override fun initViewBinding() {
@@ -88,7 +97,7 @@ class MainActivity : BaseActivity() {
 
         var filePath = FileUtil(this@MainActivity).getRootFolder() + "/saved"
         var fileSaved = File(filePath)
-        if(!fileSaved.exists()){
+        if (!fileSaved.exists()) {
             fileSaved.parentFile.mkdirs()
             fileSaved.createNewFile()
         }
@@ -110,7 +119,7 @@ class MainActivity : BaseActivity() {
                     var cnt = 1
 
                     var date = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
-                    val strTime =  "Scan " + date.format(Date())
+                    val strTime = "Scan " + date.format(Date())
 
                     var filePath = "${fileRoot}/${strTime}"
                     var file = File(filePath)
@@ -130,12 +139,11 @@ class MainActivity : BaseActivity() {
                         binding.layoutBadgeImage.visibility = View.VISIBLE
                         binding.circleImg.setImageBitmap(bmp!!)
                         binding.btnDocument.setImageResource(R.drawable.ic_close)
+                        binding.vpgMain.isClickable = false
                         if (statusOption == KEY_SINGLE) {
                             var intent = Intent(this@MainActivity, ScanActivity::class.java)
-                            intent.putExtra(KEY_DATA_SCAN, DataScan(listImg, statusOption, false))
+                            intent.putExtra(KEY_DATA_SCAN, DataScan(listImg, statusOption, false).toJSON())
                             startActivity(intent)
-                        } else {
-                            binding.rcclvMain.isNestedScrollingEnabled = false
                         }
                     } else {
 
@@ -190,10 +198,11 @@ class MainActivity : BaseActivity() {
 
         binding.layoutBadgeImage.setOnClickListener {
             var intent = Intent(this, ScanActivity::class.java)
+            var status = binding.vpgM.currentItem
             if (statusOption == KEY_OCR) {
-                intent.putExtra(KEY_DATA_SCAN, DataScan(listImg, statusOption, true).toJSON())
+                intent.putExtra(KEY_DATA_SCAN, DataScan(listImg, status, true).toJSON())
             } else {
-                intent.putExtra(KEY_DATA_SCAN, DataScan(listImg, statusOption, false).toJSON())
+                intent.putExtra(KEY_DATA_SCAN, DataScan(listImg, status, false).toJSON())
             }
             startActivity(intent)
         }
@@ -210,16 +219,16 @@ class MainActivity : BaseActivity() {
 
         layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
 
-        binding.rcclvMain.layoutManager = layoutManager
-        binding.rcclvMain.adapter = adapter
-
-        binding.rcclvMain.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                binding.rcclvMain.post {
-                    selectMiddleItem()
-                }
-            }
-        })
+//        binding.rcclvMain.layoutManager = layoutManager
+//        binding.rcclvMain.adapter = adapter
+//
+//        binding.rcclvMain.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+//            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+//                binding.rcclvMain.post {
+//                    selectMiddleItem()
+//                }
+//            }
+//        })
 
 
         val displayMetrics = DisplayMetrics()
@@ -232,8 +241,35 @@ class MainActivity : BaseActivity() {
         setContentView(binding.root)
     }
 
-    private fun saveImage() {
+    private fun initViewpager() {
+        val commonNavigator = CommonNavigator(this)
+        commonNavigator.isSkimOver = true
+        val padding = UIUtil.getScreenWidth(this) / 2
+        commonNavigator.rightPadding = padding
+        commonNavigator.leftPadding = padding
+        commonNavigator.adapter = object : CommonNavigatorAdapter() {
+            override fun getCount(): Int {
+                return listOption.size
+            }
 
+            override fun getTitleView(context: Context, index: Int): IPagerTitleView {
+                val clipPagerTitleView = ClipPagerTitleView(context)
+                clipPagerTitleView.text = listOption[index].name
+                clipPagerTitleView.textColor = Color.parseColor("#4C4C4C")
+                clipPagerTitleView.clipColor = Color.RED
+                clipPagerTitleView.setOnClickListener {
+                    statusOption = index
+                    binding.vpgM.currentItem = index
+                }
+                return clipPagerTitleView
+            }
+
+            override fun getIndicator(context: Context): IPagerIndicator? {
+                return null
+            }
+        }
+        binding.vpgMain.navigator = commonNavigator
+        ViewPagerHelper.bind(binding.vpgMain, binding.vpgM)
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -268,39 +304,39 @@ class MainActivity : BaseActivity() {
         return Base64.encodeToString(b, Base64.DEFAULT)
     }
 
-    private fun selectMiddleItem() {
-        val firstVisibleIndex = layoutManager.findFirstVisibleItemPosition()
-        val lastVisibleIndex = layoutManager.findLastVisibleItemPosition()
-        val visibleIndexes = listOf(firstVisibleIndex..lastVisibleIndex).flatten()
-
-        for (i in visibleIndexes) {
-            val vh = binding.rcclvMain.findViewHolderForLayoutPosition(i)
-            if (vh?.itemView == null) {
-                continue
-            }
-
-            val displayMetrics = DisplayMetrics()
-            windowManager.defaultDisplay.getMetrics(displayMetrics)
-
-            var screenWidth = displayMetrics.widthPixels
-            var height = displayMetrics.heightPixels
-
-            val location = IntArray(2)
-            vh.itemView.getLocationOnScreen(location)
-            val x = location[0]
-            val halfWidth = vh.itemView.width * .5
-            val rightSide = x + halfWidth
-            val leftSide = x - halfWidth
-            val isInMiddle = screenWidth * .5 in leftSide..rightSide
-            if (isInMiddle) {
-                // "i" is your middle index and implement selecting it as you want
-                // optionsAdapter.selectItemAtIndex(i)
-                viewModel.selectItem(position = i)
-                statusOption = i
-                return
-            }
-        }
-    }
+//    private fun selectMiddleItem() {
+//        val firstVisibleIndex = layoutManager.findFirstVisibleItemPosition()
+//        val lastVisibleIndex = layoutManager.findLastVisibleItemPosition()
+//        val visibleIndexes = listOf(firstVisibleIndex..lastVisibleIndex).flatten()
+//
+//        for (i in visibleIndexes) {
+//            // val vh = binding.rcclvMain.findViewHolderForLayoutPosition(i)
+//            if (vh?.itemView == null) {
+//                continue
+//            }
+//
+//            val displayMetrics = DisplayMetrics()
+//            windowManager.defaultDisplay.getMetrics(displayMetrics)
+//
+//            var screenWidth = displayMetrics.widthPixels
+//            var height = displayMetrics.heightPixels
+//
+//            val location = IntArray(2)
+//            vh.itemView.getLocationOnScreen(location)
+//            val x = location[0]
+//            val halfWidth = vh.itemView.width * .5
+//            val rightSide = x + halfWidth
+//            val leftSide = x - halfWidth
+//            val isInMiddle = screenWidth * .5 in leftSide..rightSide
+//            if (isInMiddle) {
+//                // "i" is your middle index and implement selecting it as you want
+//                // optionsAdapter.selectItemAtIndex(i)
+//                viewModel.selectItem(position = i)
+//                statusOption = i
+//                return
+//            }
+//        }
+//    }
 
     override fun observeViewModel() {
         observe(viewModel.listOption, ::handleOption)
@@ -311,6 +347,10 @@ class MainActivity : BaseActivity() {
         when (list) {
             is Resource.Success -> {
                 adapter.setData(list.data!!)
+                listOption = list.data!!
+                mExamplePagerAdapter = OptionAdapter(listOption)
+                binding.vpgM.adapter = mExamplePagerAdapter
+                initViewpager()
             }
         }
     }
@@ -326,7 +366,6 @@ class MainActivity : BaseActivity() {
             }
 
             R.id.itemFlash -> {
-                Log.e("onOptionsItemSelected", "sa")
                 when (statusCamera) {
                     0 -> {
                         statusCamera = 1
@@ -381,5 +420,10 @@ class MainActivity : BaseActivity() {
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         binding.cameraKit.onRequestPermissionsResult(requestCode, permissions, grantResults)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+
+        super.onActivityResult(requestCode, resultCode, data)
     }
 }

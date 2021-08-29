@@ -9,25 +9,21 @@ import javax.inject.Inject
 
 class RemoteData @Inject constructor(
     private val networkConnectivity: NetworkConnectivity
-){
+) {
 
-
-
-    private suspend fun processCall(responseCall: suspend () -> Response<*>): Any?{
-        if(!networkConnectivity.isConnected()){
+    private suspend fun processCall(responseCall: suspend () -> Response<*>): Any? {
+        if (!networkConnectivity.isConnected()) {
             return NO_INTERNET_CONNECTION
         }
-        return try{
+        return try {
             val response = responseCall.invoke()
             val responseCode = response.code()
-            if(response.isSuccessful){
+            if (response.isSuccessful) {
                 response.body()
-            }
-            else{
+            } else {
                 responseCode
             }
-        }
-        catch (e: IOException){
+        } catch (e: IOException) {
             NETWORK_ERROR
         }
     }

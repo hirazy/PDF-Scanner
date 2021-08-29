@@ -2,6 +2,7 @@ package com.example.pdf_scanner.di
 
 import android.content.Context
 import com.example.pdf_scanner.data.local.AssetData
+import com.example.pdf_scanner.data.local.LocalData
 import com.example.pdf_scanner.utils.*
 import com.oneadx.vpnclient.utils.*
 import dagger.Module
@@ -17,14 +18,14 @@ import kotlin.coroutines.CoroutineContext
 @InstallIn(SingletonComponent::class)
 class AppModule {
 
-//    @Provides
-//    @Singleton
-//    fun provideLocalRepository(
-//        @ApplicationContext context: Context,
-//        sharedPrefsSource: SharedPrefsSource
-//    ): LocalData {
-//        return LocalData(context, sharedPrefsSource)
-//    }
+    @Provides
+    @Singleton
+    fun provideLocalRepository(
+        @ApplicationContext context: Context,
+        sharedPrefsSource: SharedPrefsSource
+    ): LocalData {
+        return LocalData(context, sharedPrefsSource)
+    }
 
     @Provides
     @Singleton

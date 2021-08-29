@@ -4,8 +4,8 @@ plugins {
     id 'kotlin-kapt'
     id 'kotlin-parcelize'
     id 'dagger.hilt.android.plugin'
-//    id 'com.google.firebase.crashlytics'
-//    id 'com.google.gms.google-services'
+    id 'com.google.firebase.crashlytics'
+    id 'com.google.gms.google-services'
 }
 
 android {
@@ -88,6 +88,16 @@ dependencies {
     implementation 'com.google.firebase:firebase-analytics-ktx'
     implementation 'com.google.firebase:firebase-crashlytics-ktx'
 
+    // dependancy for firebase ml kit
+
+    //noinspection OutdatedLibrary
+    implementation 'com.google.firebase:firebase-ml-vision:24.0.1'
+
+    implementation 'com.google.firebase:firebase-ml-natural-language:22.0.0'
+    implementation 'com.google.firebase:firebase-ml-natural-language-language-id-model:20.0.7'
+
+
+
 //    def multidex_version = "2.0.1"
 //    implementation "androidx.multidex:multidex:$multidex_version"
     // implementation "androidx.multidex:multidex:2.0.1"
@@ -138,6 +148,8 @@ dependencies {
 
     // Swipe Layout
     implementation 'com.chauthai.swipereveallayout:swipe-reveal-layout:1.4.1'
+
+    implementation 'com.github.hackware1993:MagicIndicator:1.7.0' // for androidx
 
 
 }

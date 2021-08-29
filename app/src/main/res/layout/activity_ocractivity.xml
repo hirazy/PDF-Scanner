@@ -20,6 +20,8 @@
             android:layout_height="wrap_content">
 
             <androidx.appcompat.widget.Toolbar
+                android:background="@color/colorApp"
+                app:navigationIcon="@drawable/ic_back"
                 app:titleTextColor="@color/white"
                 app:title="@string/tvOCRLanguage"
                 android:id="@+id/tbOCR"

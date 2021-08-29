@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+        <variable
+            name="o"
+            type="com.example.pdf_scanner.data.dto.DataLanguage" />
+    </data>
+
+    <androidx.cardview.widget.CardView
+        android:layout_marginLeft="10dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:cardCornerRadius="15dp">
+
+        <LinearLayout
+            android:background="@drawable/bg_language_selected"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingLeft="8dp"
+            android:paddingTop="5dp"
+            android:paddingRight="8dp"
+            android:paddingBottom="5dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="English"
+                android:textColor="@color/white"
+                android:textSize="12sp" />
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+</layout>

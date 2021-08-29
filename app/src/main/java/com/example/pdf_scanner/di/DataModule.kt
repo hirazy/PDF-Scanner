@@ -12,7 +12,7 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class DataModule {
-//    @Binds
-//    @Singleton
-//    abstract fun provideDataRepository(dataRepository: DataRepository): DataRepositorySource
+    @Binds
+    @Singleton
+    abstract fun provideDataRepository(dataRepository: DataRepository): DataRepositorySource
 }

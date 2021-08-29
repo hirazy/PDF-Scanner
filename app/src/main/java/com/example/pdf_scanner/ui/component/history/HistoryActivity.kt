@@ -12,6 +12,7 @@ import android.widget.EditText
 import android.widget.ImageButton
 import androidx.activity.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.pdf_scanner.KEY_DATA_DETAIL
 import com.example.pdf_scanner.R
 import com.example.pdf_scanner.data.Resource
 import com.example.pdf_scanner.data.dto.ImageFolder
@@ -60,12 +61,15 @@ class HistoryActivity : BaseActivity() {
 
         binding.layoutSearchFolder.setOnClickListener {
             var intent = Intent(this@HistoryActivity, SearchActivity::class.java)
+
             startActivity(intent)
         }
 
         adapter = FolderAdapter(object : RecycleFolderListener {
             override fun onItemSelected(index: Int, data: OBase) {
+                var o = data as ImageFolder
                 var intent = Intent(this@HistoryActivity, DetailActivity::class.java)
+                intent.putExtra(KEY_DATA_DETAIL, o.toJSON())
                 startActivity(intent)
             }
 
