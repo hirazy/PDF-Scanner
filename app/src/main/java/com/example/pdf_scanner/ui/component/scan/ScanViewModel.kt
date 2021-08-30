@@ -19,7 +19,7 @@ class ScanViewModel @Inject constructor(var dataRepositorySource: DataRepository
     val listLanguage : LiveData<Resource<ArrayList<String>>> get() = listDataLanguage
 
     init {
-        fetchLanguage()
+        // fetchLanguage()
     }
 
     fun fetchLanguage(){

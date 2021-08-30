@@ -30,11 +30,11 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="15dp"
                 android:layout_marginTop="10dp"
-                android:layout_marginRight="20dp"
+                android:layout_marginRight="30dp"
                 android:background="@drawable/bg_search_history"
                 android:orientation="horizontal"
-                android:paddingTop="10dp"
-                android:paddingBottom="10dp">
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp">
 
                 <ImageView
                     android:layout_centerVertical="true"
@@ -52,7 +52,7 @@
                     android:id="@+id/edtSearch"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center"
+                    android:layout_gravity="left"
                     android:layout_marginLeft="10dp"
                     android:gravity="center"
                     android:hint="@string/tvSearch"

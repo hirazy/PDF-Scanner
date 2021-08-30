@@ -13,8 +13,10 @@ import android.widget.ImageButton
 import androidx.activity.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.pdf_scanner.KEY_DATA_DETAIL
+import com.example.pdf_scanner.KEY_DATA_SEARCH
 import com.example.pdf_scanner.R
 import com.example.pdf_scanner.data.Resource
+import com.example.pdf_scanner.data.dto.DataSearch
 import com.example.pdf_scanner.data.dto.ImageFolder
 import com.example.pdf_scanner.data.dto.OBase
 import com.example.pdf_scanner.databinding.ActivityHistoryBinding
@@ -38,6 +40,7 @@ class HistoryActivity : BaseActivity() {
     val viewModel: HistoryViewModel by viewModels()
     lateinit var binding: ActivityHistoryBinding
     lateinit var adapter: FolderAdapter
+    lateinit var listFolder : ArrayList<ImageFolder>
 
     override fun initViewBinding() {
 
@@ -48,7 +51,7 @@ class HistoryActivity : BaseActivity() {
 
         binding = ActivityHistoryBinding.inflate(layoutInflater)
 
-        setContentView(binding.root)
+        setContentView(binding.root)    
         setSupportActionBar(binding.tbHistory)
 
         binding.tbHistory.setNavigationOnClickListener {
@@ -61,7 +64,7 @@ class HistoryActivity : BaseActivity() {
 
         binding.layoutSearchFolder.setOnClickListener {
             var intent = Intent(this@HistoryActivity, SearchActivity::class.java)
-
+            intent.putExtra(KEY_DATA_SEARCH, DataSearch(listFolder).toJSON())
             startActivity(intent)
         }
 
@@ -137,6 +140,7 @@ class HistoryActivity : BaseActivity() {
         var filePath = FileUtil(this@HistoryActivity).getRootFolder() + "/saved"
         Log.e("Files", "Path: $filePath")
         val directory = File(filePath)
+        listFolder = ArrayList()
 
         if (!directory.exists() || directory.listFiles() == null) {
             Log.e("fetchFolder", "")
@@ -152,6 +156,8 @@ class HistoryActivity : BaseActivity() {
             }
             list.add(ImageFolder(files[i].name, files[i].name.substring(4, 14), listPath))
         }
+
+        listFolder = list
 
         viewModel.fetchData(list)
     }

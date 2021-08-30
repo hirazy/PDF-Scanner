@@ -46,4 +46,10 @@ class DataRepository @Inject constructor(
         }.flowOn(ioDispatcher)
     }
 
+    override suspend fun saveLanguageOCR(languages: Set<String>): Flow<Resource<Boolean>> {
+        return flow{
+            emit(localRepository.cacheLanguageOCR(languages))
+        }.flowOn(ioDispatcher)
+    }
+
 }

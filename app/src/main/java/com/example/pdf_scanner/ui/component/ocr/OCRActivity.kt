@@ -9,6 +9,7 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.pdf_scanner.*
+import com.example.pdf_scanner.data.Resource
 import com.example.pdf_scanner.data.dto.DataOCR
 import com.example.pdf_scanner.data.dto.LanguageOCR
 import com.example.pdf_scanner.data.dto.OBase
@@ -16,6 +17,7 @@ import com.example.pdf_scanner.databinding.ActivityOcractivityBinding
 import com.example.pdf_scanner.ui.base.BaseActivity
 import com.example.pdf_scanner.ui.base.listener.RecyclerItemListener
 import com.example.pdf_scanner.ui.component.ocr.adapter.LanguageAdapter
+import com.oneadx.vpnclient.utils.observe
 import com.pranavpandey.android.dynamic.toasts.DynamicToast
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -47,10 +49,12 @@ class OCRActivity : BaseActivity() {
                     }
                     else{
                         listOCR[index].isEnabled = true
+                        adapter.notifyItemChanged(index)
                     }
                 }
                 else{
                     listOCR[index].isEnabled = false
+                    adapter.notifyItemChanged(index)
                 }
             }
 
@@ -72,7 +76,15 @@ class OCRActivity : BaseActivity() {
     }
 
     override fun observeViewModel() {
+        observe(viewModel.listLanguage, ::handleLanguage)
+    }
 
+    private fun handleLanguage(data: Resource<ArrayList<LanguageOCR>>){
+        when(data){
+            is Resource.Success ->{
+                adapter.setData(listOCR)
+            }
+        }
     }
 
     private fun fetchOCR(){
@@ -144,8 +156,12 @@ class OCRActivity : BaseActivity() {
         when(item.itemId){
             R.id.itemActionSaveOCR ->{
                 var intent = Intent()
-                // intent.putExtra(KEY_DATA_OCR, DataOCR(list).toJSON())
-
+                var languages = ArrayList<String>()
+                for(i in 0 until listOCR.size)
+                    if(listOCR[i].isEnabled){
+                        languages.add(listOCR[i].name)
+                    }
+                viewModel.saveLanguage(languages.toSet())
                 setResult(RESULT_OK)
                 finish()
             }

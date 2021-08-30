@@ -8,4 +8,6 @@ interface DataRepositorySource {
     suspend fun addLanguageOCR(language: String): Flow<Resource<Boolean>>
 
     suspend fun removeLanguageOCR(language: String): Flow<Resource<Boolean>>
+
+    suspend fun saveLanguageOCR(languages: Set<String>): Flow<Resource<Boolean>>
 }

@@ -39,6 +39,16 @@ class OCRViewModel @Inject constructor(var dataRepositorySource: DataRepositoryS
         }
     }
 
+    fun saveLanguage(languages: Set<String>){
+        viewModelScope.launch {
+            dataRepositorySource.saveLanguageOCR(languages).collect{
+                when(it){
+                    is Resource.Success ->{
 
+                    }
+                }
+            }
+        }
+    }
 
 }

@@ -68,6 +68,7 @@ const val KEY_SAVE_PURCHASE = "key_save_purchase"
 
 const val KEY_DATA_SCAN = "key_data_scan"
 const val KEY_DATA_OCR = "key_data_ocr"
+const val KEY_DATA_SEARCH = "key_data_search"
 
 const val LIST_SERVER = "list_server"
 const val KEY_INTENT_SERVER = "key_intent_server"

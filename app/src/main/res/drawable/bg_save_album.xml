@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
     <corners android:radius="20dp"/>
-    <stroke android:width="0.5dp" android:color="@color/colorHistoryBar"/>
-
-    <solid android:color="@color/colorApp"/>
+    <gradient android:startColor="#2BE5C3" android:centerColor="#32DCBC"
+        android:endColor="#38D1B5"
+        android:angle="270"
+        />
 </shape>

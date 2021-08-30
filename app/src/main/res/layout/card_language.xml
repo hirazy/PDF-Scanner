@@ -23,6 +23,7 @@
             android:layout_height="wrap_content"
             >
             <TextView
+                android:textColor="@color/white"
                 android:gravity="center"
                 android:textSize="16sp"
                 android:text="@{o.name}"

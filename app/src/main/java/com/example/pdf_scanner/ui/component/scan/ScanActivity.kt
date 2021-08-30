@@ -11,7 +11,6 @@ import android.os.Handler
 import android.util.Log
 import android.view.*
 import android.widget.Button
-import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.*
@@ -22,28 +21,25 @@ import com.example.pdf_scanner.*
 import com.example.pdf_scanner.R
 import com.example.pdf_scanner.data.Resource
 import com.example.pdf_scanner.data.dto.DataImage
-import com.example.pdf_scanner.data.dto.DataOCR
+import com.example.pdf_scanner.data.dto.DataLanguage
 import com.example.pdf_scanner.data.dto.DataScan
-import com.example.pdf_scanner.data.dto.LanguageOCR
+import com.example.pdf_scanner.data.dto.OBase
 import com.example.pdf_scanner.databinding.ActivityScanBinding
 import com.example.pdf_scanner.ui.base.BaseActivity
+import com.example.pdf_scanner.ui.base.listener.RecyclerItemListener
 import com.example.pdf_scanner.ui.component.image.ImageActivity
 import com.example.pdf_scanner.ui.component.ocr.OCRActivity
-import com.example.pdf_scanner.ui.component.scan.adapter.LanguageAdapter
+import com.example.pdf_scanner.ui.component.scan.adapter.LanguageSelectedAdapter
 import com.example.pdf_scanner.ui.component.scan.dialog.BottomScan
 import com.example.pdf_scanner.ui.component.scan.dialog.BottomScanEvent
 import com.example.pdf_scanner.ui.component.scan.dialog.ShapeBSFragment
 import com.example.pdf_scanner.ui.component.scan.dialog.TextEditorDialogFragment
 import com.example.pdf_scanner.utils.FileUtil
 import com.example.pdf_scanner.utils.toObject
-import com.google.android.gms.tasks.OnFailureListener
-import com.google.android.gms.tasks.OnSuccessListener
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import com.google.firebase.ml.vision.FirebaseVision
-import com.google.firebase.ml.vision.common.FirebaseVisionImage
 import com.google.firebase.ml.vision.text.FirebaseVisionText
-import com.google.firebase.ml.vision.text.FirebaseVisionTextRecognizer
 import com.oneadx.vpnclient.utils.observe
+import dagger.hilt.android.AndroidEntryPoint
 import ja.burhanrashid52.photoeditor.*
 import ja.burhanrashid52.photoeditor.shape.ShapeBuilder
 import ja.burhanrashid52.photoeditor.shape.ShapeType
@@ -52,15 +48,15 @@ import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
 
-
+@AndroidEntryPoint
 class ScanActivity : BaseActivity(), ShapeBSFragment.Properties {
 
     lateinit var binding: ActivityScanBinding
     val viewModel: ScanViewModel by viewModels()
     lateinit var adapterImg: ImagePageAdapter
-    lateinit var adapterLanguage: LanguageAdapter
+    lateinit var adapterLanguageSelected: LanguageSelectedAdapter
     lateinit var listImg: ArrayList<String>
-    lateinit var listOCR : ArrayList<String>
+    lateinit var listOCR: ArrayList<String>
     lateinit var dataScan: DataScan
     lateinit var handler: Handler
     var optionSelected = 0
@@ -79,10 +75,25 @@ class ScanActivity : BaseActivity(), ShapeBSFragment.Properties {
 
         dataScan = intent.getStringExtra(KEY_DATA_SCAN)!!.toObject() as DataScan
 
-        if(dataScan.status == KEY_OCR){
+        if (dataScan.status == KEY_OCR) {
             binding.layoutScanLanguage.visibility = View.VISIBLE
 
-            binding.rcclvScanLanguage.layoutManager = LinearLayoutManager(this@ScanActivity, LinearLayoutManager.HORIZONTAL, false)
+            adapterLanguageSelected = LanguageSelectedAdapter(object : RecyclerItemListener {
+                override fun onItemSelected(index: Int, data: OBase) {
+                    var intent = Intent(this@ScanActivity, OCRActivity::class.java)
+                    // intent.putExtra(KEY_DATA_OCR, DataOCR(listOCR).toJSON())
+                    startActivityForResult(intent, KEY_RESULT_OCR)
+                }
+
+                override fun onOption(index: Int, data: OBase) {
+
+                }
+
+            })
+
+            binding.rcclvScanLanguage.layoutManager =
+                LinearLayoutManager(this@ScanActivity, LinearLayoutManager.HORIZONTAL, false)
+            binding.rcclvScanLanguage.adapter = adapterLanguageSelected
 
             viewModel.fetchLanguage()
             binding.layoutScanLanguage.setOnClickListener {
@@ -323,10 +334,14 @@ class ScanActivity : BaseActivity(), ShapeBSFragment.Properties {
         observe(viewModel.listLanguage, ::handleLanguageOCR)
     }
 
-    private fun handleLanguageOCR(list: Resource<ArrayList<String>>){
-        when(list){
-            is Resource.Success ->{
-
+    private fun handleLanguageOCR(list: Resource<ArrayList<String>>) {
+        when (list) {
+            is Resource.Success -> {
+                var it = list.data
+                var listLanguage = ArrayList<DataLanguage>()
+                for (i in 0 until it!!.size)
+                    listLanguage.add(DataLanguage(it[i]))
+                adapterLanguageSelected.setData(listLanguage)
             }
         }
     }
@@ -400,11 +415,11 @@ class ScanActivity : BaseActivity(), ShapeBSFragment.Properties {
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if(requestCode == KEY_RESULT_OCR){
+        if (requestCode == KEY_RESULT_OCR) {
             // viewModel.fetchLanguage()
 
             // Reset OCR Language
-            if(dataScan.status == KEY_OCR){
+            if (dataScan.status == KEY_OCR) {
                 viewModel.fetchLanguage()
             }
         }
