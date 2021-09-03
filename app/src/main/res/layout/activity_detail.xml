@@ -71,7 +71,7 @@
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/layoutTextDetail"
-            app:layout_constraintVertical_bias="0.497" />
+            app:layout_constraintVertical_bias="0.492" />
 
         <LinearLayout
             android:id="@+id/layoutOptionDetail"

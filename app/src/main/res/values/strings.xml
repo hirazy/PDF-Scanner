@@ -9,7 +9,11 @@
     <string name="network_error">Network error, could get data,please try again!</string>
 
     <string name="tv_save">Save</string>
+    <string name="tv_saveAll">Save all</string>
+    <string name="tv_selectAll">Select all</string>
     <string name="tvRecognized">Recognized</string>
+
+    <string name="tvRecognize">Recognize</string>
 
     <string name="tvWhiteBoard">Focus your phone on the whiteboard and take pictures for scanning.</string>
     <string name="tvOCR">Hold your Phone over document and take a picture.</string>
@@ -85,17 +89,18 @@
 
     <string name="tvCancel">Cancel</string>
     <string name="tvConfirm">Confirm</string>
-    
+
     <string name="tvPremium">Premium</string>
     <string name="tvFeedBack">Feedback &amp; Support</string>
     <string name="tvAbout">About Us</string>
     <string name="tvList">list</string>
-    
+
     <string name="tvComment">Comment</string>
     <string name="tvEmail">Email</string>
     <string name="tvSave">Save</string>
     <string name="tvPrint">Print</string>
-    
+    <string name="tvToAlbum">To Album</string>
+
     <string name="tvNoResultSearch">Your search did not return any matches</string>
 
 </resources>

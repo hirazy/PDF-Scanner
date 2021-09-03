@@ -1,16 +1,12 @@
 package com.example.pdf_scanner.ui.component.ocr
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
-import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.pdf_scanner.*
 import com.example.pdf_scanner.data.Resource
-import com.example.pdf_scanner.data.dto.DataOCR
 import com.example.pdf_scanner.data.dto.LanguageOCR
 import com.example.pdf_scanner.data.dto.OBase
 import com.example.pdf_scanner.databinding.ActivityOcractivityBinding
@@ -24,42 +20,42 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class OCRActivity : BaseActivity() {
 
-    lateinit var binding : ActivityOcractivityBinding
-    val viewModel : OCRViewModel by viewModels()
+    lateinit var binding: ActivityOcractivityBinding
+    val viewModel: OCRViewModel by viewModels()
     lateinit var adapter: LanguageAdapter
-    lateinit var listOCR : ArrayList<LanguageOCR>
+    lateinit var listOCR: ArrayList<LanguageOCR>
 
     override fun initViewBinding() {
         binding = ActivityOcractivityBinding.inflate(layoutInflater)
 
         setSupportActionBar(binding.tbOCR)
 
-        adapter = LanguageAdapter(object: RecyclerItemListener{
+        adapter = LanguageAdapter(object : RecyclerItemListener {
             override fun onItemSelected(index: Int, data: OBase) {
-                var o = data as LanguageOCR
-                if(!o.isEnabled){
-                    var cnt = 0
-                    for(i in 0 until listOCR.size){
-                        if(listOCR[i].isEnabled){
-                            cnt++
-                        }
-                    }
-                    if(cnt == 3){
-                        DynamicToast.makeError(this@OCRActivity, "Tips: To ensure the accuracy of OCR, you can choose up to 3 languages.").show()
-                    }
-                    else{
-                        listOCR[index].isEnabled = true
-                        adapter.notifyItemChanged(index)
-                    }
-                }
-                else{
-                    listOCR[index].isEnabled = false
-                    adapter.notifyItemChanged(index)
-                }
             }
 
             override fun onOption(index: Int, data: OBase) {
-
+                var o = data as LanguageOCR
+                if (!o.isEnabled) {
+                    var cnt = 0
+                    for (i in 0 until listOCR.size) {
+                        if (listOCR[i].isEnabled) {
+                            cnt++
+                        }
+                    }
+                    if (cnt == 3) {
+                        DynamicToast.makeError(
+                            this@OCRActivity,
+                            "Tips: To ensure the accuracy of OCR, you can choose up to 3 languages."
+                        ).show()
+                    } else {
+                        listOCR[index].isEnabled = true
+                        adapter.notifyItemChanged(index)
+                    }
+                } else {
+                    listOCR[index].isEnabled = false
+                    adapter.notifyItemChanged(index)
+                }
             }
         })
 
@@ -79,15 +75,15 @@ class OCRActivity : BaseActivity() {
         observe(viewModel.listLanguage, ::handleLanguage)
     }
 
-    private fun handleLanguage(data: Resource<ArrayList<LanguageOCR>>){
-        when(data){
-            is Resource.Success ->{
+    private fun handleLanguage(data: Resource<ArrayList<LanguageOCR>>) {
+        when (data) {
+            is Resource.Success -> {
                 adapter.setData(listOCR)
             }
         }
     }
 
-    private fun fetchOCR(){
+    private fun fetchOCR() {
         listOCR = ArrayList<LanguageOCR>()
         listOCR.add(LanguageOCR(English, false))
         listOCR.add(LanguageOCR(Afrikaans, false))
@@ -153,12 +149,12 @@ class OCRActivity : BaseActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when(item.itemId){
-            R.id.itemActionSaveOCR ->{
+        when (item.itemId) {
+            R.id.itemActionSaveOCR -> {
                 var intent = Intent()
                 var languages = ArrayList<String>()
-                for(i in 0 until listOCR.size)
-                    if(listOCR[i].isEnabled){
+                for (i in 0 until listOCR.size)
+                    if (listOCR[i].isEnabled) {
                         languages.add(listOCR[i].name)
                     }
                 viewModel.saveLanguage(languages.toSet())
@@ -168,7 +164,6 @@ class OCRActivity : BaseActivity() {
         }
         return super.onOptionsItemSelected(item)
     }
-
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.item_action_ocr_save, menu)

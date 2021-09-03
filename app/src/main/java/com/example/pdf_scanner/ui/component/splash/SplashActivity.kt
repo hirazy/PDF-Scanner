@@ -1,5 +1,6 @@
 package com.example.pdf_scanner.ui.component.splash
 
+import android.animation.Animator
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Handler
@@ -13,7 +14,6 @@ import dagger.hilt.android.AndroidEntryPoint
 class SplashActivity : BaseActivity() {
 
     lateinit var binding: ActivitySplashBinding
-    lateinit var handler: Handler
 
     override fun initViewBinding() {
         binding = ActivitySplashBinding.inflate(layoutInflater)
@@ -24,14 +24,27 @@ class SplashActivity : BaseActivity() {
         binding.laAnimation.setAnimation(R.raw.splash_scanner)
         binding.laAnimation.playAnimation()
 
-        handler = Handler()
-        handler.postDelayed({
-            // binding.rippleSplash.stopRippleAnimation()
-            binding.laAnimation.cancelAnimation()
-            var intent = Intent(this@SplashActivity, MainActivity::class.java)
-            startActivity(intent)
-            finish()
-        }, 3500)
+        binding.laAnimation.repeatCount = 1
+
+        binding.laAnimation.addAnimatorListener(object: Animator.AnimatorListener{
+            override fun onAnimationStart(animation: Animator?) {
+
+            }
+
+            override fun onAnimationEnd(animation: Animator?) {
+                binding.laAnimation.cancelAnimation()
+                var intent = Intent(this@SplashActivity, MainActivity::class.java)
+                startActivity(intent)
+                finish()
+            }
+
+            override fun onAnimationCancel(animation: Animator?) {
+            }
+
+            override fun onAnimationRepeat(animation: Animator?) {
+            }
+
+        })
     }
 
     private fun getVersion(): String{

@@ -26,13 +26,23 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.PDF_Scanner">
-        <activity android:name=".ui.component.detail.DetailActivity"
-            android:windowSoftInputMode="stateAlwaysHidden|adjustResize|adjustPan"
+        <activity android:name=".ui.component.detail_text.DetailTextActivity"
             android:theme="@style/ScanScreenTheme"
             />
-        <activity android:name=".ui.component.search.SearchActivity"
+        <activity android:name=".ui.component.filter.FilterActivity"
+            android:theme="@style/ScanScreenTheme"/>
+        <activity android:name=".ui.component.about.AboutActivity"
+            android:theme="@style/ScanScreenTheme"/>
+        <activity
+            android:name=".ui.component.select.SelectActivity"
+            android:theme="@style/ScanScreenTheme" />
+        <activity
+            android:name=".ui.component.detail.DetailActivity"
             android:theme="@style/ScanScreenTheme"
-            />
+            android:windowSoftInputMode="stateAlwaysHidden|adjustResize|adjustPan" />
+        <activity
+            android:name=".ui.component.search.SearchActivity"
+            android:theme="@style/ScanScreenTheme" />
         <activity
             android:name=".ui.component.ocr.OCRActivity"
             android:theme="@style/ScanScreenTheme" />
@@ -65,6 +75,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <meta-data
+            android:name="com.google.firebase.ml.vision.DEPENDENCIES"
+            android:value="ocr" />
     </application>
 
 </manifest>

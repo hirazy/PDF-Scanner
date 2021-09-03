@@ -36,8 +36,9 @@
             android:layout_height="wrap_content"
             >
             <EditText
+                android:background="@null"
                 android:id="@+id/edtReName"
-                android:text="adadasd"
+                android:text="Scan"
                 android:textColor="@color/black"
                 android:maxLength="25"
                 android:layout_centerVertical="true"
@@ -77,7 +78,7 @@
                 android:background="@drawable/bg_btn_decline"
                 android:id="@+id/btnDeclineReName"
                 android:text="@string/tvCancel"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 />
 
@@ -92,7 +93,7 @@
                 android:text="@string/tvConfirm"
                 android:textColor="@color/white"
                 android:background="@drawable/bg_btn_accept"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 />
         </LinearLayout>

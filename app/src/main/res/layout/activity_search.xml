@@ -46,18 +46,22 @@
                     android:src="@drawable/ic_search" />
 
                 <EditText
+                    android:layout_marginRight="10dp"
+                    android:lines="1"
                     android:background="@null"
                     android:layout_centerVertical="true"
                     android:layout_toRightOf="@+id/icSearch"
                     android:id="@+id/edtSearch"
+                    android:layout_toLeftOf="@+id/btnClearSearch"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="left"
                     android:layout_marginLeft="10dp"
-                    android:gravity="center"
+                    android:gravity="left"
                     android:hint="@string/tvSearch"
                     android:textColorHint="@color/colorPageFolder"
                     android:textColor="@color/white"
+                    android:maxLength="30"
                     android:textSize="15sp" />
 
                 <ImageButton

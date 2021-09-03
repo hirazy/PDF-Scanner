@@ -9,7 +9,6 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.os.Build
-import android.util.Base64
 import android.util.DisplayMetrics
 import android.view.Menu
 import android.view.MenuItem
@@ -53,7 +52,6 @@ import net.lucode.hackware.magicindicator.buildins.commonnavigator.abs.CommonNav
 import net.lucode.hackware.magicindicator.buildins.commonnavigator.abs.IPagerIndicator
 import net.lucode.hackware.magicindicator.buildins.commonnavigator.abs.IPagerTitleView
 import net.lucode.hackware.magicindicator.buildins.commonnavigator.titles.ClipPagerTitleView
-import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
 import java.nio.charset.StandardCharsets
@@ -61,6 +59,10 @@ import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
 
+/**
+ * @author hirazy2001
+ * Main Activity to select Option
+ */
 
 @AndroidEntryPoint
 class MainActivity : BaseActivity() {
@@ -90,11 +92,9 @@ class MainActivity : BaseActivity() {
 
         hud = KProgressHUD.create(this)
             .setStyle(KProgressHUD.Style.SPIN_INDETERMINATE)
-
         /*
             Create file save image
          */
-
         var filePath = FileUtil(this@MainActivity).getRootFolder() + "/saved"
         var fileSaved = File(filePath)
         if (!fileSaved.exists()) {
@@ -114,39 +114,35 @@ class MainActivity : BaseActivity() {
 
                     val str = String(p1!!, StandardCharsets.UTF_8)
                     val bmp = BitmapFactory.decodeByteArray(p1, 0, p1!!.size)
-
-                    var fileRoot = FileUtil(this@MainActivity).getRootFolder()
-                    var cnt = 1
-
+                    val fileRoot = FileUtil(this@MainActivity).getRootFolder()
                     var date = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
                     val strTime = "Scan " + date.format(Date())
 
-                    var filePath = "${fileRoot}/${strTime}"
+                    val filePath = "${fileRoot}/${strTime}"
                     var file = File(filePath)
-
                     file.parentFile.mkdirs()
                     file.createNewFile()
-
                     val stream = FileOutputStream(file)
                     stream.write(p1)
                     stream.flush()
                     stream.close()
-
+                    /*
+                        Add image file saved
+                     */
                     listImg.add(filePath)
-
                     if (listImg.size == 1) {
                         binding.btnImage.visibility = View.GONE
                         binding.layoutBadgeImage.visibility = View.VISIBLE
                         binding.circleImg.setImageBitmap(bmp!!)
                         binding.btnDocument.setImageResource(R.drawable.ic_close)
-                        binding.vpgMain.isClickable = false
                         if (statusOption == KEY_SINGLE) {
                             var intent = Intent(this@MainActivity, ScanActivity::class.java)
-                            intent.putExtra(KEY_DATA_SCAN, DataScan(listImg, statusOption, false).toJSON())
+                            intent.putExtra(
+                                KEY_DATA_SCAN,
+                                DataScan(listImg, statusOption, false).toJSON()
+                            )
                             startActivity(intent)
                         }
-                    } else {
-
                     }
                     hud!!.dismiss()
                 }
@@ -216,28 +212,9 @@ class MainActivity : BaseActivity() {
 
             }
         })
-
         layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
-
-//        binding.rcclvMain.layoutManager = layoutManager
-//        binding.rcclvMain.adapter = adapter
-//
-//        binding.rcclvMain.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-//            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-//                binding.rcclvMain.post {
-//                    selectMiddleItem()
-//                }
-//            }
-//        })
-
-
         val displayMetrics = DisplayMetrics()
         windowManager.defaultDisplay.getMetrics(displayMetrics)
-
-        var screenWidth = displayMetrics.widthPixels
-
-        //      binding.rcclvMain.setPadding(screenWidth/2 - 60, 0, screenWidth/2 - 60, 0)
-
         setContentView(binding.root)
     }
 
@@ -258,8 +235,29 @@ class MainActivity : BaseActivity() {
                 clipPagerTitleView.textColor = Color.parseColor("#4C4C4C")
                 clipPagerTitleView.clipColor = Color.RED
                 clipPagerTitleView.setOnClickListener {
-                    statusOption = index
-                    binding.vpgM.currentItem = index
+                    if (index != binding.vpgM.currentItem) {
+                        statusOption = index
+                        binding.vpgM.setCurrentItem(index, true)
+                        var msgStatus = ""
+                        when (index) {
+                            KEY_WHITEBOARD -> {
+                                msgStatus = TOAST_WHITEBOARD
+                            }
+                            KEY_OCR -> {
+                                msgStatus = TOAST_OCR
+                            }
+                            KEY_SINGLE -> {
+                                msgStatus = TOAST_SINGLE
+                            }
+                            KEY_BATCH -> {
+                                msgStatus = TOAST_BATCH
+                            }
+                            KEY_CARD -> {
+                                msgStatus = TOAST_CARD
+                            }
+                        }
+                        viewModel.showToast(msgStatus)
+                    }
                 }
                 return clipPagerTitleView
             }
@@ -278,7 +276,6 @@ class MainActivity : BaseActivity() {
     }
 
     private fun hasStoragePermission(requestCode: Int): Boolean {
-
         var permission = arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE)
 
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -295,48 +292,6 @@ class MainActivity : BaseActivity() {
             true
         }
     }
-
-
-    fun BitMapToString(bitmap: Bitmap): String? {
-        val baos = ByteArrayOutputStream()
-        bitmap.compress(Bitmap.CompressFormat.PNG, 100, baos)
-        val b: ByteArray = baos.toByteArray()
-        return Base64.encodeToString(b, Base64.DEFAULT)
-    }
-
-//    private fun selectMiddleItem() {
-//        val firstVisibleIndex = layoutManager.findFirstVisibleItemPosition()
-//        val lastVisibleIndex = layoutManager.findLastVisibleItemPosition()
-//        val visibleIndexes = listOf(firstVisibleIndex..lastVisibleIndex).flatten()
-//
-//        for (i in visibleIndexes) {
-//            // val vh = binding.rcclvMain.findViewHolderForLayoutPosition(i)
-//            if (vh?.itemView == null) {
-//                continue
-//            }
-//
-//            val displayMetrics = DisplayMetrics()
-//            windowManager.defaultDisplay.getMetrics(displayMetrics)
-//
-//            var screenWidth = displayMetrics.widthPixels
-//            var height = displayMetrics.heightPixels
-//
-//            val location = IntArray(2)
-//            vh.itemView.getLocationOnScreen(location)
-//            val x = location[0]
-//            val halfWidth = vh.itemView.width * .5
-//            val rightSide = x + halfWidth
-//            val leftSide = x - halfWidth
-//            val isInMiddle = screenWidth * .5 in leftSide..rightSide
-//            if (isInMiddle) {
-//                // "i" is your middle index and implement selecting it as you want
-//                // optionsAdapter.selectItemAtIndex(i)
-//                viewModel.selectItem(position = i)
-//                statusOption = i
-//                return
-//            }
-//        }
-//    }
 
     override fun observeViewModel() {
         observe(viewModel.listOption, ::handleOption)

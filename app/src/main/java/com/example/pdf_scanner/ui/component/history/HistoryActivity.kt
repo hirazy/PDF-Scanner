@@ -14,9 +14,11 @@ import androidx.activity.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.pdf_scanner.KEY_DATA_DETAIL
 import com.example.pdf_scanner.KEY_DATA_SEARCH
+import com.example.pdf_scanner.KEY_DATA_SELECT
 import com.example.pdf_scanner.R
 import com.example.pdf_scanner.data.Resource
 import com.example.pdf_scanner.data.dto.DataSearch
+import com.example.pdf_scanner.data.dto.DataSelect
 import com.example.pdf_scanner.data.dto.ImageFolder
 import com.example.pdf_scanner.data.dto.OBase
 import com.example.pdf_scanner.databinding.ActivityHistoryBinding
@@ -27,6 +29,7 @@ import com.example.pdf_scanner.ui.component.history.adapter.FolderAdapter
 import com.example.pdf_scanner.ui.component.history.dialog.BottomMore
 import com.example.pdf_scanner.ui.component.history.dialog.BottomMoreEvent
 import com.example.pdf_scanner.ui.component.search.SearchActivity
+import com.example.pdf_scanner.ui.component.select.SelectActivity
 import com.example.pdf_scanner.ui.component.settings.SettingsActivity
 import com.example.pdf_scanner.utils.FileUtil
 import com.oneadx.vpnclient.utils.observe
@@ -138,27 +141,20 @@ class HistoryActivity : BaseActivity() {
     private fun fetchFolder() {
         var list = ArrayList<ImageFolder>()
         var filePath = FileUtil(this@HistoryActivity).getRootFolder() + "/saved"
-        Log.e("Files", "Path: $filePath")
         val directory = File(filePath)
         listFolder = ArrayList()
-
         if (!directory.exists() || directory.listFiles() == null) {
-            Log.e("fetchFolder", "")
             return
         }
-
         val files: Array<File> = directory.listFiles()
         for (i in files.indices) {
-            Log.e("File_Name", files[i].name)
             var listPath = ArrayList<String>()
             for (j in files[i].listFiles()) {
                 listPath.add(j.path)
             }
             list.add(ImageFolder(files[i].name, files[i].name.substring(4, 14), listPath))
         }
-
         listFolder = list
-
         viewModel.fetchData(list)
     }
 
@@ -187,7 +183,9 @@ class HistoryActivity : BaseActivity() {
             }
 
             R.id.itemDocSelected -> {
-
+                var intent = Intent(this@HistoryActivity, SelectActivity::class.java)
+                intent.putExtra(KEY_DATA_SELECT, DataSelect(listFolder).toJSON())
+                startActivity(intent)
             }
         }
         return super.onOptionsItemSelected(item)

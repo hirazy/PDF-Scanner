@@ -9,8 +9,12 @@ import com.example.pdf_scanner.ui.base.listener.RecyclerItemListener
 import com.example.pdf_scanner.utils.LayoutId
 
 @LayoutId(R.layout.card_language)
-class LanguageAdapter(e: RecyclerItemListener): AdapterBase<LanguageOCR, CardLanguageBinding> (e) {
+class LanguageAdapter(var e: RecyclerItemListener): AdapterBase<LanguageOCR, CardLanguageBinding> (e) {
     override fun bindView(itemBinding: BaseHolder<CardLanguageBinding>, position: Int) {
         itemBinding.itemBinding.o = listData[position]
+
+        itemBinding.itemBinding.layoutCardLanguage.setOnClickListener {
+            e.onOption(position, listData[position])
+        }
     }
 }

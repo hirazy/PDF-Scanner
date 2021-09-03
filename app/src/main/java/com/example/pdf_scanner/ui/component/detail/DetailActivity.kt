@@ -11,6 +11,7 @@ import com.example.pdf_scanner.R
 import com.example.pdf_scanner.data.dto.ImageFolder
 import com.example.pdf_scanner.databinding.ActivityDetailBinding
 import com.example.pdf_scanner.ui.base.BaseActivity
+import com.example.pdf_scanner.utils.FileUtil
 import com.example.pdf_scanner.utils.toObject
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -42,6 +43,8 @@ class DetailActivity : BaseActivity() {
         }
 
         binding.layoutSaveDetail.setOnClickListener {
+            val fileRoot = FileUtil(this@DetailActivity).getRootFolder()
+
 
         }
 
@@ -68,7 +71,6 @@ class DetailActivity : BaseActivity() {
             acceptBtn.setOnClickListener {
 
             }
-
             dialog.show()
         }
 

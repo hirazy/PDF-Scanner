@@ -25,8 +25,9 @@ class ImageViewModel @Inject constructor() : BaseViewModel() {
     fun fetchImage(list: ArrayList<String>) {
 
         viewModelScope.launch {
+            var itemPerLoading = 20
             var listImg = ArrayList<ImageCard>()
-            for(i in 0 until Math.min(20, list.size)){
+            for(i in 0 until Math.min(itemPerLoading, list.size)){
                 listImg.add(ImageCard(list[i], ""))
             }
             listData.value = Resource.Success(listImg)
@@ -36,5 +37,5 @@ class ImageViewModel @Inject constructor() : BaseViewModel() {
         }
     }
 
-    // Every one load more 20 item images
+
 }

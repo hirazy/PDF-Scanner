@@ -1,7 +1,5 @@
 package com.example.pdf_scanner
 
-import com.example.pdf_scanner.data.dto.OptionCamera
-
 /**
  * Created by Nguyen Manh Tien
  */
@@ -69,6 +67,8 @@ const val KEY_SAVE_PURCHASE = "key_save_purchase"
 const val KEY_DATA_SCAN = "key_data_scan"
 const val KEY_DATA_OCR = "key_data_ocr"
 const val KEY_DATA_SEARCH = "key_data_search"
+const val KEY_DATA_SELECT = "key_data_select"
+const val KEY_DATA_FILTER = "key_data_filter"
 
 const val LIST_SERVER = "list_server"
 const val KEY_INTENT_SERVER = "key_intent_server"
@@ -76,7 +76,6 @@ const val KEY_INTENT_APPLICATION = "key_intent_application"
 const val KEY_INTENT_IMAGE = "key_intent_image"
 
 const val KEY_DATA_DETAIL = "key_data_detail"
-
 const val SIGN = "Sign"
 const val ERASER = "Eraser"
 
@@ -120,6 +119,8 @@ const val TOAST_SINGLE = "Hold your Phone over a document and take a picture."
 const val TOAST_BATCH = "Hold your Phone over a document and Continuous shooting."
 const val TOAST_CARD = "Hold your phone over the ID Card/Passport/Business Card to take pictures."
 
+const val SAVE_SUCCESSFULLY = "Successfully save photo to the album"
+
 const val WHITE_BOARD = "Whiteboard"
 const val OCR = "OCR"
 const val SINGLE = "Single"
@@ -127,7 +128,7 @@ const val BATCH = "Batch"
 const val CARD = "Card"
 const val QRCODE = "QR Code"
 
-var KEY_STATUS_OPTION = "key_status_option"
+const val KEY_STATUS_OPTION = "key_status_option"
 const val KEY_WHITEBOARD = 0
 const val KEY_OCR = 1
 const val KEY_SINGLE = 2
@@ -140,16 +141,13 @@ const val KEY_INTENT_LISTIMG = "key_intent_listimg"
 // KEY_RESULT
 const val KEY_RESULT_OCR = 1
 
-
 const val DIALOG_TITLE_LEAVE = "Leave Scanning"
 const val DIALOG_CONTENT_LEAVE = "This will delete all scanned pages. Are you sure?"
-
 const val DIALOG_TITLE_DELETE = "Delete"
 const val DIALOG_CONTENT_DELETE = "Are you sure that you want to delete this page?"
 
 // LANGUAGE
 const val English = "English"
-
 const val Afrikaans = "Afrikaans"
 const val Albanian = "shqip"
 const val Arabic = "العربية"
@@ -185,7 +183,7 @@ const val Latvian = "Latviešu"
 const val Lithuanian = "Lietuvių"
 const val Macedonian = "Македонски"
 const val Malay = "Bahasa Melayu"
-const val Malayalam	= "മലയാളം"
+const val Malayalam = "മലയാളം"
 const val Marathi = "मराठी"
 const val Nepali = "नेपाली"
 const val Norwegian = "Norsk"

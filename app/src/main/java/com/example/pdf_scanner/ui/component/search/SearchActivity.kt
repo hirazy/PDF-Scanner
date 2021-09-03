@@ -35,6 +35,7 @@ class SearchActivity : BaseActivity() {
         list = intent.getStringExtra(KEY_DATA_SEARCH)!!.toObject<DataSearch>().list
 
         binding.btnDeleteSearch.setOnClickListener {
+
             finish()
         }
 
@@ -62,9 +63,7 @@ class SearchActivity : BaseActivity() {
             }
 
             override fun onOption(index: Int, data: OBase) {
-
             }
-
         })
 
         binding.rcclvSearch.layoutManager = LinearLayoutManager(this)

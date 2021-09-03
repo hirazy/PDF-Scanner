@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+    </data>
+
+    <RelativeLayout
+        android:background="@color/colorApp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".ui.component.detail_text.DetailTextActivity">
+
+        <com.google.android.material.appbar.AppBarLayout
+            android:id="@+id/appBarDetailText"
+            android:background="@color/colorApp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            >
+            <androidx.appcompat.widget.Toolbar
+                android:id="@+id/tbDetailText"
+                app:navigationIcon="@drawable/ic_back"
+                app:titleTextColor="@color/white"
+                app:title="@string/tvList"
+                android:background="@color/colorApp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:menu="@menu/item_action_detail"
+                />
+        </com.google.android.material.appbar.AppBarLayout>
+
+        <androidx.viewpager.widget.ViewPager
+            android:layout_below="@+id/appBarDetailText"
+            android:id="@+id/vpgDetailText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            >
+
+        </LinearLayout>
+
+    </RelativeLayout>
+</layout>

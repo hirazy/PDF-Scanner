@@ -29,6 +29,7 @@ import com.example.pdf_scanner.utils.toObject
 import com.kaopiz.kprogresshud.KProgressHUD
 import com.oneadx.vpnclient.utils.observe
 import dagger.hilt.android.AndroidEntryPoint
+import java.lang.ref.WeakReference
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -40,7 +41,7 @@ class ImageActivity : BaseActivity() {
     var list = ArrayList<ImageCard>()
     private val viewModel: ImageViewModel by viewModels()
     var listSelected = ArrayList<ImageCard>()
-    lateinit var data: DataImage
+    lateinit var dataO: DataImage
     lateinit var adapter: CardImageAdapter
     lateinit var adapterSelected: CardImageSelectedAdapter
     private var hudProgress: KProgressHUD? = null
@@ -49,9 +50,9 @@ class ImageActivity : BaseActivity() {
     override fun initViewBinding() {
         binding = ActivityImageBinding.inflate(layoutInflater)
 
-        data = intent.getStringExtra(KEY_INTENT_IMAGE)!!.toObject()
+        dataO = intent.getStringExtra(KEY_INTENT_IMAGE)!!.toObject()
 
-        if (data.status == KEY_SINGLE) {
+        if (dataO.status == KEY_SINGLE) {
             binding.layoutImageSelected.visibility = View.GONE
         }
 
@@ -68,6 +69,20 @@ class ImageActivity : BaseActivity() {
 
         adapter = CardImageAdapter(object : RecyclerItemListener {
             override fun onItemSelected(index: Int, data: OBase) {
+
+                if (dataO.status == KEY_SINGLE) {
+                    listSelected.add(data as ImageCard)
+                    var intent = Intent(this@ImageActivity, ScanActivity::class.java)
+                    var listImage = ArrayList<String>()
+                    listImage.add(listSelected[0].path)
+                    intent.putExtra(
+                        KEY_DATA_SCAN,
+                        DataScan(listImage, dataO.status, false).toJSON()
+                    )
+                    startActivity(intent)
+                    finish()
+                }
+
                 if (list[index].countSelected.isEmpty()) {
                     listSelected.add(data as ImageCard)
                     adapterSelected.setValue(listSelected)
@@ -99,8 +114,8 @@ class ImageActivity : BaseActivity() {
             override fun onOption(index: Int, data: OBase) {
                 var o = data as ImageCard
                 listSelected.removeAt(index)
-                adapterSelected.notifyItemRemoved(index)
-                adapterSelected.setValue(listSelected)
+                adapterSelected.notifyItemRemoved(index - 1)
+                // adapterSelected.setValue(listSelected)
                 if (listSelected.size == 0)
                     binding.btnDoneImg.setBackgroundResource(R.drawable.bg_btn_done)
 
@@ -147,7 +162,7 @@ class ImageActivity : BaseActivity() {
                 for (i in 0 until listSelected.size) {
                     listImage.add(listSelected[i].path)
                 }
-                intent.putExtra(KEY_DATA_SCAN, DataScan(listImage, data.status, false).toJSON())
+                intent.putExtra(KEY_DATA_SCAN, DataScan(listImage, dataO.status, false).toJSON())
                 startActivity(intent)
                 finish()
             }
@@ -182,8 +197,6 @@ class ImageActivity : BaseActivity() {
             arrPath[i] = cursor.getString(dataColumnIndex)
             list.add(arrPath[i]!!)
         }
-
-        Log.e("fetchImage", count.toString())
         cursor.close()
         viewModel.fetchImage(ArrayList(list.reversed()))
     }
