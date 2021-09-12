@@ -45,7 +45,6 @@ class DetailActivity : BaseActivity() {
         binding.layoutSaveDetail.setOnClickListener {
             val fileRoot = FileUtil(this@DetailActivity).getRootFolder()
 
-
         }
 
         binding.layoutPrintDetail.setOnClickListener {

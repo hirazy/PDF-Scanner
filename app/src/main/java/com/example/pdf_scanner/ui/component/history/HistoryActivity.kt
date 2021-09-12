@@ -140,7 +140,8 @@ class HistoryActivity : BaseActivity() {
 
     private fun fetchFolder() {
         var list = ArrayList<ImageFolder>()
-        var filePath = FileUtil(this@HistoryActivity).getRootFolder() + "/saved"
+        var pathSaved = "/saved"
+        var filePath = FileUtil(this@HistoryActivity).getRootFolder() + pathSaved
         val directory = File(filePath)
         listFolder = ArrayList()
         if (!directory.exists() || directory.listFiles() == null) {

@@ -6,10 +6,12 @@
     android:background="@color/colorTransparent">
 
     <LinearLayout
+        android:id="@+id/layoutAnimationSave"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:background="@color/colorTransparent"
         android:orientation="vertical"
-        android:visibility="gone"
+        android:padding="20dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
@@ -17,14 +19,16 @@
 
         <com.airbnb.lottie.LottieAnimationView
             android:id="@+id/animSave"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
+            android:layout_width="200dp"
+            android:layout_height="180dp"
             android:layout_gravity="center" />
 
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="40dp"
+            android:layout_gravity="center"
+            android:layout_marginTop="30dp"
+            android:gravity="center"
             android:orientation="vertical">
 
             <TextView
@@ -32,223 +36,255 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:gravity="center"
-                android:text="@string/saveDoc" />
+                android:text="@string/saveDoc"
+                android:textColor="@color/white" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
+                android:layout_marginTop="5dp"
                 android:gravity="center"
-                android:text="@string/tvWait" />
+                android:text="@string/tvWait"
+                android:textColor="@color/white" />
         </LinearLayout>
 
     </LinearLayout>
 
-    <LinearLayout
-        android:background="@drawable/bg_dialog_save"
-        android:paddingTop="10dp"
-        android:paddingBottom="10dp"
+    <RelativeLayout
+        android:visibility="gone"
+        android:id="@+id/layoutOptionSave"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
+        android:background="@color/colorTransparent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <com.google.android.material.imageview.ShapeableImageView
-            android:id="@+id/imgSave"
+        <ImageButton
+            android:id="@+id/btnCloseSave"
+            android:background="@null"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="10dp"
+            android:layout_marginTop="10dp"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_close_dialog"
+            />
 
         <LinearLayout
-            android:layout_gravity="center"
-            android:gravity="center"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:layout_centerInParent="true"
+            android:background="@drawable/bg_dialog_save"
+            android:padding="10dp">
+
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/imgSave"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
 
             <LinearLayout
-                android:id="@+id/layoutSaveName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:gravity="center"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:id="@+id/layoutSaveName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/tvFolderName"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:gravity="center"
+                        android:text="Scan 2021-08-31 08.39.54"
+                        android:textColor="#000000"
+                        android:textSize="18sp" />
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_marginLeft="10dp"
+                        android:src="@drawable/ic_edit_save_name" />
+                </LinearLayout>
 
                 <TextView
-                    android:textSize="18sp"
-                    android:layout_gravity="center"
-                    android:gravity="center"
-                    android:textColor="#000000"
-                    android:text="Scan 2021-08-31 08.39.54"
-                    android:id="@+id/tvFolderName"
+                    android:id="@+id/tvSaveTime"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
-
-                <ImageView
-                    android:layout_marginLeft="10dp"
-                    android:layout_gravity="center"
-                    android:src="@drawable/ic_edit_save_name"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
-            </LinearLayout>
-
-            <TextView
-                android:layout_marginTop="8dp"
-                android:id="@+id/tvSaveTime"
-                android:layout_gravity="center"
-                android:gravity="center"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Today, 08-31"
-                />
-
-            <LinearLayout
-                android:layout_marginTop="10dp"
-                android:background="#2E2E2E"
-                android:layout_width="match_parent"
-                android:layout_height="0.5dp"
-                />
-
-            <LinearLayout
-                android:layout_marginTop="10dp"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <LinearLayout
-                    android:id="@+id/layoutSaveShare"
-                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:layout_weight="1"
+                    android:layout_marginTop="8dp"
                     android:gravity="center"
-                    android:orientation="vertical">
-
-                    <RelativeLayout
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:layout_gravity="center"
-                        android:background="@drawable/bg_save_share"
-                        android:gravity="center">
-
-                        <ImageView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_centerInParent="true"
-                            android:layout_gravity="center"
-                            android:src="@drawable/ic_share" />
-                    </RelativeLayout>
-
-                    <TextView
-                        android:layout_marginTop="10dp"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:gravity="center"
-                        android:text="@string/tvShare" />
-                </LinearLayout>
+                    android:text="Today, 08-31" />
 
                 <LinearLayout
-                    android:id="@+id/layoutSavePrint"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:orientation="vertical">
-
-                    <RelativeLayout
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:layout_gravity="center"
-                        android:layout_marginLeft="10dp"
-                        android:background="@drawable/bg_save_print"
-                        android:gravity="center">
-
-                        <ImageView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_centerInParent="true"
-                            android:layout_gravity="center"
-                            android:src="@drawable/ic_print" />
-                    </RelativeLayout>
-
-                    <TextView
-                        android:layout_marginTop="10dp"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:gravity="center"
-                        android:text="@string/tvPrint" />
-                </LinearLayout>
+                    android:layout_height="0.5dp"
+                    android:layout_marginTop="10dp"
+                    android:background="#2E2E2E" />
 
                 <LinearLayout
-                    android:id="@+id/layoutSaveToAlbum"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:orientation="vertical">
+                    android:layout_marginTop="10dp"
+                    android:orientation="horizontal">
 
                     <RelativeLayout
-                        android:layout_gravity="center"
-                        android:gravity="center"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:layout_marginLeft="10dp"
-                        android:background="@drawable/bg_save_album">
-
-                        <ImageView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_centerInParent="true"
-                            android:layout_gravity="center"
-                            android:src="@drawable/ic_save" />
-                    </RelativeLayout>
-
-                    <TextView
-                        android:layout_marginTop="10dp"
-                        android:layout_width="wrap_content"
+                        android:id="@+id/layoutSaveShare"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
+                        android:layout_weight="1"
                         android:gravity="center"
-                        android:text="@string/tvToAlbum" />
-                </LinearLayout>
+                        android:orientation="vertical">
 
-                <LinearLayout
-                    android:id="@+id/layoutSaveEmail"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:orientation="vertical">
+                        <RelativeLayout
+                            android:id="@+id/layoutIconShare"
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:layout_centerHorizontal="true"
+                            android:layout_gravity="center"
+                            android:background="@drawable/bg_save_share"
+                            android:gravity="center">
+
+                            <ImageView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_centerInParent="true"
+                                android:layout_gravity="center"
+                                android:src="@drawable/ic_share" />
+                        </RelativeLayout>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@id/layoutIconShare"
+                            android:layout_centerHorizontal="true"
+                            android:layout_gravity="center"
+                            android:layout_marginTop="10dp"
+                            android:gravity="center"
+                            android:text="@string/tvShare" />
+                    </RelativeLayout>
 
                     <RelativeLayout
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:background="@drawable/bg_save_email">
-
-                        <ImageView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_centerInParent="true"
-                            android:layout_gravity="center"
-                            android:src="@drawable/ic_email" />
-                    </RelativeLayout>
-
-                    <TextView
-                        android:layout_marginTop="10dp"
-                        android:layout_width="wrap_content"
+                        android:id="@+id/layoutSavePrint"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
+                        android:layout_weight="1"
                         android:gravity="center"
-                        android:text="@string/tvEmail" />
+                        android:orientation="vertical">
+
+                        <RelativeLayout
+                            android:id="@+id/layoutIconPrint"
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:layout_centerHorizontal="true"
+                            android:layout_gravity="center"
+                            android:background="@drawable/bg_save_print"
+                            android:gravity="center">
+
+                            <ImageView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_centerInParent="true"
+                                android:layout_gravity="center"
+                                android:src="@drawable/ic_print" />
+                        </RelativeLayout>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@+id/layoutIconPrint"
+                            android:layout_centerHorizontal="true"
+                            android:layout_gravity="center"
+                            android:layout_marginTop="10dp"
+                            android:gravity="center"
+                            android:text="@string/tvPrint" />
+                    </RelativeLayout>
+
+                    <RelativeLayout
+                        android:id="@+id/layoutSaveToAlbum"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:orientation="vertical">
+
+                        <RelativeLayout
+                            android:id="@+id/layoutIconAlbum"
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:layout_centerHorizontal="true"
+                            android:layout_gravity="center"
+                            android:background="@drawable/bg_save_album"
+                            android:gravity="center">
+
+                            <ImageView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_centerInParent="true"
+                                android:layout_gravity="center"
+                                android:src="@drawable/ic_save" />
+                        </RelativeLayout>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@+id/layoutIconAlbum"
+                            android:layout_centerHorizontal="true"
+                            android:layout_gravity="center"
+                            android:layout_marginTop="10dp"
+                            android:gravity="center"
+                            android:text="@string/tvToAlbum" />
+                    </RelativeLayout>
+
+                    <RelativeLayout
+                        android:id="@+id/layoutSaveEmail"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:orientation="vertical">
+
+                        <RelativeLayout
+                            android:id="@+id/layoutIconEmail"
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:layout_centerHorizontal="true"
+                            android:background="@drawable/bg_save_email">
+
+                            <ImageView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_centerInParent="true"
+                                android:layout_gravity="center"
+                                android:src="@drawable/ic_email" />
+                        </RelativeLayout>
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@+id/layoutIconEmail"
+                            android:layout_centerHorizontal="true"
+                            android:layout_gravity="center"
+                            android:layout_marginTop="10dp"
+                            android:gravity="center"
+                            android:text="@string/tvEmail" />
+                    </RelativeLayout>
                 </LinearLayout>
             </LinearLayout>
         </LinearLayout>
-
-    </LinearLayout>
+    </RelativeLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

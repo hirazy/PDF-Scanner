@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item android:id="@+id/actionUndo" app:showAsAction="always" android:icon="@drawable/ic_undo" android:title=""/>
+    <item android:id="@+id/actionRedo" app:showAsAction="always" android:icon="@drawable/ic_redo" android:title=""/>
     <item android:id="@+id/actionOCR" android:title="@string/tvRecognized" app:showAsAction="always"
         />
 </menu>

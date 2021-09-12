@@ -27,7 +27,6 @@ class ImageFragment(var list: ArrayList<String>): Fragment() {
         val root: View = inflater.inflate(R.layout.item_page_image, container, false)
         val number = requireArguments().getInt("number")
 
-
         return root
     }
 }

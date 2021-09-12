@@ -103,4 +103,8 @@
 
     <string name="tvNoResultSearch">Your search did not return any matches</string>
 
+    <string name="tvRecognizeText">Recognize image &amp; convert to text</string>
+
+    <string name="tvAllPages">Apply to all pages</string>
+
 </resources>

@@ -22,13 +22,11 @@ import com.airbnb.lottie.LottieAnimationView
 import com.example.pdf_scanner.*
 import com.example.pdf_scanner.R
 import com.example.pdf_scanner.data.Resource
-import com.example.pdf_scanner.data.dto.DataImage
-import com.example.pdf_scanner.data.dto.DataLanguage
-import com.example.pdf_scanner.data.dto.DataScan
-import com.example.pdf_scanner.data.dto.OBase
+import com.example.pdf_scanner.data.dto.*
 import com.example.pdf_scanner.databinding.ActivityScanBinding
 import com.example.pdf_scanner.ui.base.BaseActivity
 import com.example.pdf_scanner.ui.base.listener.RecyclerItemListener
+import com.example.pdf_scanner.ui.component.detail_text.DetailTextActivity
 import com.example.pdf_scanner.ui.component.filter.FilterActivity
 import com.example.pdf_scanner.ui.component.image.ImageActivity
 import com.example.pdf_scanner.ui.component.ocr.OCRActivity
@@ -39,6 +37,7 @@ import com.example.pdf_scanner.ui.component.scan.dialog.ShapeBSFragment
 import com.example.pdf_scanner.ui.component.scan.dialog.TextEditorDialogFragment
 import com.example.pdf_scanner.utils.FileUtil
 import com.example.pdf_scanner.utils.toObject
+import com.flurry.sdk.y
 import com.google.android.gms.tasks.OnFailureListener
 import com.google.android.gms.tasks.OnSuccessListener
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -92,6 +91,8 @@ class ScanActivity : BaseActivity(), ShapeBSFragment.Properties {
 
         if (dataScan.status == KEY_OCR) {
             binding.layoutScanLanguage.visibility = View.VISIBLE
+            binding.tbScan.title = OCR
+            binding.layoutFilter.visibility = View.GONE
 
             adapterLanguageSelected = LanguageSelectedAdapter(object : RecyclerItemListener {
                 override fun onItemSelected(index: Int, data: OBase) {
@@ -126,39 +127,11 @@ class ScanActivity : BaseActivity(), ShapeBSFragment.Properties {
         binding.tbScan.setNavigationIcon(R.drawable.ic_back)
 
         binding.tbScan.setNavigationOnClickListener {
-            var dialog = Dialog(this)
-            dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-            dialog.window!!.setBackgroundDrawableResource(android.R.color.transparent)
-            dialog.window!!.setBackgroundDrawableResource(android.R.color.transparent)
-            dialog.setCancelable(false)
-            dialog.setContentView(R.layout.dialog_leave_scan)
-
-            var btnCancel = dialog.findViewById<Button>(R.id.btnDecline)
-            btnCancel.setOnClickListener {
-                dialog.dismiss()
-            }
-            var btnLeave = dialog.findViewById<Button>(R.id.btnAcceptLeave)
-            btnLeave.setOnClickListener {
-                finish()
-            }
-            dialog.show()
+            backToMain()
         }
 
-        adapterImg = ImagePageAdapter(supportFragmentManager, listImg)
-
         binding.layoutAddImage.setOnClickListener {
-            var bottomDialog = BottomScan(object : BottomScanEvent {
-                override fun takePhoto() {
-                    finish()
-                }
-
-                override fun selectAlbum() {
-                    var intent = Intent(this@ScanActivity, ImageActivity::class.java)
-                    intent.putExtra(KEY_INTENT_IMAGE, DataImage(dataScan.status).toJSON())
-                    startActivity(intent)
-                }
-            })
-            bottomDialog.show(supportFragmentManager, bottomDialog.tag)
+            addImage()
         }
 
         binding.animScan.setAnimation(R.raw.scanner)
@@ -167,13 +140,12 @@ class ScanActivity : BaseActivity(), ShapeBSFragment.Properties {
 
         handler = Handler()
         handler.postDelayed({
-            // adapterImg.setDocument()
             binding.animScan.cancelAnimation()
             binding.animScan.visibility = View.GONE
         }, 4000)
 
         binding.layoutRotateImage.setOnClickListener {
-
+            rotateImage()
         }
 
         binding.layoutCropImage.setOnClickListener {
@@ -181,76 +153,32 @@ class ScanActivity : BaseActivity(), ShapeBSFragment.Properties {
         }
 
         binding.layoutSignImage.setOnClickListener {
-            var dialog = ShapeBSFragment()
-            showBottomSheetDialogFragment(dialog)
-            binding.tbScan.title = SIGN
-            dialog.setPropertiesChangeListener(this)
+            signImage()
         }
 
         binding.layoutText.setOnClickListener {
-            var dialogSign: TextEditorDialogFragment = TextEditorDialogFragment.show(
-                this
-            )
-
-            dialogSign.setOnTextEditorListener(object : TextEditorDialogFragment.TextEditor {
-                override fun onDone(inputText: String?, colorCode: Int) {
-                    val styleBuilder = TextStyleBuilder()
-                    styleBuilder.withTextColor(colorCode)
-                    // adapterImg.addText(inputText!!, styleBuilder)
-                    // adapterImg.getItem(binding.vpgImg.currentItem).
-                    onEdit.addText(inputText!!, styleBuilder)
-                }
-            })
-
+            addText()
         }
 
         binding.layoutFilter.setOnClickListener {
-            var intent = Intent(this@ScanActivity, FilterActivity::class.java)
-            // intent.putExtra(KEY_DATA_FILTER, )
-            startActivity(intent)
+            addFilter()
         }
 
         binding.layoutEraser.setOnClickListener {
             binding.tbScan.title = ERASER
-            // adapterImg.eraser()
+            adapterImg.listFrg[binding.vpgImg.currentItem].erase()
         }
 
         binding.layoutDeleteImage.setOnClickListener {
-            var dialog = Dialog(this)
-            dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-            dialog.window!!.setBackgroundDrawableResource(android.R.color.transparent)
-            dialog.setCancelable(false)
-            dialog.setContentView(R.layout.dialog_leave_scan)
-
-            var btnCancel = dialog.findViewById<Button>(R.id.btnDecline)
-            btnCancel.setOnClickListener {
-                dialog.dismiss()
-            }
-            var btnLeave = dialog.findViewById<Button>(R.id.btnAcceptLeave)
-            btnLeave.setOnClickListener {
-
-                dialog.dismiss()
-                finish()
-            }
-            dialog.show()
+            deleteImage()
         }
 
         binding.btnPageBack.setOnClickListener {
-            var pos = binding.vpgImg.currentItem - 1
-            if (pos >= 1) {
-                binding.vpgImg.setCurrentItem(pos , true)
-                var page = pos + 1
-                binding.tvCountPage.text = page.toString() + " / " + listImg.size
-            }
+            pageBack()
         }
 
         binding.btnPageNext.setOnClickListener {
-            var pos = binding.vpgImg.currentItem + 1
-            if (pos < adapterImg.count) {
-                binding.vpgImg.setCurrentItem(pos, true)
-                var page = pos + 1
-                binding.tvCountPage.text = page.toString() + " / " + listImg.size
-            }
+            pageNext()
         }
 
         binding.vpgImg.offscreenPageLimit = listImg.size
@@ -275,10 +203,120 @@ class ScanActivity : BaseActivity(), ShapeBSFragment.Properties {
         })
 
         adapterImg = ImagePageAdapter(supportFragmentManager, listImg)
-
         binding.vpgImg.adapter = adapterImg
-
         setContentView(binding.root)
+    }
+
+    private fun backToMain(){
+        var dialog = Dialog(this)
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.window!!.setBackgroundDrawableResource(android.R.color.transparent)
+        dialog.window!!.setBackgroundDrawableResource(android.R.color.transparent)
+        dialog.setCancelable(false)
+        dialog.setContentView(R.layout.dialog_leave_scan)
+
+        var btnCancel = dialog.findViewById<Button>(R.id.btnDecline)
+        btnCancel.setOnClickListener {
+            dialog.dismiss()
+        }
+        var btnLeave = dialog.findViewById<Button>(R.id.btnAcceptLeave)
+        btnLeave.setOnClickListener {
+            finish()
+        }
+        dialog.show()
+    }
+
+    private fun addImage(){
+        var bottomDialog = BottomScan(object : BottomScanEvent {
+            override fun takePhoto() {
+                finish()
+            }
+
+            override fun selectAlbum() {
+                var intent = Intent(this@ScanActivity, ImageActivity::class.java)
+                intent.putExtra(KEY_INTENT_IMAGE, DataImage(dataScan.status).toJSON())
+                startActivity(intent)
+            }
+        })
+        bottomDialog.show(supportFragmentManager, bottomDialog.tag)
+    }
+
+    private fun rotateImage(){
+        Log.e("rotateImage", "rotateImage")
+        adapterImg.listFrg[binding.vpgImg.currentItem].rotate()
+    }
+    private fun signImage(){
+        var dialog = ShapeBSFragment()
+        showBottomSheetDialogFragment(dialog)
+        binding.tbScan.title = SIGN
+
+        adapterImg.listFrg[binding.vpgImg.currentItem].sign()
+
+        dialog.setPropertiesChangeListener(this)
+    }
+
+    private fun addText(){
+        var dialogText: TextEditorDialogFragment = TextEditorDialogFragment.show(
+            this
+        )
+
+        dialogText.setOnTextEditorListener(object : TextEditorDialogFragment.TextEditor {
+            override fun onDone(inputText: String?, colorCode: Int) {
+                val styleBuilder = TextStyleBuilder()
+                styleBuilder.withTextColor(colorCode)
+                // adapterImg.addText(inputText!!, styleBuilder)
+                adapterImg.listFrg[binding.vpgImg.currentItem].addTextO(inputText!!, styleBuilder)
+            }
+        })
+    }
+
+    private fun addFilter(){
+        var intent = Intent(this@ScanActivity, FilterActivity::class.java)
+        /**
+         * listImg.size > 1 to Filter All
+         */
+        intent.putExtra(
+            KEY_DATA_FILTER,
+            DataFilter(listImg.size > 1, listImg[binding.vpgImg.currentItem]).toJSON()
+        )
+        startActivityForResult(intent, KEY_RESULT_FILTER)
+    }
+
+    private fun deleteImage(){
+        var dialog = Dialog(this)
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.window!!.setBackgroundDrawableResource(android.R.color.transparent)
+        dialog.setCancelable(false)
+        dialog.setContentView(R.layout.dialog_leave_scan)
+
+        var btnCancel = dialog.findViewById<Button>(R.id.btnDecline)
+        btnCancel.setOnClickListener {
+            dialog.dismiss()
+        }
+        var btnLeave = dialog.findViewById<Button>(R.id.btnAcceptLeave)
+        btnLeave.setOnClickListener {
+            dialog.dismiss()
+            finish()
+        }
+        dialog.show()
+    }
+
+    private fun pageBack(){
+        var pos = binding.vpgImg.currentItem
+        if (pos >= 1) {
+            binding.vpgImg.setCurrentItem(pos - 1, true)
+            var page = pos
+            binding.tvCountPage.text = page.toString() + " / " + listImg.size
+        }
+    }
+
+    private fun pageNext(){
+        var pos = binding.vpgImg.currentItem + 1
+            if (pos < adapterImg.count) {
+                binding.vpgImg.setCurrentItem(pos, true)
+                var page = pos + 1
+                binding.tvCountPage.text = page.toString() + " / " + listImg.size
+            }
     }
 
     private fun deleteFilePath(path: String) {
@@ -292,7 +330,7 @@ class ScanActivity : BaseActivity(), ShapeBSFragment.Properties {
         }
     }
 
-    private fun u(imageBitmap: Bitmap) {
+    private fun convertText(imageBitmap: Bitmap) {
 
         val image = FirebaseVisionImage.fromBitmap(imageBitmap)
 
@@ -372,32 +410,28 @@ class ScanActivity : BaseActivity(), ShapeBSFragment.Properties {
                 dialog.window!!.setBackgroundDrawableResource(android.R.color.transparent)
                 dialog.setCancelable(false)
                 dialog.setContentView(R.layout.dialog_save)
-
                 var animSave = dialog.findViewById<LottieAnimationView>(R.id.animSave)
-                animSave.setAnimation(R.raw.save_file)
+                animSave.setAnimation(R.raw.save_scan)
+                animSave.repeatCount = 2
                 animSave.playAnimation()
 
-                animSave.addAnimatorListener(object : Animator.AnimatorListener {
-                    override fun onAnimationStart(animation: Animator?) {
-
-                    }
-
-                    override fun onAnimationEnd(animation: Animator?) {
-                        dialog.setCancelable(true)
-                    }
-
-                    override fun onAnimationCancel(animation: Animator?) {
-
-                    }
-
-                    override fun onAnimationRepeat(animation: Animator?) {
-
-                    }
-                })
-
+                val fileRoot = FileUtil(this@ScanActivity).getRootFolder()
                 var date = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
                 val strTime = "Scan " + date.format(Date())
 
+                for(i in 0 until listImg.size){
+                    var count = i + 1
+                    var name = ""
+                    if(count < 10){
+                        name = "0$count"
+                    }
+                    else{
+                        name = count.toString()
+                    }
+                    adapterImg.listFrg[i].save(strTime, name)
+                }
+
+                var layoutOptionSave = dialog.findViewById<RelativeLayout>(R.id.layoutOptionSave)
                 var layoutName = dialog.findViewById<LinearLayout>(R.id.layoutSaveName)
                 layoutName.setOnClickListener {
                     var dialogName = Dialog(this)
@@ -423,43 +457,71 @@ class ScanActivity : BaseActivity(), ShapeBSFragment.Properties {
                     acceptBtn.setOnClickListener {
 
                     }
-
                     dialogName.show()
                 }
 
-                var layoutShare = dialog.findViewById<LinearLayout>(R.id.layoutSaveShare)
+                var layoutShare = dialog.findViewById<RelativeLayout>(R.id.layoutSaveShare)
                 layoutShare.setOnClickListener {
 
                 }
 
-                var layoutPrint = dialog.findViewById<LinearLayout>(R.id.layoutSavePrint)
+                var layoutPrint = dialog.findViewById<RelativeLayout>(R.id.layoutSavePrint)
                 layoutPrint.setOnClickListener {
 
                 }
 
-                var layoutToAlbum = dialog.findViewById<LinearLayout>(R.id.layoutSaveToAlbum)
+                var layoutToAlbum = dialog.findViewById<RelativeLayout>(R.id.layoutSaveToAlbum)
                 layoutToAlbum.setOnClickListener {
 
                 }
 
-                var layoutEmail = dialog.findViewById<LinearLayout>(R.id.layoutSaveEmail)
+                var layoutEmail = dialog.findViewById<RelativeLayout>(R.id.layoutSaveEmail)
                 layoutEmail.setOnClickListener {
 
                 }
 
+                var btnClose = dialog.findViewById<ImageButton>(R.id.btnCloseSave)
+                btnClose.setOnClickListener {
+                    dialog.dismiss()
+                    finish()
+                }
+
+                var layoutAnimation = dialog.findViewById<LinearLayout>(R.id.layoutAnimationSave)
+                animSave.addAnimatorListener(object : Animator.AnimatorListener {
+                    override fun onAnimationStart(animation: Animator?) {
+
+                    }
+
+                    override fun onAnimationEnd(animation: Animator?) {
+                        layoutAnimation.visibility = View.GONE
+                        layoutOptionSave.visibility = View.VISIBLE
+                    }
+
+                    override fun onAnimationCancel(animation: Animator?) {
+
+                    }
+
+                    override fun onAnimationRepeat(animation: Animator?) {
+
+                    }
+                })
                 dialog.show()
             }
 
             R.id.actionUndo -> {
                 // adapterImg.unDo()
+                adapterImg.listFrg[binding.vpgImg.currentItem].unDo()
             }
 
             R.id.actionRedo -> {
-                //adapterImg.reDo()
+                // adapterImg.reDo()
+                adapterImg.listFrg[binding.vpgImg.currentItem].reDo()
             }
 
             R.id.actionOCR -> {
-
+                var intent = Intent(this@ScanActivity, DetailTextActivity::class.java)
+                intent.putExtra(KEY_DATA_DETAIL_TEXT, DataDetailText())
+                startActivity(intent)
             }
         }
         return super.onOptionsItemSelected(item)
@@ -473,33 +535,53 @@ class ScanActivity : BaseActivity(), ShapeBSFragment.Properties {
     }
 
     override fun onColorChanged(colorCode: Int) {
-        Log.e("colorCode", colorCode.toString())
-        //adapterImg.changeColorShape(colorCode)
+        adapterImg.listFrg[binding.vpgImg.currentItem].setOnCoLorChanged(colorCode)
     }
 
     override fun onOpacityChanged(opacity: Int) {
-        Log.e("opacity", opacity.toString())
-        // adapterImg.changeOpacity(opacity)
+        adapterImg.listFrg[binding.vpgImg.currentItem].setOnOpacityChanged(opacity)
     }
 
     override fun onShapeSizeChanged(shapeSize: Int) {
-        Log.e("shapeSize", shapeSize.toString())
-        //  adapterImg.changeShapeSized(shapeSize)
+        adapterImg.listFrg[binding.vpgImg.currentItem].setOnShapeSizeChanged(shapeSize)
     }
 
     override fun onShapePicked(shapeType: ShapeType?) {
-        // adapterImg.shapePicked(shapeType!!)
+        adapterImg.listFrg[binding.vpgImg.currentItem].setShape(shapeType)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (requestCode == KEY_RESULT_OCR) {
-            // viewModel.fetchLanguage()
 
-            // Reset OCR Language
-            if (dataScan.status == KEY_OCR) {
-                viewModel.fetchLanguage()
+        if (resultCode == RESULT_OK) {
+            when (requestCode) {
+                KEY_RESULT_OCR -> {
+                    if (dataScan.status == KEY_OCR) {
+                        /**
+                         * Reset OCR language
+                         */
+                        viewModel.fetchLanguage()
+                    }
+                }
+
+                KEY_RESULT_FILTER -> {
+                    /**
+                     * Set Filter for current page
+                     */
+                    var filter = data!!.getStringExtra(KEY_FILTER)!!.toObject<DataResultFilter>()
+                    if(filter.filter != PhotoFilter.NONE){
+                        if(filter.isFilterAll){
+                            for(i in 0 until listImg.size){
+                                adapterImg.listFrg[i].setFilter(filter.filter)
+                            }
+                        }
+                        else{
+                            adapterImg.listFrg[binding.vpgImg.currentItem].setFilter(filter.filter)
+                        }
+                    }
+                }
             }
         }
+
         super.onActivityResult(requestCode, resultCode, data)
     }
 
@@ -538,21 +620,21 @@ class ScanActivity : BaseActivity(), ShapeBSFragment.Properties {
             val number = requireArguments().getInt(NUMBER)
             mPhotoEditorView = root!!.findViewById(R.id.photoEditor)
 
+            mPhotoEditor = PhotoEditor.Builder(context, mPhotoEditorView)
+                .setPinchTextScalable(true)
+                .build()
+
             var file = File(list[number])
 
             if (file.exists()) {
                 val uri: Uri = Uri.fromFile(file)
                 mPhotoEditorView!!.source.setImageURI(uri)
+                mPhotoEditor!!.setFilterEffect(PhotoFilter.BLACK_WHITE)
             }
 
-            mPhotoEditor = PhotoEditor.Builder(context, mPhotoEditorView)
-                .setPinchTextScalable(true)
-                .build()
             mPhotoEditor!!.setOnPhotoEditorListener(this)
-            mPhotoEditor!!.setFilterEffect(PhotoFilter.BLACK_WHITE)
             mShapeBuilder = ShapeBuilder()
             mPhotoEditor!!.setShape(mShapeBuilder)
-
 
             var act = activity as ScanActivity
             act.setOnEdit(object : onEditPhoto {
@@ -578,21 +660,64 @@ class ScanActivity : BaseActivity(), ShapeBSFragment.Properties {
             )
         }
 
-        fun addText(pos: Int, inputText: String, styleBuilder: TextStyleBuilder) {
-            if (pos == requireArguments().getInt("num")) {
-                Log.e("addText", "")
-                mPhotoEditor!!.addText(inputText, styleBuilder)
-            }
+        fun addTextO(inputText: String, styleBuilder: TextStyleBuilder) {
+            mPhotoEditor!!.addText(inputText, styleBuilder)
         }
 
-        fun save(folderName: String) {
+        fun rotate(){
+            Log.e("rotate", "")
+            var drawable = mPhotoEditorView.source
+            drawable.rotation = 90.0F
+            mPhotoEditorView.source.setImageDrawable(drawable.drawable)
+        }
+
+        fun unDo(){
+            mPhotoEditor.undo()
+        }
+
+        fun reDo(){
+            mPhotoEditor.redo()
+        }
+
+        fun erase(){
+            mPhotoEditor.brushEraser()
+        }
+
+        fun setShape(shapeType: ShapeType?){
+            mPhotoEditor.setShape(mShapeBuilder.withShapeType(shapeType))
+        }
+
+        fun setOnCoLorChanged(colorCode: Int){
+            mPhotoEditor.setShape(mShapeBuilder.withShapeColor(colorCode))
+        }
+
+        fun setOnOpacityChanged(opacity: Int){
+            mPhotoEditor.setShape(mShapeBuilder.withShapeOpacity(opacity))
+        }
+
+        fun setOnShapeSizeChanged(shapeSize: Int){
+            mPhotoEditor.setShape(mShapeBuilder.withShapeSize(shapeSize.toFloat()))
+        }
+
+        fun sign(){
+            mPhotoEditor.setBrushDrawingMode(true)
+            mShapeBuilder = ShapeBuilder()
+            mPhotoEditor.setShape(mShapeBuilder)
+            // showBottomSheetDialogFragment(mShapeBSFragment)
+        }
+
+        fun setFilter(filter: PhotoFilter){
+            mPhotoEditor.setFilterEffect(filter)
+        }
+
+        fun save(folderName: String, name: String) {
             val saveSettings = SaveSettings.Builder()
                 .setClearViewsEnabled(true)
                 .setTransparencyEnabled(true)
                 .build()
 
             var fileRoot = FileUtil(requireContext()).getRootFolder()
-            var filePath = "$fileRoot/saved/$folderName"
+            var filePath = "$fileRoot/saved/$folderName/$name"
 
             if (ActivityCompat.checkSelfPermission(
                     requireContext(),
@@ -603,10 +728,7 @@ class ScanActivity : BaseActivity(), ShapeBSFragment.Properties {
             }
             mPhotoEditor!!.saveAsFile(filePath, saveSettings, object : PhotoEditor.OnSaveListener {
                 override fun onSuccess(imagePath: String) {
-                    // pos is tail
-                    if (requireArguments().getInt("number") == list.size - 1) {
 
-                    }
                 }
 
                 override fun onFailure(exception: Exception) {
@@ -698,9 +820,6 @@ class ScanActivity : BaseActivity(), ShapeBSFragment.Properties {
 
                 }
             })
-
-            //!!.addView(root)
-
             return root
         }
 
@@ -737,11 +856,46 @@ class ScanActivity : BaseActivity(), ShapeBSFragment.Properties {
                 mPhotoEditor!!.addText(inputText, styleBuilder)
             }
         }
+
+        fun rotate(){
+            var drawable = mPhotoEditorView.source
+            drawable.rotation = 90.0F
+            mPhotoEditorView.source.setImageDrawable(drawable.drawable)
+        }
+
+        fun sign(){
+            mPhotoEditor.setBrushDrawingMode(true)
+            mShapeBuilder = ShapeBuilder()
+            mPhotoEditor.setShape(mShapeBuilder)
+            // showBottomSheetDialogFragment(mShapeBSFragment)
+        }
+
+        fun setOnCoLorChanged(colorCode: Int){
+            mPhotoEditor.setShape(mShapeBuilder.withShapeColor(colorCode))
+        }
+
+        fun setOnOpacityChanged(opacity: Int){
+            mPhotoEditor.setShape(mShapeBuilder.withShapeOpacity(opacity))
+        }
+
+        fun setOnShapeSizeChanged(shapeSize: Int){
+            mPhotoEditor.setShape(mShapeBuilder.withShapeSize(shapeSize.toFloat()))
+        }
+
+        fun setOnShapePicker(shapeType: ShapeType){
+            mPhotoEditor.setShape(mShapeBuilder.withShapeType(shapeType))
+        }
+
+        fun setFilter(filter: PhotoFilter){
+            mPhotoEditor.setFilterEffect(filter)
+        }
     }
 
 
     class ImagePageAdapter(fm: FragmentManager, var list: ArrayList<String>) :
         FragmentStatePagerAdapter(fm) {
+
+        var listFrg = ArrayList<ImageFragment>()
 
         var position = 0
         var mNum: Int = 0
@@ -751,14 +905,16 @@ class ScanActivity : BaseActivity(), ShapeBSFragment.Properties {
         }
 
         override fun instantiateItem(container: ViewGroup, position: Int): Any {
-
             return super.instantiateItem(container, position)
         }
 
         override fun getItem(position: Int): Fragment {
-            var fragment: Fragment? = null
+            if(listFrg.size > position)
+                return listFrg[position]
+            var fragment: ImageFragment? = null
             try {
                 fragment = ImageFragment(list).newInstance(position)
+                listFrg.add(fragment!!)
             } catch (e: Exception) {
             }
             return fragment!!
@@ -769,7 +925,6 @@ class ScanActivity : BaseActivity(), ShapeBSFragment.Properties {
         }
 
         override fun destroyItem(container: ViewGroup, position: Int, `object`: Any) {
-
             super.destroyItem(container, position, `object`)
         }
 

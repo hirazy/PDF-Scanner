@@ -69,11 +69,14 @@ const val KEY_DATA_OCR = "key_data_ocr"
 const val KEY_DATA_SEARCH = "key_data_search"
 const val KEY_DATA_SELECT = "key_data_select"
 const val KEY_DATA_FILTER = "key_data_filter"
+const val KEY_DATA_DETAIL_TEXT = "key_data_detail_text"
 
 const val LIST_SERVER = "list_server"
 const val KEY_INTENT_SERVER = "key_intent_server"
 const val KEY_INTENT_APPLICATION = "key_intent_application"
 const val KEY_INTENT_IMAGE = "key_intent_image"
+
+const val KEY_FILTER = "key_filter"
 
 const val KEY_DATA_DETAIL = "key_data_detail"
 const val SIGN = "Sign"
@@ -140,6 +143,7 @@ const val KEY_INTENT_LISTIMG = "key_intent_listimg"
 
 // KEY_RESULT
 const val KEY_RESULT_OCR = 1
+const val KEY_RESULT_FILTER = 2
 
 const val DIALOG_TITLE_LEAVE = "Leave Scanning"
 const val DIALOG_CONTENT_LEAVE = "This will delete all scanned pages. Are you sure?"

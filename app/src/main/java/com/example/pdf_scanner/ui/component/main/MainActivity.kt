@@ -10,6 +10,7 @@ import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.os.Build
 import android.util.DisplayMetrics
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -78,6 +79,7 @@ class MainActivity : BaseActivity() {
     var statusCamera = 0 // FLASH OR AUTO-FLASH
     var statusOption = 0 // WHITEBOARD, SINGLE, BATCH,...
     var listOption = ArrayList<OptionCamera>()
+    var filePath: String = ""
     private lateinit var mExamplePagerAdapter: OptionAdapter
 
 
@@ -95,11 +97,15 @@ class MainActivity : BaseActivity() {
         /*
             Create file save image
          */
-        var filePath = FileUtil(this@MainActivity).getRootFolder() + "/saved"
+        var pathNameSaved = "/saved/"
+        filePath = FileUtil(this@MainActivity).getRootFolder() + pathNameSaved
         var fileSaved = File(filePath)
         if (!fileSaved.exists()) {
-            fileSaved.parentFile.mkdirs()
-            fileSaved.createNewFile()
+            fileSaved.mkdirs()
+            var pathNameSaved1 = "/saved/test.txt"
+            var filePath1 = FileUtil(this@MainActivity).getRootFolder() + pathNameSaved
+            var file1 = File(filePath1)
+            file1.mkdir()
         }
 
         mBounceAnimation = AnimationUtils.loadAnimation(this, R.anim.anim_bounce_start)
@@ -126,8 +132,8 @@ class MainActivity : BaseActivity() {
                     stream.write(p1)
                     stream.flush()
                     stream.close()
-                    /*
-                        Add image file saved
+                    /**
+                     * Add image file saved
                      */
                     listImg.add(filePath)
                     if (listImg.size == 1) {
@@ -135,6 +141,7 @@ class MainActivity : BaseActivity() {
                         binding.layoutBadgeImage.visibility = View.VISIBLE
                         binding.circleImg.setImageBitmap(bmp!!)
                         binding.btnDocument.setImageResource(R.drawable.ic_close)
+                        binding.vpgMain.isActivated = false
                         if (statusOption == KEY_SINGLE) {
                             var intent = Intent(this@MainActivity, ScanActivity::class.java)
                             intent.putExtra(
@@ -215,7 +222,43 @@ class MainActivity : BaseActivity() {
         layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
         val displayMetrics = DisplayMetrics()
         windowManager.defaultDisplay.getMetrics(displayMetrics)
+
+        /**
+         * Delete File Saved
+         */
+        deleteFileSaved()
+
         setContentView(binding.root)
+    }
+
+    private fun deleteFileSaved(){
+        var filePath = FileUtil(this@MainActivity).getRootFolder()
+        var fileSaved = "$filePath/saved"
+        val directory = File(filePath)
+        if (!directory.exists() || directory.listFiles() == null) {
+            return
+        }
+
+        var listFiles = directory.listFiles()
+
+        Log.e("deleteFileSaved", listFiles.size.toString())
+        for(i in 0 until listFiles.size){
+            Log.e("listPath", listFiles[i].path)
+            if(listFiles[i].path != fileSaved){
+                deleteFilePath(listFiles[i].path)
+            }
+        }
+    }
+
+    private fun deleteFilePath(path: String) {
+        val file: File = File(path)
+        file.delete()
+        if (file.exists()) {
+            file.canonicalFile.delete()
+            if (file.exists()) {
+                applicationContext.deleteFile(file.name)
+            }
+        }
     }
 
     private fun initViewpager() {
@@ -373,12 +416,11 @@ class MainActivity : BaseActivity() {
         permissions: Array<out String>,
         grantResults: IntArray
     ) {
+        // binding.cameraKit.onRequestPermissionsResult(requestCode, permissions, grantResults)
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        binding.cameraKit.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-
         super.onActivityResult(requestCode, resultCode, data)
     }
 }

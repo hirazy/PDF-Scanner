@@ -115,7 +115,7 @@ class ImageActivity : BaseActivity() {
                 var o = data as ImageCard
                 listSelected.removeAt(index)
                 adapterSelected.notifyItemRemoved(index - 1)
-                // adapterSelected.setValue(listSelected)
+                adapterSelected.setValue(listSelected)
                 if (listSelected.size == 0)
                     binding.btnDoneImg.setBackgroundResource(R.drawable.bg_btn_done)
 

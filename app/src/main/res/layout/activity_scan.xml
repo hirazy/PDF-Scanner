@@ -30,6 +30,7 @@
 
 
         <HorizontalScrollView
+            android:layout_centerHorizontal="true"
             android:id="@+id/hscvScan"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -51,7 +52,7 @@
                     android:orientation="horizontal"
                     android:paddingTop="10dp">
 
-                    <LinearLayout
+                        <LinearLayout
                         android:id="@+id/layoutAddImage"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -248,6 +249,7 @@
         </HorizontalScrollView>
 
         <androidx.viewpager.widget.ViewPager
+            android:layout_marginTop="5dp"
             android:id="@+id/vpgImg"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -272,9 +274,9 @@
             android:layout_centerHorizontal="true"
             android:layout_marginBottom="30dp"
             android:background="@drawable/bg_page_img"
-            android:paddingLeft="15dp"
+            android:paddingLeft="10dp"
             android:paddingTop="3dp"
-            android:paddingRight="15dp"
+            android:paddingRight="10dp"
             android:paddingBottom="3dp">
 
             <ImageButton

@@ -16,9 +16,36 @@
             android:id="@+id/imgFilter"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_above="@+id/layoutOptionFilter" />
+            android:layout_above="@+id/layoutFilterAll" />
+
+        <RelativeLayout
+            android:id="@+id/layoutFilterAll"
+            android:layout_above="@+id/layoutOptionFilter"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            >
+            <TextView
+                android:layout_marginRight="10dp"
+                android:layout_centerVertical="true"
+                android:layout_toLeftOf="@+id/swFilterAll"
+                android:textColor="@color/colorBorderReName"
+                android:text="@string/tvAllPages"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                />
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:layout_marginRight="10dp"
+                android:layout_centerVertical="true"
+                android:layout_alignParentRight="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/swFilterAll"
+                />
+        </RelativeLayout>
 
         <LinearLayout
+            android:layout_marginTop="10dp"
             android:id="@+id/layoutOptionFilter"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -27,6 +54,7 @@
             android:orientation="horizontal">
 
             <ImageButton
+                android:id="@+id/btnFilterNormal"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
@@ -47,45 +75,47 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
-            android:paddingTop="3dp"
-            android:paddingBottom="3dp">
+            android:paddingTop="20dp"
+            android:paddingBottom="20dp">
 
             <LinearLayout
+                android:id="@+id/layoutFilterCancel"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_weight="1"
                 android:gravity="center">
 
-                <Button
+                <TextView
+                    android:textSize="17sp"
+                    android:layout_gravity="center"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:background="@null"
-                    android:gravity="center"
                     android:text="@string/tvCancel"
                     android:textAllCaps="false"
                     android:textColor="@color/white"
-                    android:textStyle="bold" />
+                    android:textStyle="bold"
+                    />
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/layoutFilterDone"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_weight="1"
                 android:gravity="center">
 
-                <Button
+                <TextView
+                    android:textSize="17sp"
+                    android:layout_gravity="center"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:background="@null"
-                    android:gravity="center"
                     android:text="@string/tvDone"
                     android:textAllCaps="false"
-                    android:textColor="@color/white"
-                    android:textStyle="bold" />
+                    android:textColor="@color/colorTextSave"
+                    android:textStyle="bold"
+                    />
             </LinearLayout>
         </LinearLayout>
     </RelativeLayout>

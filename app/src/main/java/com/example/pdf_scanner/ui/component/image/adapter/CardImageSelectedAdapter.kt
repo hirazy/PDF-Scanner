@@ -17,6 +17,5 @@ class CardImageSelectedAdapter(var e: RecyclerItemListener) :
         itemBinding.itemBinding.btnCancelSelected.setOnClickListener {
             e.onOption(position, listData[position])
         }
-
     }
 }
