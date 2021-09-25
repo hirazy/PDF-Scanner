@@ -108,5 +108,36 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
+        <RelativeLayout
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            android:id="@+id/layoutFolderSearchEmpty"
+            android:layout_centerInParent="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            >
+            <ImageView
+                android:layout_centerHorizontal="true"
+                android:id="@+id/icFolderEmpty"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:src="@drawable/ic_empty_folder"
+                />
+
+            <TextView
+                android:textSize="@dimen/_18ssp"
+                android:fontFamily="@font/font4"
+                android:textColor="@color/white"
+                android:layout_marginTop="10dp"
+                android:text="@string/tvFolderEmpty"
+                android:layout_centerHorizontal="true"
+                android:layout_below="@+id/icFolderEmpty"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                />
+        </RelativeLayout>
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

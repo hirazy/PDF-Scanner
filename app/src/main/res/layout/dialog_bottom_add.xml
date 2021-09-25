@@ -20,7 +20,7 @@
     <LinearLayout
         android:id="@+id/layoutTakePhoto"
         android:layout_marginLeft="20dp"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="30dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         >
@@ -45,7 +45,7 @@
     <LinearLayout
         android:id="@+id/layoutSelectAlbum"
         android:layout_marginLeft="20dp"
-        android:layout_marginTop="15dp"
+        android:layout_marginTop="20dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         >

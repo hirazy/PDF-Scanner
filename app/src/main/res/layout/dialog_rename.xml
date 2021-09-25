@@ -16,7 +16,7 @@
         >
 
         <TextView
-            android:id="@+id/tvContentLeave"
+            android:id="@+id/tvContentRename"
             android:textSize="18dp"
             android:textStyle="bold"
             android:textColor="@color/black"
@@ -40,6 +40,7 @@
                 android:id="@+id/edtReName"
                 android:text="Scan"
                 android:textColor="@color/black"
+                android:focusable="true"
                 android:maxLength="25"
                 android:layout_centerVertical="true"
                 android:layout_marginLeft="15dp"
@@ -85,17 +86,17 @@
             <LinearLayout
                 android:layout_width="25dp"
                 android:layout_height="wrap_content" />
+
             <Button
-                android:textSize="14sp"
-                android:textAllCaps="false"
-                android:layout_weight="1"
                 android:id="@+id/btnAcceptRename"
-                android:text="@string/tvConfirm"
-                android:textColor="@color/white"
-                android:background="@drawable/bg_btn_accept"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                />
+                android:layout_weight="1"
+                android:background="@drawable/bg_btn_accept"
+                android:text="@string/tvConfirm"
+                android:textAllCaps="false"
+                android:textColor="@color/white"
+                android:textSize="14sp" />
         </LinearLayout>
     </LinearLayout>
 </RelativeLayout>

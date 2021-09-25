@@ -74,7 +74,7 @@ abstract class AdapterFolder<K : OBase, T : ViewDataBinding>(var event: RecycleF
     }
 
     fun setValue(it: ArrayList<K>){
-        listData = it
+        listData = ArrayList(it)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseHolder<T> {

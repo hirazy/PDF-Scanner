@@ -227,7 +227,6 @@ class ImageActivity : BaseActivity() {
         when (listImg) {
             is Resource.Success -> {
                 list = listImg.data!!
-                Log.e("observeListImage", list.size.toString())
                 adapter.setData(list)
             }
         }

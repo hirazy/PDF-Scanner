@@ -1,5 +1,6 @@
 package com.example.pdf_scanner.ui.component.search
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
@@ -10,7 +11,9 @@ import com.example.pdf_scanner.ui.base.BaseViewModel
 import com.flurry.sdk.fo
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import java.util.*
 import javax.inject.Inject
+import kotlin.collections.ArrayList
 
 @HiltViewModel
 class SearchViewModel @Inject constructor(var dataRepositorySource: DataRepositorySource): BaseViewModel(){
@@ -25,17 +28,20 @@ class SearchViewModel @Inject constructor(var dataRepositorySource: DataReposito
     }
 
     fun fetchData(list: ArrayList<ImageFolder>){
-        listAll = list
+        listAll = ArrayList(list)
         listDataFolder.value = Resource.Success(list)
     }
 
     fun search(key: String){
+        Log.e("search", key + listAll.size)
+        var listData = listAll
         viewModelScope.launch {
             var listTemp = ArrayList<ImageFolder>()
-
-            for(i in 0 until listAll!!.size){
-                if(listAll[i].name.contains(key)){
-                    listTemp.add(listAll[i])
+            var keySearch = key.toLowerCase()
+            for(i in 0 until listData!!.size){
+                Log.e("listAll[i].name", keySearch)
+                if(listData[i].name.toLowerCase().contains(keySearch)){
+                    listTemp.add(listData[i])
                 }
             }
             listDataFolder.value = Resource.Success(listTemp)

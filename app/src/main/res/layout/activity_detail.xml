@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
@@ -8,56 +7,56 @@
 
     </data>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:background="@color/colorApp"
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="@color/colorApp"
         tools:context=".ui.component.detail.DetailActivity">
 
         <com.google.android.material.appbar.AppBarLayout
             android:id="@+id/appBarDetail"
-            app:layout_constraintTop_toTopOf="parent"
-            android:background="@color/colorApp"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:background="@color/colorApp"
+            app:layout_constraintTop_toTopOf="parent">
 
             <androidx.appcompat.widget.Toolbar
                 android:id="@+id/tbDetail"
-                app:titleTextColor="@color/white"
-                app:title="@string/tvList"
-                app:navigationIcon="@drawable/ic_back"
-                android:background="@color/colorApp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-
-                />
+                android:background="@color/colorApp"
+                app:menu="@menu/item_action_detail"
+                app:navigationIcon="@drawable/ic_back"
+                app:title="@string/tvList"
+                app:titleTextColor="@color/white" />
         </com.google.android.material.appbar.AppBarLayout>
 
         <LinearLayout
-            android:gravity="center"
             android:id="@+id/layoutTextDetail"
-            android:layout_marginTop="10dp"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/appBarDetail"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            >
+            android:layout_below="@id/appBarDetail"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="10dp"
+            android:gravity="center"
+            android:padding="5dp"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/appBarDetail">
             <TextView
-                android:layout_gravity="center"
-                android:gravity="center"
                 android:id="@+id/tvListImage"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                />
-
-            <ImageView
-                android:layout_marginLeft="10dp"
-                android:src="@drawable/ic_edit"
                 android:layout_gravity="center"
+                android:gravity="center"
+                android:text="Name file"
+                android:textColor="@color/white" />
+            <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                />
+                android:layout_gravity="center"
+                android:layout_marginLeft="10dp"
+                android:src="@drawable/ic_edit" />
         </LinearLayout>
 
 
@@ -65,147 +64,151 @@
             android:id="@+id/rcclvDetail"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            app:layout_constraintBottom_toTopOf="@+id/layoutOptionDetail"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/layoutTextDetail"
-            app:layout_constraintVertical_bias="0.492" />
+            android:layout_above="@+id/layoutOptionDetail"
+            android:layout_below="@id/layoutTextDetail"
+            android:layout_marginLeft="@dimen/_40sdp"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:layout_marginRight="@dimen/_40sdp"
+            android:paddingBottom="10dp" />
 
         <LinearLayout
             android:id="@+id/layoutOptionDetail"
-            android:gravity="center_horizontal"
-            android:orientation="horizontal"
-            app:layout_constraintBottom_toBottomOf="parent"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            >
+            android:layout_alignParentBottom="true"
+            android:gravity="center_horizontal"
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toBottomOf="parent">
+
             <LinearLayout
-                android:padding="10dp"
                 android:id="@+id/layoutCommentDetail"
-                android:layout_gravity="center"
-                android:orientation="vertical"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                >
+                android:layout_gravity="center"
+                android:orientation="vertical"
+                android:padding="10dp">
+
                 <ImageView
-                    android:layout_gravity="center"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/ic_comment"
-                    />
-                <TextView
-                    android:textSize="11sp"
-                    android:layout_marginTop="15dp"
-                    android:textColor="@color/colorPageFolder"
                     android:layout_gravity="center"
+                    android:src="@drawable/ic_comment" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="15dp"
                     android:gravity="center"
                     android:text="@string/tvComment"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    />
+                    android:textColor="@color/colorPageFolder"
+                    android:textSize="11sp" />
             </LinearLayout>
+
             <LinearLayout
-                android:padding="10dp"
                 android:id="@+id/layoutEmailDetail"
-                android:layout_gravity="center"
-                android:orientation="vertical"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                >
+                android:layout_gravity="center"
+                android:layout_marginLeft="10dp"
+                android:orientation="vertical"
+                android:padding="10dp">
+
                 <ImageView
-                    android:layout_gravity="center"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/ic_email"
-                    />
-                <TextView
-                    android:textSize="11sp"
-                    android:layout_marginTop="15dp"
-                    android:textColor="@color/colorPageFolder"
                     android:layout_gravity="center"
+                    android:src="@drawable/ic_email" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="15dp"
                     android:gravity="center"
                     android:text="@string/tvEmail"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    />
+                    android:textColor="@color/colorPageFolder"
+                    android:textSize="11sp" />
             </LinearLayout>
+
             <LinearLayout
-                android:padding="10dp"
                 android:id="@+id/layoutShareDetail"
-                android:layout_gravity="center"
-                android:orientation="vertical"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                >
+                android:layout_gravity="center"
+                android:layout_marginLeft="10dp"
+                android:orientation="vertical"
+                android:padding="10dp">
+
                 <ImageView
-                    android:layout_gravity="center"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/ic_share"
-                    />
-                <TextView
-                    android:textSize="11sp"
-                    android:layout_marginTop="15dp"
-                    android:textColor="@color/colorPageFolder"
                     android:layout_gravity="center"
+                    android:src="@drawable/ic_share" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="15dp"
                     android:gravity="center"
                     android:text="@string/tvShare"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    />
+                    android:textColor="@color/colorPageFolder"
+                    android:textSize="11sp" />
             </LinearLayout>
+
             <LinearLayout
-                android:padding="10dp"
                 android:id="@+id/layoutSaveDetail"
-                android:layout_gravity="center"
-                android:orientation="vertical"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                >
+                android:layout_gravity="center"
+                android:layout_marginLeft="10dp"
+                android:orientation="vertical"
+                android:padding="10dp">
+
                 <ImageView
-                    android:layout_gravity="center"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/ic_save"
-                    />
-                <TextView
-                    android:textSize="11sp"
-                    android:layout_marginTop="15dp"
-                    android:textColor="@color/colorPageFolder"
                     android:layout_gravity="center"
+                    android:src="@drawable/ic_save" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="15dp"
                     android:gravity="center"
                     android:text="@string/tvSave"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    />
+                    android:textColor="@color/colorPageFolder"
+                    android:textSize="11sp" />
             </LinearLayout>
+
             <LinearLayout
-                android:padding="10dp"
                 android:id="@+id/layoutPrintDetail"
-                android:layout_gravity="center"
-                android:orientation="vertical"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                >
+                android:layout_gravity="center"
+                android:layout_marginLeft="10dp"
+                android:orientation="vertical"
+                android:padding="10dp">
+
                 <ImageView
-                    android:layout_gravity="center"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/ic_print"
-                    />
-                <TextView
-                    android:textSize="11sp"
-                    android:layout_marginTop="15dp"
-                    android:textColor="@color/colorPageFolder"
                     android:layout_gravity="center"
+                    android:src="@drawable/ic_print" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="15dp"
                     android:gravity="center"
                     android:text="@string/tvPrint"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    />
+                    android:textColor="@color/colorPageFolder"
+                    android:textSize="11sp" />
             </LinearLayout>
         </LinearLayout>
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    </RelativeLayout>
 </layout>

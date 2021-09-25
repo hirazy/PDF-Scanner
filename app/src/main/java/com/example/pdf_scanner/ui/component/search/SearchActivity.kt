@@ -3,6 +3,8 @@ package com.example.pdf_scanner.ui.component.search
 import android.content.Intent
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
+import android.view.View
 import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -35,7 +37,6 @@ class SearchActivity : BaseActivity() {
         list = intent.getStringExtra(KEY_DATA_SEARCH)!!.toObject<DataSearch>().list
 
         binding.btnDeleteSearch.setOnClickListener {
-
             finish()
         }
 
@@ -48,6 +49,7 @@ class SearchActivity : BaseActivity() {
             }
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                Log.e("onTextChanged", s.toString())
                 viewModel.search(s.toString())
             }
 
@@ -55,20 +57,20 @@ class SearchActivity : BaseActivity() {
             }
         })
 
-        adapter = CardFolderAdapter(object: RecyclerItemListener{
+        adapter = CardFolderAdapter(object : RecyclerItemListener {
             override fun onItemSelected(index: Int, data: OBase) {
+                var o = data as ImageFolder
                 var intent = Intent(this@SearchActivity, DetailActivity::class.java)
-                intent.putExtra(KEY_DATA_DETAIL, DataSearch(list))
+                intent.putExtra(KEY_DATA_DETAIL, o.toJSON())
                 startActivity(intent)
             }
 
             override fun onOption(index: Int, data: OBase) {
+
             }
         })
-
         binding.rcclvSearch.layoutManager = LinearLayoutManager(this)
         binding.rcclvSearch.adapter = adapter
-
         viewModel.fetchData(list)
         setContentView(binding.root)
     }
@@ -77,10 +79,17 @@ class SearchActivity : BaseActivity() {
         observe(viewModel.listFolder, ::handleFolder)
     }
 
-    private fun handleFolder(data: Resource<ArrayList<ImageFolder>>){
-        when(data){
-            is Resource.Success ->{
-                adapter.setData(data.data!!)
+    private fun handleFolder(data: Resource<ArrayList<ImageFolder>>) {
+        when (data) {
+            is Resource.Success -> {
+                var list = data.data!!
+                adapter.setData(list)
+                if (list.size == 0 && binding.layoutFolderSearchEmpty.visibility == View.GONE) {
+                    binding.layoutFolderSearchEmpty.visibility = View.VISIBLE
+                } else if (list.size != 0 && binding.layoutFolderSearchEmpty.visibility == View.VISIBLE) {
+                    binding.layoutFolderSearchEmpty.visibility = View.GONE
+                }
+
             }
         }
     }

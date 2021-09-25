@@ -13,6 +13,8 @@
     <color name="colorTextScan">#555555</color>
     <color name="colorStatus">#1C1C1C</color>
     <color name="colorApp">#000000</color>
+    <color name="colorCard">#101010</color>
+
     <color name="colorTextSave">#00C356</color>
 
     <color name="colorTextOption">#4C4C4C</color>

@@ -10,6 +10,7 @@ import com.example.pdf_scanner.data.dto.OptionCamera
 
 class OptionAdapter(private val mDataList: List<OptionCamera>?) :
     PagerAdapter() {
+
     override fun getCount(): Int {
         return mDataList?.size ?: 0
     }

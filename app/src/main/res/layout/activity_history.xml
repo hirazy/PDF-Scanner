@@ -19,7 +19,6 @@
             android:background="@color/colorApp">
 
             <androidx.appcompat.widget.Toolbar
-                app:navigationIcon="@drawable/ic_back"
                 app:menu="@menu/item_action_history"
                 android:id="@+id/tbHistory"
                 android:layout_width="match_parent"
@@ -131,5 +130,32 @@
                 android:layout_height="wrap_content"
                 />
         </com.github.clans.fab.FloatingActionMenu>
+
+        <RelativeLayout
+            android:id="@+id/layoutFolderEmpty"
+            android:layout_centerInParent="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            >
+            <ImageView
+                android:layout_centerHorizontal="true"
+                android:id="@+id/icFolderEmpty"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:src="@drawable/ic_empty_folder"
+                />
+
+            <TextView
+                android:textSize="@dimen/_18ssp"
+                android:fontFamily="@font/font4"
+                android:textColor="@color/white"
+                android:layout_marginTop="10dp"
+                android:text="@string/tvFolderEmpty"
+                android:layout_centerHorizontal="true"
+                android:layout_below="@+id/icFolderEmpty"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                />
+        </RelativeLayout>
     </RelativeLayout>
 </layout>

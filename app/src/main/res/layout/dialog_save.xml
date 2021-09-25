@@ -12,6 +12,7 @@
         android:background="@color/colorTransparent"
         android:orientation="vertical"
         android:padding="20dp"
+        android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
@@ -58,22 +59,13 @@
         android:layout_height="match_parent"
         android:background="@color/colorTransparent"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0">
 
-        <ImageButton
-            android:id="@+id/btnCloseSave"
-            android:background="@null"
-            android:layout_alignParentRight="true"
-            android:layout_marginRight="10dp"
-            android:layout_marginTop="10dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_close_dialog"
-            />
-
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
@@ -97,6 +89,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
+                    android:layout_marginTop="20dp"
                     android:gravity="center"
                     android:orientation="horizontal">
 
@@ -118,25 +111,36 @@
                         android:src="@drawable/ic_edit_save_name" />
                 </LinearLayout>
 
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="3dp"
+                    android:layout_gravity="center"
+                    android:layout_marginLeft="100dp"
+                    android:layout_marginTop="3dp"
+                    android:layout_marginRight="100dp"
+                    android:background="@drawable/bg_dotted"
+                    android:gravity="center" />
+
                 <TextView
                     android:id="@+id/tvSaveTime"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:layout_marginTop="8dp"
+                    android:layout_marginTop="15dp"
                     android:gravity="center"
-                    android:text="Today, 08-31" />
+                    android:text="Today, 08-31"
+                    android:textSize="15sp" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="0.5dp"
-                    android:layout_marginTop="10dp"
-                    android:background="#2E2E2E" />
+                    android:layout_height="0.4dp"
+                    android:layout_marginTop="20dp"
+                    android:background="#323232" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
+                    android:layout_marginTop="20dp"
                     android:orientation="horizontal">
 
                     <RelativeLayout
@@ -150,8 +154,8 @@
 
                         <RelativeLayout
                             android:id="@+id/layoutIconShare"
-                            android:layout_width="40dp"
-                            android:layout_height="40dp"
+                            android:layout_width="50dp"
+                            android:layout_height="50dp"
                             android:layout_centerHorizontal="true"
                             android:layout_gravity="center"
                             android:background="@drawable/bg_save_share"
@@ -162,7 +166,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_centerInParent="true"
                                 android:layout_gravity="center"
-                                android:src="@drawable/ic_share" />
+                                android:src="@drawable/ic_scan_share" />
                         </RelativeLayout>
 
                         <TextView
@@ -187,8 +191,8 @@
 
                         <RelativeLayout
                             android:id="@+id/layoutIconPrint"
-                            android:layout_width="40dp"
-                            android:layout_height="40dp"
+                            android:layout_width="50dp"
+                            android:layout_height="50dp"
                             android:layout_centerHorizontal="true"
                             android:layout_gravity="center"
                             android:background="@drawable/bg_save_print"
@@ -199,7 +203,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_centerInParent="true"
                                 android:layout_gravity="center"
-                                android:src="@drawable/ic_print" />
+                                android:src="@drawable/ic_scan_print" />
                         </RelativeLayout>
 
                         <TextView
@@ -224,8 +228,8 @@
 
                         <RelativeLayout
                             android:id="@+id/layoutIconAlbum"
-                            android:layout_width="40dp"
-                            android:layout_height="40dp"
+                            android:layout_width="50dp"
+                            android:layout_height="50dp"
                             android:layout_centerHorizontal="true"
                             android:layout_gravity="center"
                             android:background="@drawable/bg_save_album"
@@ -236,7 +240,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_centerInParent="true"
                                 android:layout_gravity="center"
-                                android:src="@drawable/ic_save" />
+                                android:src="@drawable/ic_scan_save" />
                         </RelativeLayout>
 
                         <TextView
@@ -261,8 +265,8 @@
 
                         <RelativeLayout
                             android:id="@+id/layoutIconEmail"
-                            android:layout_width="40dp"
-                            android:layout_height="40dp"
+                            android:layout_width="50dp"
+                            android:layout_height="50dp"
                             android:layout_centerHorizontal="true"
                             android:background="@drawable/bg_save_email">
 
@@ -271,8 +275,9 @@
                                 android:layout_height="wrap_content"
                                 android:layout_centerInParent="true"
                                 android:layout_gravity="center"
-                                android:src="@drawable/ic_email" />
+                                android:src="@drawable/ic_scan_email" />
                         </RelativeLayout>
+
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -285,6 +290,17 @@
                     </RelativeLayout>
                 </LinearLayout>
             </LinearLayout>
-        </LinearLayout>
+
+            <ImageButton
+                android:id="@+id/btnCloseSave"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_gravity="right"
+                android:background="@null"
+                android:padding="5dp"
+                android:src="@drawable/ic_close_dialog" />
+
+        </RelativeLayout>
     </RelativeLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

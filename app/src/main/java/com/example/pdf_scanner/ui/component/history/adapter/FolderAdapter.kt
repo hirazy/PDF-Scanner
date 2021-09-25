@@ -9,8 +9,24 @@ import com.example.pdf_scanner.ui.base.listener.RecycleFolderListener
 import com.example.pdf_scanner.utils.LayoutId
 
 @LayoutId(R.layout.card_folder)
-class FolderAdapter(e: RecycleFolderListener) : AdapterFolder<ImageFolder, CardFolderBinding>(e) {
+class FolderAdapter(var e: RecycleFolderListener) : AdapterFolder<ImageFolder, CardFolderBinding>(e) {
     override fun bindView(itemBinding: BaseHolder<CardFolderBinding>, position: Int) {
         itemBinding.itemBinding.o = listData[position]
+
+        itemBinding.itemBinding.cardFolder.setOnClickListener {
+            e.onItemSelected(position, listData[position])
+        }
+
+        itemBinding.itemBinding.layoutDeleteFolder.setOnClickListener {
+            e.onItemDelete(position, listData[position])
+        }
+
+        itemBinding.itemBinding.layoutMoreFolder.setOnClickListener {
+            e.onItemMore(position, listData[position])
+        }
+
+        itemBinding.itemBinding.layoutReNameFolder.setOnClickListener {
+            e.onItemRename(position, listData[position])
+        }
     }
 }

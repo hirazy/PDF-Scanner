@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:layout_centerInParent="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        >
+        <NumberPicker
+            android:theme="@style/AppTheme.Picker"
+            android:id="@+id/numberPickerTextSize"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="64dp" />
+
+        <Button
+            android:textAllCaps="false"
+            android:textColor="@color/colorTextSave"
+            android:id="@+id/btnSetTextSize"
+            android:background="@null"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@+id/btnCancelTextSize"
+            android:layout_alignBottom="@+id/btnCancelTextSize"
+            android:layout_marginRight="16dp"
+            android:layout_toRightOf="@+id/numberPickerTextSize"
+            android:text="OK" />
+
+        <Button
+            android:textAllCaps="false"
+            android:background="@null"
+            android:textColor="@color/colorTextSave"
+            android:id="@+id/btnCancelTextSize"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/numberPickerTextSize"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="50dp"
+            android:layout_toLeftOf="@+id/numberPickerTextSize"
+            android:text="Cancel" />
+
+    </RelativeLayout>
+
+</RelativeLayout>

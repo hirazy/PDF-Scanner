@@ -50,6 +50,15 @@
 
     <style name="cornerCard">
         <item name="cornerSize">15%</item>
+        <item name="background">@color/white</item>
     </style>
 
+    <style name="cornerCardDetail">
+        <item name="cornerSize">5%</item>
+    </style>
+
+
+    <style name="AppTheme.Picker" parent="Theme.AppCompat.Light.NoActionBar" >
+        <item name="android:textColorPrimary">@android:color/white</item>
+    </style>
 </resources>

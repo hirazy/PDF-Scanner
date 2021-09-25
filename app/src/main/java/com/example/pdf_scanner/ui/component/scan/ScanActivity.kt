@@ -2,10 +2,13 @@ package com.example.pdf_scanner.ui.component.scan
 
 import android.Manifest
 import android.animation.Animator
+import android.annotation.SuppressLint
 import android.app.Dialog
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.pdf.PdfDocument
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -26,8 +29,11 @@ import com.example.pdf_scanner.data.dto.*
 import com.example.pdf_scanner.databinding.ActivityScanBinding
 import com.example.pdf_scanner.ui.base.BaseActivity
 import com.example.pdf_scanner.ui.base.listener.RecyclerItemListener
+import com.example.pdf_scanner.ui.component.detail.dialog.BottomShare
+import com.example.pdf_scanner.ui.component.detail.dialog.BottomShareEvent
 import com.example.pdf_scanner.ui.component.detail_text.DetailTextActivity
 import com.example.pdf_scanner.ui.component.filter.FilterActivity
+import com.example.pdf_scanner.ui.component.history.HistoryActivity
 import com.example.pdf_scanner.ui.component.image.ImageActivity
 import com.example.pdf_scanner.ui.component.ocr.OCRActivity
 import com.example.pdf_scanner.ui.component.scan.adapter.LanguageSelectedAdapter
@@ -37,20 +43,14 @@ import com.example.pdf_scanner.ui.component.scan.dialog.ShapeBSFragment
 import com.example.pdf_scanner.ui.component.scan.dialog.TextEditorDialogFragment
 import com.example.pdf_scanner.utils.FileUtil
 import com.example.pdf_scanner.utils.toObject
-import com.flurry.sdk.y
-import com.google.android.gms.tasks.OnFailureListener
-import com.google.android.gms.tasks.OnSuccessListener
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import com.google.firebase.ml.naturallanguage.FirebaseNaturalLanguage
-import com.google.firebase.ml.vision.FirebaseVision
-import com.google.firebase.ml.vision.common.FirebaseVisionImage
-import com.google.firebase.ml.vision.text.FirebaseVisionText
-import com.google.firebase.ml.vision.text.FirebaseVisionTextRecognizer
 import com.oneadx.vpnclient.utils.observe
+import com.pranavpandey.android.dynamic.toasts.DynamicToast
 import dagger.hilt.android.AndroidEntryPoint
 import ja.burhanrashid52.photoeditor.*
 import ja.burhanrashid52.photoeditor.shape.ShapeBuilder
 import ja.burhanrashid52.photoeditor.shape.ShapeType
+import java.io.ByteArrayOutputStream
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
@@ -70,8 +70,6 @@ class ScanActivity : BaseActivity(), ShapeBSFragment.Properties {
     lateinit var adapterImg: ImagePageAdapter
     lateinit var adapterLanguageSelected: LanguageSelectedAdapter
     lateinit var listImg: ArrayList<String>
-    lateinit var listOCR: ArrayList<String>
-    lateinit var adapterVpg: ImagePageAdapter
     lateinit var dataScan: DataScan
     lateinit var handler: Handler
     var optionSelected = 0
@@ -86,7 +84,6 @@ class ScanActivity : BaseActivity(), ShapeBSFragment.Properties {
         }
 
         binding = ActivityScanBinding.inflate(layoutInflater)
-
         dataScan = intent.getStringExtra(KEY_DATA_SCAN)!!.toObject() as DataScan
 
         if (dataScan.status == KEY_OCR) {
@@ -97,7 +94,6 @@ class ScanActivity : BaseActivity(), ShapeBSFragment.Properties {
             adapterLanguageSelected = LanguageSelectedAdapter(object : RecyclerItemListener {
                 override fun onItemSelected(index: Int, data: OBase) {
                     var intent = Intent(this@ScanActivity, OCRActivity::class.java)
-                    // intent.putExtra(KEY_DATA_OCR, DataOCR(listOCR).toJSON())
                     startActivityForResult(intent, KEY_RESULT_OCR)
                 }
 
@@ -123,9 +119,7 @@ class ScanActivity : BaseActivity(), ShapeBSFragment.Properties {
         binding.tvCountPage.text = "1 / " + listImg.size.toString()
 
         setSupportActionBar(binding.tbScan)
-
         binding.tbScan.setNavigationIcon(R.drawable.ic_back)
-
         binding.tbScan.setNavigationOnClickListener {
             backToMain()
         }
@@ -201,16 +195,14 @@ class ScanActivity : BaseActivity(), ShapeBSFragment.Properties {
 
             }
         })
-
         adapterImg = ImagePageAdapter(supportFragmentManager, listImg)
         binding.vpgImg.adapter = adapterImg
         setContentView(binding.root)
     }
 
-    private fun backToMain(){
+    private fun backToMain() {
         var dialog = Dialog(this)
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        dialog.window!!.setBackgroundDrawableResource(android.R.color.transparent)
         dialog.window!!.setBackgroundDrawableResource(android.R.color.transparent)
         dialog.setCancelable(false)
         dialog.setContentView(R.layout.dialog_leave_scan)
@@ -226,7 +218,7 @@ class ScanActivity : BaseActivity(), ShapeBSFragment.Properties {
         dialog.show()
     }
 
-    private fun addImage(){
+    private fun addImage() {
         var bottomDialog = BottomScan(object : BottomScanEvent {
             override fun takePhoto() {
                 finish()
@@ -241,21 +233,19 @@ class ScanActivity : BaseActivity(), ShapeBSFragment.Properties {
         bottomDialog.show(supportFragmentManager, bottomDialog.tag)
     }
 
-    private fun rotateImage(){
-        Log.e("rotateImage", "rotateImage")
+    private fun rotateImage() {
         adapterImg.listFrg[binding.vpgImg.currentItem].rotate()
     }
-    private fun signImage(){
+
+    private fun signImage() {
         var dialog = ShapeBSFragment()
         showBottomSheetDialogFragment(dialog)
         binding.tbScan.title = SIGN
-
         adapterImg.listFrg[binding.vpgImg.currentItem].sign()
-
         dialog.setPropertiesChangeListener(this)
     }
 
-    private fun addText(){
+    private fun addText() {
         var dialogText: TextEditorDialogFragment = TextEditorDialogFragment.show(
             this
         )
@@ -264,13 +254,13 @@ class ScanActivity : BaseActivity(), ShapeBSFragment.Properties {
             override fun onDone(inputText: String?, colorCode: Int) {
                 val styleBuilder = TextStyleBuilder()
                 styleBuilder.withTextColor(colorCode)
-                // adapterImg.addText(inputText!!, styleBuilder)
+                styleBuilder.withTextSize(viewModel.textSizeLive.value!!.data!!.toFloat())
                 adapterImg.listFrg[binding.vpgImg.currentItem].addTextO(inputText!!, styleBuilder)
             }
         })
     }
 
-    private fun addFilter(){
+    private fun addFilter() {
         var intent = Intent(this@ScanActivity, FilterActivity::class.java)
         /**
          * listImg.size > 1 to Filter All
@@ -282,7 +272,7 @@ class ScanActivity : BaseActivity(), ShapeBSFragment.Properties {
         startActivityForResult(intent, KEY_RESULT_FILTER)
     }
 
-    private fun deleteImage(){
+    private fun deleteImage() {
         var dialog = Dialog(this)
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.window!!.setBackgroundDrawableResource(android.R.color.transparent)
@@ -301,7 +291,7 @@ class ScanActivity : BaseActivity(), ShapeBSFragment.Properties {
         dialog.show()
     }
 
-    private fun pageBack(){
+    private fun pageBack() {
         var pos = binding.vpgImg.currentItem
         if (pos >= 1) {
             binding.vpgImg.setCurrentItem(pos - 1, true)
@@ -310,13 +300,13 @@ class ScanActivity : BaseActivity(), ShapeBSFragment.Properties {
         }
     }
 
-    private fun pageNext(){
+    private fun pageNext() {
         var pos = binding.vpgImg.currentItem + 1
-            if (pos < adapterImg.count) {
-                binding.vpgImg.setCurrentItem(pos, true)
-                var page = pos + 1
-                binding.tvCountPage.text = page.toString() + " / " + listImg.size
-            }
+        if (pos < adapterImg.count) {
+            binding.vpgImg.setCurrentItem(pos, true)
+            var page = pos + 1
+            binding.tvCountPage.text = page.toString() + " / " + listImg.size
+        }
     }
 
     private fun deleteFilePath(path: String) {
@@ -327,41 +317,6 @@ class ScanActivity : BaseActivity(), ShapeBSFragment.Properties {
             if (file.exists()) {
                 applicationContext.deleteFile(file.name)
             }
-        }
-    }
-
-    private fun convertText(imageBitmap: Bitmap) {
-
-        val image = FirebaseVisionImage.fromBitmap(imageBitmap)
-
-        val languageIdentifier = FirebaseNaturalLanguage.getInstance()
-            .languageIdentification
-
-        val detector: FirebaseVisionTextRecognizer =
-            FirebaseVision.getInstance().cloudTextRecognizer
-
-        detector.processImage(image)
-            .addOnSuccessListener(OnSuccessListener<FirebaseVisionText?> { firebaseVisionText ->
-                processTxt(firebaseVisionText)
-            }).addOnFailureListener(OnFailureListener { // handling an error listener.
-                Toast.makeText(
-                    this@ScanActivity,
-                    "Fail to detect the text from image..",
-                    Toast.LENGTH_SHORT
-                ).show()
-            })
-    }
-
-    private fun processTxt(text: FirebaseVisionText) {
-        val blocks: List<FirebaseVisionText.TextBlock> = text.textBlocks
-
-        if (blocks.isEmpty()) {
-            // Toast.makeText(this@MainActivity, "No Text ", Toast.LENGTH_LONG).show()
-            return
-        }
-        for (block in blocks) {
-            val txt: String = block.text
-            // textview.setText(txt)
         }
     }
 
@@ -417,15 +372,21 @@ class ScanActivity : BaseActivity(), ShapeBSFragment.Properties {
 
                 val fileRoot = FileUtil(this@ScanActivity).getRootFolder()
                 var date = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
-                val strTime = "Scan " + date.format(Date())
+                var pathNameSaved = "/saved/"
+                val strTime = "Scan " + date.format(Date()) + "/"
+                var folderSavedPath = fileRoot + pathNameSaved + strTime
+                var folderSaved = File(folderSavedPath)
+                folderSaved.mkdirs()
 
-                for(i in 0 until listImg.size){
+                var txtTime = dialog.findViewById<TextView>(R.id.tvSaveTime)
+                txtTime.text = "Today, " + date.format(Date()).substring(5, 10)
+
+                for (i in 0 until listImg.size) {
                     var count = i + 1
                     var name = ""
-                    if(count < 10){
+                    if (count < 10) {
                         name = "0$count"
-                    }
-                    else{
+                    } else {
                         name = count.toString()
                     }
                     adapterImg.listFrg[i].save(strTime, name)
@@ -446,6 +407,7 @@ class ScanActivity : BaseActivity(), ShapeBSFragment.Properties {
                     var deleteName = dialogName.findViewById<ImageButton>(R.id.btnDeleteName)
                     deleteName.setOnClickListener {
                         textName.setText("")
+                        textName.isFocusable = true
                     }
 
                     var cancelBtn = dialogName.findViewById<Button>(R.id.btnDeclineReName)
@@ -456,28 +418,107 @@ class ScanActivity : BaseActivity(), ShapeBSFragment.Properties {
                     var acceptBtn = dialogName.findViewById<Button>(R.id.btnAcceptRename)
                     acceptBtn.setOnClickListener {
 
+                        dialog.dismiss()
                     }
                     dialogName.show()
                 }
 
                 var layoutShare = dialog.findViewById<RelativeLayout>(R.id.layoutSaveShare)
                 layoutShare.setOnClickListener {
+                    dialog.dismiss()
+                    var bottomShare = BottomShare(object : BottomShareEvent {
+                        override fun sharePDF() {
+                            var filePDF = File(filePath(strTime, PDF))
+                            var isSuccess = filePDF.createNewFile()
 
+                            if (!isSuccess) {
+                                DynamicToast.makeError(this@ScanActivity, "Create file error!")
+                                    .show()
+                                return
+                            }
+//                            for (i in 0 until listImg.size) {
+//                                var fileImage = File(listImg[i])
+//                                val bmOptions = BitmapFactory.Options()
+//                                val image =
+//                                    BitmapFactory.decodeFile(fileImage.absolutePath, bmOptions)
+//
+//                                val stream = ByteArrayOutputStream()
+//                                image.compress(Bitmap.CompressFormat.PNG, 100, stream)
+//                                val byteArray: ByteArray = stream.toByteArray()
+//                                filePDF.writeBytes(byteArray)
+//                            }
+
+                            val sharingIntent = Intent(Intent.ACTION_SEND)
+                            sharingIntent.putExtra(
+                                Intent.EXTRA_STREAM,
+                                Uri.parse(filePDF.toString())
+                            )
+                            sharingIntent.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
+                            sharingIntent.type = "application/pdf"
+                            startActivity(Intent.createChooser(sharingIntent, "Share PDF"))
+                        }
+
+                        override fun shareImage() {
+                            val intent = Intent()
+                            intent.action = Intent.ACTION_SEND_MULTIPLE
+                            intent.putExtra(Intent.EXTRA_SUBJECT, "Here are some files.")
+                            intent.type = "image/jpeg"
+                            val files = ArrayList<Uri>()
+                            var fileRoot = File(folderSavedPath)
+                            var listFile = fileRoot.listFiles()
+                            for (f in listFile) {
+                                val file = File(f.path)
+                                val uri = Uri.fromFile(file)
+                                files.add(uri)
+                            }
+                            intent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, files)
+                            startActivity(Intent.createChooser(intent, "Share Image"))
+                        }
+
+                        override fun shareWord() {
+                            val intent = Intent()
+                            intent.action = Intent.ACTION_SEND_MULTIPLE
+                            intent.putExtra(Intent.EXTRA_SUBJECT, "Here are some files.")
+                            intent.type = "image/jpeg"
+                            val files = ArrayList<Uri>()
+                            var fileRoot = File(folderSavedPath)
+                            var listFile = fileRoot.listFiles()
+                            for (f in listFile) {
+                                val file = File(f.path)
+                                val uri = Uri.fromFile(file)
+                                files.add(uri)
+                            }
+                            intent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, files)
+                            startActivity(Intent.createChooser(intent, "Share Image"))
+                        }
+
+                        override fun shareText() {
+
+                        }
+
+                        override fun dismiss() {
+                            finish()
+                        }
+                    })
+                    bottomShare.show(supportFragmentManager, bottomShare.tag)
                 }
 
                 var layoutPrint = dialog.findViewById<RelativeLayout>(R.id.layoutSavePrint)
                 layoutPrint.setOnClickListener {
+                    // var managerPrintManager: PrintManager = PrintManager()
 
                 }
 
                 var layoutToAlbum = dialog.findViewById<RelativeLayout>(R.id.layoutSaveToAlbum)
                 layoutToAlbum.setOnClickListener {
-
+                    var intent = Intent(this@ScanActivity, HistoryActivity::class.java)
+                    startActivity(intent)
+                    finish() // Finish Acitvity
                 }
 
                 var layoutEmail = dialog.findViewById<RelativeLayout>(R.id.layoutSaveEmail)
                 layoutEmail.setOnClickListener {
-
+                    // var filePDF =
                 }
 
                 var btnClose = dialog.findViewById<ImageButton>(R.id.btnCloseSave)
@@ -509,22 +550,34 @@ class ScanActivity : BaseActivity(), ShapeBSFragment.Properties {
             }
 
             R.id.actionUndo -> {
-                // adapterImg.unDo()
                 adapterImg.listFrg[binding.vpgImg.currentItem].unDo()
             }
 
             R.id.actionRedo -> {
-                // adapterImg.reDo()
                 adapterImg.listFrg[binding.vpgImg.currentItem].reDo()
             }
 
             R.id.actionOCR -> {
                 var intent = Intent(this@ScanActivity, DetailTextActivity::class.java)
-                intent.putExtra(KEY_DATA_DETAIL_TEXT, DataDetailText())
+                intent.putExtra(
+                    KEY_DATA_DETAIL_TEXT,
+                    DataDetailText(listImg[binding.vpgImg.currentItem]).toJSON()
+                )
                 startActivity(intent)
             }
         }
+
         return super.onOptionsItemSelected(item)
+    }
+
+    private fun filePath(nameFolder: String, typePath: String): String {
+        var date1 = SimpleDateFormat("yyyy-MM-dd HH.mm.ss").format(Date())
+        var date2 = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
+        var nameFile = "FILE_$date2" + "_Scan $date1"
+        var fileRoot = FileUtil(this@ScanActivity).getRootFolder()
+        var path = "$fileRoot/saved/$nameFolder$nameFile$typePath"
+        Log.e("filePath", path)
+        return path
     }
 
     private fun showBottomSheetDialogFragment(fragment: BottomSheetDialogFragment?) {
@@ -568,21 +621,23 @@ class ScanActivity : BaseActivity(), ShapeBSFragment.Properties {
                      * Set Filter for current page
                      */
                     var filter = data!!.getStringExtra(KEY_FILTER)!!.toObject<DataResultFilter>()
-                    if(filter.filter != PhotoFilter.NONE){
-                        if(filter.isFilterAll){
-                            for(i in 0 until listImg.size){
+                    if (filter.filter != PhotoFilter.NONE) {
+                        if (filter.isFilterAll) {
+                            for (i in 0 until listImg.size) {
                                 adapterImg.listFrg[i].setFilter(filter.filter)
                             }
-                        }
-                        else{
+                        } else {
                             adapterImg.listFrg[binding.vpgImg.currentItem].setFilter(filter.filter)
                         }
                     }
                 }
             }
         }
-
         super.onActivityResult(requestCode, resultCode, data)
+    }
+
+    override fun onBackPressed() {
+        backToMain()
     }
 
     class ImageFragment(val list: ArrayList<String>) : ListFragment(), OnPhotoEditorListener,
@@ -664,49 +719,45 @@ class ScanActivity : BaseActivity(), ShapeBSFragment.Properties {
             mPhotoEditor!!.addText(inputText, styleBuilder)
         }
 
-        fun rotate(){
-            Log.e("rotate", "")
-            var drawable = mPhotoEditorView.source
-            drawable.rotation = 90.0F
-            mPhotoEditorView.source.setImageDrawable(drawable.drawable)
+        fun rotate() {
+            mPhotoEditor.setFilterEffect(PhotoFilter.ROTATE)
         }
 
-        fun unDo(){
+        fun unDo() {
             mPhotoEditor.undo()
         }
 
-        fun reDo(){
+        fun reDo() {
             mPhotoEditor.redo()
         }
 
-        fun erase(){
+        fun erase() {
             mPhotoEditor.brushEraser()
         }
 
-        fun setShape(shapeType: ShapeType?){
+        fun setShape(shapeType: ShapeType?) {
             mPhotoEditor.setShape(mShapeBuilder.withShapeType(shapeType))
         }
 
-        fun setOnCoLorChanged(colorCode: Int){
+        fun setOnCoLorChanged(colorCode: Int) {
             mPhotoEditor.setShape(mShapeBuilder.withShapeColor(colorCode))
         }
 
-        fun setOnOpacityChanged(opacity: Int){
+        fun setOnOpacityChanged(opacity: Int) {
             mPhotoEditor.setShape(mShapeBuilder.withShapeOpacity(opacity))
         }
 
-        fun setOnShapeSizeChanged(shapeSize: Int){
+        fun setOnShapeSizeChanged(shapeSize: Int) {
             mPhotoEditor.setShape(mShapeBuilder.withShapeSize(shapeSize.toFloat()))
         }
 
-        fun sign(){
+        fun sign() {
             mPhotoEditor.setBrushDrawingMode(true)
             mShapeBuilder = ShapeBuilder()
             mPhotoEditor.setShape(mShapeBuilder)
-            // showBottomSheetDialogFragment(mShapeBSFragment)
         }
 
-        fun setFilter(filter: PhotoFilter){
+        fun setFilter(filter: PhotoFilter) {
             mPhotoEditor.setFilterEffect(filter)
         }
 
@@ -717,7 +768,7 @@ class ScanActivity : BaseActivity(), ShapeBSFragment.Properties {
                 .build()
 
             var fileRoot = FileUtil(requireContext()).getRootFolder()
-            var filePath = "$fileRoot/saved/$folderName/$name"
+            var filePath = "$fileRoot/saved/$folderName/$name.jpg"
 
             if (ActivityCompat.checkSelfPermission(
                     requireContext(),
@@ -726,9 +777,9 @@ class ScanActivity : BaseActivity(), ShapeBSFragment.Properties {
             ) {
                 return
             }
+
             mPhotoEditor!!.saveAsFile(filePath, saveSettings, object : PhotoEditor.OnSaveListener {
                 override fun onSuccess(imagePath: String) {
-
                 }
 
                 override fun onFailure(exception: Exception) {
@@ -817,7 +868,6 @@ class ScanActivity : BaseActivity(), ShapeBSFragment.Properties {
                 }
 
                 override fun save() {
-
                 }
             })
             return root
@@ -840,6 +890,7 @@ class ScanActivity : BaseActivity(), ShapeBSFragment.Properties {
                 return
             }
             mPhotoEditor!!.saveAsFile(filePath, saveSettings, object : PhotoEditor.OnSaveListener {
+                @SuppressLint("MissingPermission")
                 override fun onSuccess(imagePath: String) {
 
                 }
@@ -852,41 +903,40 @@ class ScanActivity : BaseActivity(), ShapeBSFragment.Properties {
 
         fun addText(pos: Int, inputText: String, styleBuilder: TextStyleBuilder) {
             if (pos == requireArguments().getInt("num")) {
-                Log.e("addText", "")
                 mPhotoEditor!!.addText(inputText, styleBuilder)
             }
         }
 
-        fun rotate(){
+        fun rotate() {
             var drawable = mPhotoEditorView.source
             drawable.rotation = 90.0F
             mPhotoEditorView.source.setImageDrawable(drawable.drawable)
         }
 
-        fun sign(){
+        fun sign() {
             mPhotoEditor.setBrushDrawingMode(true)
             mShapeBuilder = ShapeBuilder()
             mPhotoEditor.setShape(mShapeBuilder)
             // showBottomSheetDialogFragment(mShapeBSFragment)
         }
 
-        fun setOnCoLorChanged(colorCode: Int){
+        fun setOnCoLorChanged(colorCode: Int) {
             mPhotoEditor.setShape(mShapeBuilder.withShapeColor(colorCode))
         }
 
-        fun setOnOpacityChanged(opacity: Int){
+        fun setOnOpacityChanged(opacity: Int) {
             mPhotoEditor.setShape(mShapeBuilder.withShapeOpacity(opacity))
         }
 
-        fun setOnShapeSizeChanged(shapeSize: Int){
+        fun setOnShapeSizeChanged(shapeSize: Int) {
             mPhotoEditor.setShape(mShapeBuilder.withShapeSize(shapeSize.toFloat()))
         }
 
-        fun setOnShapePicker(shapeType: ShapeType){
+        fun setOnShapePicker(shapeType: ShapeType) {
             mPhotoEditor.setShape(mShapeBuilder.withShapeType(shapeType))
         }
 
-        fun setFilter(filter: PhotoFilter){
+        fun setFilter(filter: PhotoFilter) {
             mPhotoEditor.setFilterEffect(filter)
         }
     }
@@ -909,7 +959,7 @@ class ScanActivity : BaseActivity(), ShapeBSFragment.Properties {
         }
 
         override fun getItem(position: Int): Fragment {
-            if(listFrg.size > position)
+            if (listFrg.size > position)
                 return listFrg[position]
             var fragment: ImageFragment? = null
             try {

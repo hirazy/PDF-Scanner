@@ -53,6 +53,5 @@ class SelectActivity : BaseActivity() {
     }
 
     override fun observeViewModel() {
-
     }
 }

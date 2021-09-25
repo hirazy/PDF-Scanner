@@ -41,6 +41,7 @@
 
     <string name="tvLeaveScanning">Leave Scanning</string>
     <string name="tvContentLeave">This will delete all scanned pages. Are you sure?</string>
+    <string name="tvContentDelete">Are you sure yu want to delete the entire document?</string>
 
     <string name="tvLanguage">Language:</string>
 
@@ -92,6 +93,7 @@
 
     <string name="tvPremium">Premium</string>
     <string name="tvFeedBack">Feedback &amp; Support</string>
+    <string name="tvSizeEditText">Text sign size</string>
     <string name="tvAbout">About Us</string>
     <string name="tvList">list</string>
 
@@ -106,5 +108,13 @@
     <string name="tvRecognizeText">Recognize image &amp; convert to text</string>
 
     <string name="tvAllPages">Apply to all pages</string>
+
+    <string name="tvChooseFormat">Choose format:</string>
+    <string name="tvDocument">Document(.PDF)</string>
+    <string name="tvImage">Image(.JPG)</string>
+    <string name="tvDocumentWord">Document(Word)</string>
+    <string name="tvTxt">Text(TXT)</string>
+
+    <string name="tvFolderEmpty">The folders is empty!</string>
 
 </resources>

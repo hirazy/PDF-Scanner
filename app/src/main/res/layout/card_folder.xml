@@ -14,26 +14,27 @@
 
     <com.chauthai.swipereveallayout.SwipeRevealLayout
         android:layout_width="match_parent"
-        android:layout_marginTop="8dp"
         android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:background="@color/colorApp"
         app:dragEdge="right"
         app:mode="same_level">
 
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
+            android:background="@color/colorApp"
             android:orientation="horizontal">
 
             <LinearLayout
                 android:id="@+id/layoutDeleteFolder"
-                android:background="@color/bgDelete"
-                android:padding="10dp"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_gravity="center"
+                android:background="@color/bgDelete"
                 android:gravity="center"
                 android:orientation="vertical"
-                >
+                android:padding="10dp">
 
                 <ImageView
                     android:layout_width="wrap_content"
@@ -45,19 +46,21 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
+                    android:layout_marginTop="5dp"
                     android:gravity="center"
-                    android:text="@string/tvDelete" />
+                    android:text="@string/tvDelete"
+                    android:textColor="@color/white" />
             </LinearLayout>
 
             <LinearLayout
                 android:id="@+id/layoutReNameFolder"
-                android:background="@color/bgRename"
-                android:padding="10dp"
-                android:orientation="vertical"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_gravity="center"
-                android:gravity="center">
+                android:background="@color/bgRename"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="10dp">
 
                 <ImageView
                     android:layout_width="wrap_content"
@@ -69,19 +72,21 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
+                    android:layout_marginTop="5dp"
                     android:gravity="center"
-                    android:text="@string/tvRename" />
+                    android:text="@string/tvRename"
+                    android:textColor="@color/white" />
             </LinearLayout>
 
             <LinearLayout
                 android:id="@+id/layoutMoreFolder"
-                android:background="@color/bgMore"
-                android:padding="10dp"
-                android:orientation="vertical"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_gravity="center"
-                android:gravity="center">
+                android:background="@color/bgMore"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="10dp">
 
                 <ImageView
                     android:layout_width="wrap_content"
@@ -93,12 +98,15 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
+                    android:layout_marginTop="5dp"
                     android:gravity="center"
-                    android:text="@string/tvMore" />
+                    android:text="@string/tvMore"
+                    android:textColor="@color/white" />
             </LinearLayout>
         </LinearLayout>
 
         <androidx.cardview.widget.CardView
+            android:id="@+id/cardFolder"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="15dp"
@@ -107,34 +115,34 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="15dp"
-                android:layout_marginRight="15dp"
                 android:background="@color/colorApp"
                 android:orientation="horizontal">
 
                 <RelativeLayout
-                    android:layout_width="@dimen/_50sdp"
-                    android:layout_height="@dimen/_40sdp"
+                    android:layout_width="@dimen/_63sdp"
+                    android:layout_height="@dimen/_48sdp"
                     android:layout_gravity="center"
+                    android:layout_marginLeft="15dp"
                     android:gravity="center">
 
                     <com.google.android.material.imageview.ShapeableImageView
-                        android:src="@drawable/paris_tower"
                         android:id="@+id/imgFolder"
                         image="@{o.list[0]}"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
+                        android:background="@drawable/bg_card_image"
                         android:scaleType="centerCrop"
+                        android:src="@drawable/paris_tower"
                         app:cardCornerRadius="20dp"
                         app:shapeAppearance="@style/cornerCard" />
 
                     <LinearLayout
-                        android:layout_marginRight="5dp"
-                        android:layout_marginBottom="5dp"
-                        android:layout_alignParentBottom="true"
-                        android:layout_alignParentRight="true"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:layout_alignParentBottom="true"
+                        android:layout_marginRight="5dp"
+                        android:layout_marginBottom="5dp"
                         android:background="@drawable/bg_tv_pdf">
 
                         <TextView
@@ -150,21 +158,23 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:layout_marginLeft="10dp"
+                    android:layout_marginLeft="15dp"
+                    android:background="@color/colorApp"
                     android:orientation="vertical">
 
                     <TextView
-                        android:textSize="17sp"
-                        android:textStyle="bold"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Scan 2021"
-                        android:textColor="@color/white" />
+                        android:text="@{o.name}"
+                        android:textColor="@color/white"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
 
                     <RelativeLayout
-                        android:layout_marginTop="5dp"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="5dp"
+                        android:layout_marginRight="15dp">
 
                         <LinearLayout
                             android:layout_width="wrap_content"
@@ -178,26 +188,26 @@
                                 android:src="@drawable/ic_doc" />
 
                             <TextView
-                                android:textSize="14sp"
-                                android:layout_marginLeft="5dp"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_gravity="center"
+                                android:layout_marginLeft="5dp"
                                 android:gravity="center"
-                                android:text="01"
+                                android:text="@{o.list.size() &lt; 10 ? `0` + o.list.size(): o.list.size() }"
                                 android:textColor="@color/colorPageFolder"
+                                android:textSize="14sp"
                                 tools:ignore="XmlEscapeNeeded" />
 
                         </LinearLayout>
 
                         <TextView
-                            android:textSize="14sp"
-                            android:textColor="@color/colorPageFolder"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_alignParentRight="true"
                             android:layout_centerVertical="true"
-                            android:text="2021/08/11" />
+                            android:text="@{o.time}"
+                            android:textColor="@color/colorPageFolder"
+                            android:textSize="14sp" />
                     </RelativeLayout>
                 </LinearLayout>
             </LinearLayout>

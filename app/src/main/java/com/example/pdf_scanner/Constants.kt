@@ -57,6 +57,11 @@ const val NUMBER = "number"
  * Constant key Nation
  */
 
+const val PDF = ".pdf"
+const val JPG = ".jpg"
+const val DOC = ".doc"
+const val TXT = ".txt"
+
 const val START_CAMERA = "start_camera"
 
 
@@ -76,12 +81,14 @@ const val KEY_INTENT_SERVER = "key_intent_server"
 const val KEY_INTENT_APPLICATION = "key_intent_application"
 const val KEY_INTENT_IMAGE = "key_intent_image"
 
+const val IMAGE = "Image"
+const val TEXT = "Text  "
+
 const val KEY_FILTER = "key_filter"
 
 const val KEY_DATA_DETAIL = "key_data_detail"
 const val SIGN = "Sign"
 const val ERASER = "Eraser"
-
 
 const val USA = "United States"
 const val CANADA = "Canada"

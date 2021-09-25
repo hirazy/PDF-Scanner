@@ -19,6 +19,7 @@
             android:layout_above="@+id/layoutFilterAll" />
 
         <RelativeLayout
+            android:layout_marginTop="8dp"
             android:id="@+id/layoutFilterAll"
             android:layout_above="@+id/layoutOptionFilter"
             android:layout_width="match_parent"
@@ -35,6 +36,7 @@
                 />
 
             <androidx.appcompat.widget.SwitchCompat
+                android:theme="@style/theme_switch"
                 android:layout_marginRight="10dp"
                 android:layout_centerVertical="true"
                 android:layout_alignParentRight="true"

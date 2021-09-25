@@ -5,12 +5,12 @@ import android.app.Dialog
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.os.Build
+import android.os.Handler
+import android.os.Looper
 import android.util.DisplayMetrics
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -74,12 +74,12 @@ class MainActivity : BaseActivity() {
     lateinit var layoutManager: LinearLayoutManager
     lateinit var adapter: OptionCameraAdapter
     var listImg = ArrayList<String>()
-    var listBitMap = ArrayList<Bitmap>()
     private var hud: KProgressHUD? = null
     var statusCamera = 0 // FLASH OR AUTO-FLASH
     var statusOption = 0 // WHITEBOARD, SINGLE, BATCH,...
     var listOption = ArrayList<OptionCamera>()
     var filePath: String = ""
+    private var isExitAgain: Boolean = false
     private lateinit var mExamplePagerAdapter: OptionAdapter
 
 
@@ -94,8 +94,8 @@ class MainActivity : BaseActivity() {
 
         hud = KProgressHUD.create(this)
             .setStyle(KProgressHUD.Style.SPIN_INDETERMINATE)
-        /*
-            Create file save image
+        /**
+         *  Create file save image
          */
         var pathNameSaved = "/saved/"
         filePath = FileUtil(this@MainActivity).getRootFolder() + pathNameSaved
@@ -111,10 +111,8 @@ class MainActivity : BaseActivity() {
         mBounceAnimation = AnimationUtils.loadAnimation(this, R.anim.anim_bounce_start)
         binding.btnMainCapture.setOnClickListener {
             binding.btnMainCapture.startAnimation(mBounceAnimation)
-
             hud!!.show()
-
-            binding.cameraKit.captureImage(object : CameraKitView.ImageCallback {
+                binding.cameraKit.captureImage(object : CameraKitView.ImageCallback {
                 @RequiresApi(Build.VERSION_CODES.KITKAT)
                 override fun onImage(p0: CameraKitView?, p1: ByteArray?) {
 
@@ -227,11 +225,10 @@ class MainActivity : BaseActivity() {
          * Delete File Saved
          */
         deleteFileSaved()
-
         setContentView(binding.root)
     }
 
-    private fun deleteFileSaved(){
+    private fun deleteFileSaved() {
         var filePath = FileUtil(this@MainActivity).getRootFolder()
         var fileSaved = "$filePath/saved"
         val directory = File(filePath)
@@ -240,11 +237,8 @@ class MainActivity : BaseActivity() {
         }
 
         var listFiles = directory.listFiles()
-
-        Log.e("deleteFileSaved", listFiles.size.toString())
-        for(i in 0 until listFiles.size){
-            Log.e("listPath", listFiles[i].path)
-            if(listFiles[i].path != fileSaved){
+        for (i in listFiles.indices) {
+            if (listFiles[i].path != fileSaved) {
                 deleteFilePath(listFiles[i].path)
             }
         }
@@ -393,7 +387,7 @@ class MainActivity : BaseActivity() {
 
     override fun onStart() {
         super.onStart()
-        binding.cameraKit.onStart()
+         binding.cameraKit.onStart()
     }
 
     override fun onResume() {
@@ -409,6 +403,20 @@ class MainActivity : BaseActivity() {
     override fun onStop() {
         binding.cameraKit.onStop()
         super.onStop()
+    }
+
+    override fun onBackPressed() {
+        if (isExitAgain) {
+            super.onBackPressed()
+        }
+
+        isExitAgain = true
+        Toast.makeText(this, "Please click BACK again to exit", Toast.LENGTH_SHORT).show()
+
+        Handler(Looper.getMainLooper()).postDelayed(
+            Runnable
+            { isExitAgain = false }, 2000
+        )
     }
 
     override fun onRequestPermissionsResult(

@@ -1,6 +1,7 @@
 package com.example.pdf_scanner.data
 
 import com.example.pdf_scanner.KEY_LANGUAGE_OCR
+import com.example.pdf_scanner.START_CAMERA
 import com.example.pdf_scanner.data.local.AssetData
 import com.example.pdf_scanner.data.local.LocalData
 import com.example.pdf_scanner.data.remote.RemoteData
@@ -16,6 +17,31 @@ class DataRepository @Inject constructor(
     private val assetRepository: AssetData,
     private val ioDispatcher: CoroutineContext
 ): DataRepositorySource{
+
+    override suspend fun requestStartCamera(): Flow<Resource<Boolean>> {
+        return flow{
+            emit(localRepository.getCacheSettingsDefaultFalse(START_CAMERA))
+        }.flowOn(ioDispatcher)
+    }
+
+    override suspend fun cacheStartCamera(isEnabled: Boolean): Flow<Resource<Boolean>> {
+        return flow{
+            emit(localRepository.cacheStartCamera(isEnabled))
+        }.flowOn(ioDispatcher)
+    }
+
+    override suspend fun requestTextSize(): Flow<Resource<Int>> {
+        return flow {
+            emit(localRepository.getCacheTextSize())
+        }.flowOn(ioDispatcher)
+    }
+
+    override suspend fun cacheTextSize(size: Int): Flow<Resource<Boolean>> {
+        return flow {
+            emit(localRepository.cacheTextSize(size))
+        }.flowOn(ioDispatcher)
+    }
+
     override suspend fun requestLanguageOCR(): Flow<Resource<Set<String>>> {
         return flow {
             emit(localRepository.getCacheLanguageOCR())

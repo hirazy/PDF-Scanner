@@ -9,5 +9,4 @@ data class ImageFolder(
     var time: String = "",
 
     var list: ArrayList<String>
-
 ): OBase()

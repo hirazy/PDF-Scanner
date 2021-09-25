@@ -24,9 +24,9 @@ class MainViewModel @Inject constructor() : BaseViewModel() {
 
     init {
         var list = ArrayList<OptionCamera>()
-        list.add(OptionCamera(WHITE_BOARD, true))
+        list.add(OptionCamera(WHITE_BOARD, false))
         list.add(OptionCamera(OCR, false))
-        list.add(OptionCamera(SINGLE, false))
+        list.add(OptionCamera(SINGLE, true))
         list.add(OptionCamera(BATCH, false))
         list.add(OptionCamera(CARD, false))
         list.add(OptionCamera(QRCODE, false))

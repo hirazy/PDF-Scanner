@@ -21,7 +21,7 @@ class ViewPagerMainAdapter(
 
     override fun createFragment(position: Int): Fragment {
         when (position) {
-            0 -> return ImageDetailFragment()
+            // 0 -> return ImageDetailFragment()
             //  1 -> return OCRTextFragment(this)
         }
         return Fragment()

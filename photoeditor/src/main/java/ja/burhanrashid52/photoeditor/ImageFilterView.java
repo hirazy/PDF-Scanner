@@ -231,7 +231,7 @@ class ImageFilterView extends GLSurfaceView implements GLSurfaceView.Renderer {
                     break;
                 case ROTATE:
                     mEffect = effectFactory.createEffect(EFFECT_ROTATE);
-                    mEffect.setParameter("angle", 180);
+                    mEffect.setParameter("angle", 90);
                     break;
                 case SATURATE:
                     mEffect = effectFactory.createEffect(EFFECT_SATURATE);
