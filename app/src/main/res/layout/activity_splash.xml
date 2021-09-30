@@ -25,7 +25,6 @@
             app:lottie_autoPlay="true"
             app:lottie_loop="true" />
 
-
         <LinearLayout
             android:layout_above="@id/tvSplashVersion"
             android:layout_centerHorizontal="true"

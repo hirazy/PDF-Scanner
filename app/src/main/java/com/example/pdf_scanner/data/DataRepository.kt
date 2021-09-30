@@ -20,7 +20,7 @@ class DataRepository @Inject constructor(
 
     override suspend fun requestStartCamera(): Flow<Resource<Boolean>> {
         return flow{
-            emit(localRepository.getCacheSettingsDefaultFalse(START_CAMERA))
+            emit(localRepository.getCacheSettings(START_CAMERA))
         }.flowOn(ioDispatcher)
     }
 

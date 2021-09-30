@@ -146,16 +146,15 @@
                 />
 
             <TextView
-                android:textSize="@dimen/_18ssp"
-                android:fontFamily="@font/font4"
-                android:textColor="@color/white"
-                android:layout_marginTop="10dp"
-                android:text="@string/tvFolderEmpty"
-                android:layout_centerHorizontal="true"
-                android:layout_below="@+id/icFolderEmpty"
+                android:gravity="center"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                />
+                android:layout_below="@+id/icFolderEmpty"
+                android:layout_marginTop="15dp"
+                android:fontFamily="@font/font_empty"
+                android:text="@string/tvFolderEmpty"
+                android:textColor="@color/white"
+                android:textSize="@dimen/_12ssp" />
         </RelativeLayout>
     </RelativeLayout>
 </layout>

@@ -1,8 +1,14 @@
 package com.example.pdf_scanner.ui.component.detail_text.fragment
 
+import android.Manifest
 import android.app.Dialog
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.graphics.pdf.PdfDocument
+import android.graphics.pdf.PdfDocument.PageInfo
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,6 +17,7 @@ import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
+import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import com.example.pdf_scanner.DIALOG_CONTENT_DELETE
 import com.example.pdf_scanner.DIALOG_TITLE_DELETE
@@ -18,13 +25,14 @@ import com.example.pdf_scanner.R
 import com.example.pdf_scanner.ui.component.detail.dialog.BottomShare
 import com.example.pdf_scanner.ui.component.detail.dialog.BottomShareEvent
 import com.example.pdf_scanner.ui.component.scan.dialog.ShapeBSFragment
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import ja.burhanrashid52.photoeditor.PhotoEditor
 import ja.burhanrashid52.photoeditor.PhotoEditorView
 import ja.burhanrashid52.photoeditor.PhotoFilter
+import ja.burhanrashid52.photoeditor.SaveSettings
 import ja.burhanrashid52.photoeditor.shape.ShapeBuilder
 import ja.burhanrashid52.photoeditor.shape.ShapeType
 import java.io.File
+
 
 class ImageDetailFragment(var path: String, var e: OnImageTextListener) : Fragment() {
 
@@ -81,7 +89,7 @@ class ImageDetailFragment(var path: String, var e: OnImageTextListener) : Fragme
 
         var layoutSave = view.findViewById<LinearLayout>(R.id.layoutImageAlbumText)
         layoutSave.setOnClickListener {
-            Toast.makeText(requireContext(), "Successfully save photo to the album", Toast.LENGTH_SHORT).show()
+            save()
         }
 
         var layoutDelete = view.findViewById<LinearLayout>(R.id.layoutImageDeleteText)
@@ -114,6 +122,43 @@ class ImageDetailFragment(var path: String, var e: OnImageTextListener) : Fragme
         return view
     }
 
+    fun save() {
+        val saveSettings = SaveSettings.Builder()
+            .setClearViewsEnabled(true)
+            .setTransparencyEnabled(true)
+            .build()
+
+        if (ActivityCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            return
+        }
+
+        mPhotoEditor!!.saveAsFile(path, saveSettings, object : PhotoEditor.OnSaveListener {
+            override fun onSuccess(imagePath: String) {
+                Toast.makeText(
+                    requireContext(),
+                    "Successfully save photo to the album!",
+                    Toast.LENGTH_SHORT
+                ).show()
+                Log.e("onSuccess", "Save OK")
+                e.onSave()
+            }
+
+            override fun onFailure(exception: Exception) {
+                Toast.makeText(
+                    requireContext(),
+                    "Failed to save photo to the album!",
+                    Toast.LENGTH_SHORT
+                ).show()
+                Log.e("onFailure", "Save Failed")
+                e.onSave()
+            }
+        })
+    }
+
     fun rotate() {
         mPhotoEditor.setFilterEffect(PhotoFilter.ROTATE)
     }
@@ -121,12 +166,11 @@ class ImageDetailFragment(var path: String, var e: OnImageTextListener) : Fragme
     fun share() {
         var bottomShare = BottomShare(object : BottomShareEvent {
             override fun sharePDF() {
-
-                //  var filePDF = File()
+                sharePDFDetail()
             }
 
             override fun shareImage() {
-
+                shareImageDetail()
             }
 
             override fun shareWord() {
@@ -141,10 +185,41 @@ class ImageDetailFragment(var path: String, var e: OnImageTextListener) : Fragme
 
             }
         })
-        bottomShare.show(requireFragmentManager(),  bottomShare.tag)
+        bottomShare.show(requireFragmentManager(), bottomShare.tag)
     }
 
-    fun print(){
+    private fun sharePDFDetail() {
+        val document = PdfDocument()
+        val pageInfo = PageInfo.Builder(300, 600, 1).create()
+        val myPage: PdfDocument.Page = document.startPage(pageInfo)
+
+
+        // var file = File()
+        document.finishPage(myPage)
+    }
+
+    private fun shareImageDetail() {
+        val intent = Intent()
+        intent.action = Intent.ACTION_SEND_MULTIPLE
+        intent.putExtra(Intent.EXTRA_SUBJECT, "Here are some files.")
+        intent.type = "image/jpeg"
+        val files = ArrayList<Uri>()
+        val file = File(path)
+        val uri = Uri.fromFile(file)
+        files.add(uri)
+        intent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, files)
+        startActivity(Intent.createChooser(intent, "Share Image"))
+    }
+
+    private fun shareWordDetail() {
+
+    }
+
+    private fun shareTextDetail() {
+
+    }
+
+    fun print() {
         e.onPrint()
     }
 

@@ -4,23 +4,29 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.pdf_scanner.*
+import com.example.pdf_scanner.data.DataRepositorySource
 import com.example.pdf_scanner.data.Resource
 import com.example.pdf_scanner.data.dto.OptionCamera
 import com.example.pdf_scanner.ui.base.BaseViewModel
 import com.example.pdf_scanner.utils.SingleEvent
+import com.flurry.sdk.it
 import com.flurry.sdk.t
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class MainViewModel @Inject constructor() : BaseViewModel() {
+class MainViewModel @Inject constructor(dataRepositorySource: DataRepositorySource) : BaseViewModel() {
 
     private var listOptionData = MutableLiveData<Resource<ArrayList<OptionCamera>>>()
     val listOption: LiveData<Resource<ArrayList<OptionCamera>>> get() = listOptionData
 
     private var toastLiveDataPrivate = MutableLiveData<SingleEvent<String>>()
     val toastLiveData: LiveData<SingleEvent<String>> get() = toastLiveDataPrivate
+
+    private var startCamera = MutableLiveData<Resource<Boolean>>()
+    val liveStartCamera: LiveData<Resource<Boolean>> get() = startCamera
 
     init {
         var list = ArrayList<OptionCamera>()
@@ -32,6 +38,16 @@ class MainViewModel @Inject constructor() : BaseViewModel() {
         list.add(OptionCamera(QRCODE, false))
 
         listOptionData.value = Resource.Success(list)
+
+        viewModelScope.launch {
+            dataRepositorySource.requestStartCamera().collect {
+                when (it) {
+                    is Resource.Success -> {
+                        startCamera.value = Resource.Success(it.data!!)
+                    }
+                }
+            }
+        }
     }
 
     fun showToast(msg: String) {

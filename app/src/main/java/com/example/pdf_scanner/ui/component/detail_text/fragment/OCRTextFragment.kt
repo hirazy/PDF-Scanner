@@ -1,17 +1,18 @@
 package com.example.pdf_scanner.ui.component.detail_text.fragment
 
 import android.animation.Animator
+import android.annotation.SuppressLint
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.text.method.ScrollingMovementMethod
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.airbnb.lottie.LottieAnimationView
 import com.example.pdf_scanner.R
@@ -37,10 +38,7 @@ class OCRTextFragment(var path: String, var e: OCRListener) : Fragment() {
     lateinit var layoutOCR: LinearLayout
     lateinit var btnRecognize: Button
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
-
+    @SuppressLint("ResourceAsColor")
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -48,9 +46,9 @@ class OCRTextFragment(var path: String, var e: OCRListener) : Fragment() {
     ): View? {
         var root = inflater.inflate(R.layout.fragment_ocr_text, container, false)
 
-        var file = File(genPath())
+        var fileRoot = genPath()
 
-        animOCR = root.findViewById<LottieAnimationView>(R.id.animRecognizeText)
+        animOCR = root.findViewById(R.id.animRecognizeText)
         animOCR.setAnimation(R.raw.recognize_text)
 
         textOCR = root.findViewById(R.id.txtOCR)
@@ -91,9 +89,11 @@ class OCRTextFragment(var path: String, var e: OCRListener) : Fragment() {
             btnRecognize.isClickable = false
         }
 
+        var file = File("$fileRoot.txt")
         if (file.exists()) {
             animOCR.visibility = View.GONE
             btnRecognize.visibility = View.GONE
+            layoutOCR.visibility = View.GONE
 
             val text = StringBuilder()
 
@@ -105,11 +105,23 @@ class OCRTextFragment(var path: String, var e: OCRListener) : Fragment() {
                     text.append('\n')
                 }
                 br.close()
+                textOCR.visibility = View.VISIBLE
                 textOCR.text = text
+                Log.e("BufferedReader", text.toString())
             } catch (e: IOException) {
+                Log.e("BufferedReader", "IOException")
             }
         }
         return root
+    }
+
+    private fun getName(path: String): String {
+        for (i in path.length - 5 downTo 0) {
+            if (path[i] == '/') {
+                return path.substring(i, path.length - 4)
+            }
+        }
+        return ""
     }
 
     private fun genPath(): String {

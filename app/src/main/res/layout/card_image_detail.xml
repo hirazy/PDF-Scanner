@@ -25,8 +25,9 @@
             >
             <com.google.android.material.imageview.ShapeableImageView
                 image="@{o.path}"
+                android:adjustViewBounds="true"
                 app:cardUseCompatPadding="true"
-                android:scaleType="centerCrop"
+                android:scaleType="fitXY"
                 app:cardCornerRadius="20dp"
                 app:shapeAppearance="@style/cornerCardDetail"
                 android:background="@color/colorCard"

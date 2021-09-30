@@ -1,8 +1,11 @@
 package com.example.pdf_scanner.ui.component.detail
 
 import android.app.Dialog
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.Window
@@ -10,10 +13,9 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageButton
 import androidx.activity.viewModels
+import androidx.core.content.FileProvider
 import androidx.recyclerview.widget.GridLayoutManager
-import com.example.pdf_scanner.KEY_DATA_DETAIL
-import com.example.pdf_scanner.KEY_DATA_DETAIL_TEXT
-import com.example.pdf_scanner.R
+import com.example.pdf_scanner.*
 import com.example.pdf_scanner.data.Resource
 import com.example.pdf_scanner.data.dto.DataDetailText
 import com.example.pdf_scanner.data.dto.ImageDetail
@@ -28,10 +30,18 @@ import com.example.pdf_scanner.ui.component.detail.dialog.BottomShareEvent
 import com.example.pdf_scanner.ui.component.detail_text.DetailTextActivity
 import com.example.pdf_scanner.utils.FileUtil
 import com.example.pdf_scanner.utils.toObject
+import com.itextpdf.io.image.ImageDataFactory
+import com.itextpdf.kernel.pdf.PdfDocument
+import com.itextpdf.kernel.pdf.PdfWriter
+import com.itextpdf.layout.Document
+import com.itextpdf.layout.element.Image
 import com.oneadx.vpnclient.utils.observe
 import com.pranavpandey.android.dynamic.toasts.DynamicToast
 import dagger.hilt.android.AndroidEntryPoint
 import java.io.File
+import java.text.SimpleDateFormat
+import java.util.*
+import kotlin.collections.ArrayList
 
 @AndroidEntryPoint
 class DetailActivity : BaseActivity() {
@@ -54,11 +64,11 @@ class DetailActivity : BaseActivity() {
         }
 
         binding.layoutEmailDetail.setOnClickListener {
-            shareFilePDF()
+
         }
 
         binding.layoutShareDetail.setOnClickListener {
-            shareImage()
+            shareAction()
         }
 
         binding.layoutSaveDetail.setOnClickListener {
@@ -74,6 +84,10 @@ class DetailActivity : BaseActivity() {
 
         binding.layoutTextDetail.setOnClickListener {
             textDetail()
+        }
+
+        binding.btnAddImage.setOnClickListener {
+
         }
 
         adapter = CardImageDetail(object : RecyclerItemListener {
@@ -94,35 +108,94 @@ class DetailActivity : BaseActivity() {
         setContentView(binding.root)
     }
 
+    private fun filePath(nameFolder: String, typePath: String): String {
+        var date1 = SimpleDateFormat("yyyy-MM-dd HH.mm.ss").format(Date())
+        var date2 = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
+        var nameFile = "FILE_$date2" + "_Scan $date1"
+        var fileRoot = FileUtil(this@DetailActivity).getRootFolder()
+        var path = "$fileRoot/saved/$nameFolder$nameFile$typePath"
+        Log.e("filePath", path)
+        return path
+    }
+
     private fun shareFilePDF() {
+
+        val strTime = "${dataImage.name}/"
+
+        var filePDF = File(filePath(strTime, PDF))
+        var isSuccess = filePDF.createNewFile()
+
+        if (!isSuccess) {
+            DynamicToast.makeError(this@DetailActivity, "Create file error!")
+                .show()
+            return
+        }
+        val pdfWriter = PdfWriter(filePDF)
+        val pdfDocument = PdfDocument(pdfWriter)
+        val document = Document(pdfDocument)
+
+        val list = viewModel.listImage.value!!.data!!
+
+        for (i in 0 until list.size) {
+            var filePath = list[i].path
+            if (!File(filePath).exists()) {
+                DynamicToast.makeError(this@DetailActivity, "Create file error!")
+                    .show()
+                return
+            }
+
+            val imageData = ImageDataFactory.create(filePath)
+            val pdfImg = Image(imageData)
+            document.add(pdfImg)
+        }
+
+        document.close()
         val sharingIntent = Intent(Intent.ACTION_SEND)
+        sharingIntent.putExtra(
+            Intent.EXTRA_STREAM,
+            uriFromFile(this@DetailActivity, filePDF)
+        )
+        sharingIntent.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
+        sharingIntent.type = "application/pdf"
+        startActivity(Intent.createChooser(sharingIntent, "Share PDF"))
+    }
+
+    fun shareImage(){
+        val intent = Intent()
+        intent.action = Intent.ACTION_SEND_MULTIPLE
+        intent.putExtra(Intent.EXTRA_SUBJECT, "Here are some files.")
+        intent.type = "image/jpeg"
+        val files = ArrayList<Uri>()
+        var pathUtil = FileUtil(this@DetailActivity).getRootFolder()
+        var nameFolder = dataImage.name
+        var folderSavedPath = "$pathUtil/saved/$nameFolder"
+        var fileRoot = File(folderSavedPath)
+        var listFile = fileRoot.listFiles()
+        for (f in listFile) {
+            val file = File(f.path)
+            val uri = uriFromFile(this@DetailActivity, file)
+            files.add(uri)
+        }
+        intent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, files)
+        startActivity(Intent.createChooser(intent, "Share Image"))
+    }
+
+    fun shareText(){
 
     }
 
-    private fun shareImage() {
+    fun shareWord(){
+
+    }
+
+    private fun shareAction() {
         var bottomShare = BottomShare(object : BottomShareEvent {
             override fun sharePDF() {
-
+                shareFilePDF()
             }
 
             override fun shareImage() {
-                val intent = Intent()
-                intent.action = Intent.ACTION_SEND_MULTIPLE
-                intent.putExtra(Intent.EXTRA_SUBJECT, "Here are some files.")
-                intent.type = "image/jpeg"
-                val files = ArrayList<Uri>()
-                var pathUtil = FileUtil(this@DetailActivity).getRootFolder()
-                var nameFolder = dataImage.name
-                var folderSavedPath = "$pathUtil/saved/$nameFolder"
-                var fileRoot = File(folderSavedPath)
-                var listFile = fileRoot.listFiles()
-                for (f in listFile) {
-                    val file = File(f.path)
-                    val uri = Uri.fromFile(file)
-                    files.add(uri)
-                }
-                intent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, files)
-                startActivity(Intent.createChooser(intent, "Share Image"))
+                shareImage()
             }
 
             override fun shareWord() {
@@ -138,6 +211,18 @@ class DetailActivity : BaseActivity() {
             }
         })
         bottomShare.show(supportFragmentManager, bottomShare.tag)
+    }
+
+    fun uriFromFile(context: Context, file: File): Uri {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            return FileProvider.getUriForFile(
+                context,
+                BuildConfig.APPLICATION_ID + ".provider",
+                file
+            )
+        } else {
+            return Uri.fromFile(file)
+        }
     }
 
     private fun printDetail() {
@@ -165,9 +250,45 @@ class DetailActivity : BaseActivity() {
             dialog.dismiss()
         }
 
+        // tvListImage
+
         var acceptBtn = dialog.findViewById<Button>(R.id.btnAcceptRename)
         acceptBtn.setOnClickListener {
+            if (!validateFileName(edtFileName.text.toString())) {
+                DynamicToast.makeWarning(this@DetailActivity, "Failed Name!").show()
+                return@setOnClickListener
+            }
 
+            var nameFolder = dataImage.name
+            val fileRoot = FileUtil(this@DetailActivity).getRootFolder()
+            val pathNameSaved = "/saved/"
+            var folderRoot = fileRoot + pathNameSaved
+            var folderNameTmp = edtFileName.text.toString()
+            var folderSavedPath = "$fileRoot/saved/$nameFolder"
+            var fileSaved = File(folderSavedPath)
+
+            var file = File(folderRoot + folderNameTmp)
+
+            var plusName = "(1)"
+            while (file.exists()) {
+                folderNameTmp += plusName
+                file = File(folderRoot + folderNameTmp)
+            }
+
+            var isSuccess = fileSaved.renameTo(file)
+            if (isSuccess) {
+                binding.tvListImage.text = folderNameTmp
+                DynamicToast.makeSuccess(
+                    this@DetailActivity,
+                    "Rename Folder Successfully!"
+                ).show()
+            } else {
+                DynamicToast.makeError(
+                    this@DetailActivity,
+                    "Cannot rename Folder!"
+                ).show()
+            }
+            dialog.dismiss()
         }
         dialog.show()
     }
@@ -187,6 +308,7 @@ class DetailActivity : BaseActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.itemListSelected -> {
+
             }
         }
         return super.onOptionsItemSelected(item)
@@ -195,6 +317,18 @@ class DetailActivity : BaseActivity() {
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.item_action_detail, menu)
         return super.onCreateOptionsMenu(menu)
+    }
+
+    private fun validateFileName(name: String): Boolean {
+        if (name.isEmpty()) {
+            return false
+        }
+        for (i in name.indices) {
+            if (name[i] == '/') {
+                return false
+            }
+        }
+        return true
     }
 
     private fun reFetchData() {

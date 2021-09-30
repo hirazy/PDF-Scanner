@@ -1,17 +1,20 @@
 package com.example.pdf_scanner.ui.component.history
 
 import android.app.Dialog
+import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Build
+import android.os.Handler
+import android.os.Looper
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.view.Window
-import android.widget.Button
-import android.widget.EditText
-import android.widget.ImageButton
-import android.widget.TextView
+import android.widget.*
 import androidx.activity.viewModels
+import androidx.core.content.FileProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.pdf_scanner.*
 import com.example.pdf_scanner.data.Resource
@@ -23,6 +26,8 @@ import com.example.pdf_scanner.databinding.ActivityHistoryBinding
 import com.example.pdf_scanner.ui.base.BaseActivity
 import com.example.pdf_scanner.ui.base.listener.RecycleFolderListener
 import com.example.pdf_scanner.ui.component.detail.DetailActivity
+import com.example.pdf_scanner.ui.component.detail.dialog.BottomShare
+import com.example.pdf_scanner.ui.component.detail.dialog.BottomShareEvent
 import com.example.pdf_scanner.ui.component.history.adapter.FolderAdapter
 import com.example.pdf_scanner.ui.component.history.dialog.BottomMore
 import com.example.pdf_scanner.ui.component.history.dialog.BottomMoreEvent
@@ -31,6 +36,11 @@ import com.example.pdf_scanner.ui.component.search.SearchActivity
 import com.example.pdf_scanner.ui.component.select.SelectActivity
 import com.example.pdf_scanner.ui.component.settings.SettingsActivity
 import com.example.pdf_scanner.utils.FileUtil
+import com.itextpdf.io.image.ImageDataFactory
+import com.itextpdf.kernel.pdf.PdfDocument
+import com.itextpdf.kernel.pdf.PdfWriter
+import com.itextpdf.layout.Document
+import com.itextpdf.layout.element.Image
 import com.oneadx.vpnclient.utils.observe
 import com.pranavpandey.android.dynamic.toasts.DynamicToast
 import dagger.hilt.android.AndroidEntryPoint
@@ -76,7 +86,7 @@ class HistoryActivity : BaseActivity() {
         binding.layoutSearchFolder.setOnClickListener {
             var intent = Intent(this@HistoryActivity, SearchActivity::class.java)
             intent.putExtra(KEY_DATA_SEARCH, DataSearch(listFolder).toJSON())
-            startActivity(intent)
+            startActivityForResult(intent, 1)
         }
 
         adapter = FolderAdapter(object : RecycleFolderListener {
@@ -84,7 +94,7 @@ class HistoryActivity : BaseActivity() {
                 var o = data as ImageFolder
                 var intent = Intent(this@HistoryActivity, DetailActivity::class.java)
                 intent.putExtra(KEY_DATA_DETAIL, o.toJSON())
-                startActivity(intent)
+                startActivityForResult(intent, 1)
             }
 
             override fun onItemDelete(index: Int, data: OBase) {
@@ -154,28 +164,28 @@ class HistoryActivity : BaseActivity() {
                         return@setOnClickListener
                     }
                     var pathUtil = FileUtil(this@HistoryActivity).getRootFolder()
-                    var date = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
                     var pathNameSaved = "/saved/"
+                    var pathRootFolder = pathUtil + pathNameSaved
                     var pathFileSaved = pathUtil + pathNameSaved + o.name
-                    var pathFileChange = pathUtil + pathNameSaved + name
                     val oldFolder = File(pathFileSaved)
-                    val newFolder =
-                        File(pathFileChange)
-                    val success = oldFolder.renameTo(newFolder)
-                    var repeatedName = false
-                    if (success) {
-                        for (i in 0 until listFolder.size) {
-                            if (i != index && listFolder[i].name == name) {
-                                repeatedName = true
-                                break
-                            }
-                        }
-                        if (repeatedName) {
-                            fetchFolder()
-                        } else {
-                            listFolder[index].name = pathFileChange
-                            adapter.notifyItemChanged(index)
-                        }
+                    var newFolder =
+                        File(pathRootFolder + name)
+                    var plusName = "(1)"
+                    while (newFolder.exists()) {
+                        name += plusName
+                        newFolder = File(pathRootFolder + name)
+                    }
+
+                    var isSuccess = oldFolder.renameTo(newFolder)
+                    if (isSuccess) {
+                        fetchFolder()
+                        DynamicToast.makeSuccess(
+                            this@HistoryActivity,
+                            "Rename folder successfully!"
+                        ).show()
+                    } else {
+                        DynamicToast.makeSuccess(this@HistoryActivity, "Cannot rename folder!")
+                            .show()
                     }
                     dialog.dismiss()
                 }
@@ -183,17 +193,71 @@ class HistoryActivity : BaseActivity() {
             }
 
             override fun onItemMore(index: Int, data: OBase) {
+                var o = data as ImageFolder
+
+                val fileRoot = FileUtil(this@HistoryActivity).getRootFolder()
+                var pathNameSaved = "/saved/"
+                val nameFolder = o.name
+                var folderSavedPath = fileRoot + pathNameSaved + nameFolder
+
                 var bottomMore = BottomMore(object : BottomMoreEvent {
                     override fun onMove() {
 
                     }
 
                     override fun onCopy() {
+                        // var folderCopy = File()
 
                     }
 
                     override fun onShare() {
+                        var bottomShare = BottomShare(object : BottomShareEvent {
+                            override fun sharePDF() {
+                                sharePDF(o)
+                            }
 
+                            override fun shareImage() {
+                                val intent = Intent()
+                                intent.action = Intent.ACTION_SEND_MULTIPLE
+                                intent.putExtra(Intent.EXTRA_SUBJECT, "Here are some files.")
+                                intent.type = "image/jpeg"
+                                val files = ArrayList<Uri>()
+                                var fileRoot = File(folderSavedPath)
+                                var listFile = fileRoot.listFiles()
+                                for (f in listFile) {
+                                    val file = File(f.path)
+                                    val uri = Uri.fromFile(file)
+                                    files.add(uri)
+                                }
+                                intent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, files)
+                                startActivity(Intent.createChooser(intent, "Share Image"))
+                            }
+
+                            override fun shareWord() {
+                                val intent = Intent()
+                                intent.action = Intent.ACTION_SEND_MULTIPLE
+                                intent.putExtra(Intent.EXTRA_SUBJECT, "Here are some files.")
+                                intent.type = "image/jpeg"
+                                val files = ArrayList<Uri>()
+                                var fileRoot = File(folderSavedPath)
+                                var listFile = fileRoot.listFiles()
+                                for (f in listFile) {
+                                    val file = File(f.path)
+                                    val uri = Uri.fromFile(file)
+                                    files.add(uri)
+                                }
+                                intent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, files)
+                                startActivity(Intent.createChooser(intent, "Share Image"))
+                            }
+
+                            override fun shareText() {
+
+                            }
+
+                            override fun dismiss() {
+                            }
+                        })
+                        bottomShare.show(supportFragmentManager, bottomShare.tag)
                     }
                 })
 
@@ -221,16 +285,20 @@ class HistoryActivity : BaseActivity() {
             if (files[i].listFiles() == null) {
                 continue
             }
-            for (j in files[i].listFiles()) {
-                if (j.name.endsWith(JPG)) {
-                    listPath.add(j.path)
+            for (f in files[i].listFiles()) {
+                if (f.name.endsWith(JPG)) {
+                    listPath.add(f.path)
                 }
             }
             if (listPath.size == 0) {
                 files[i].delete()
                 continue
             }
-            list.add(ImageFolder(files[i].name, files[i].name.substring(4, 15), listPath))
+
+            var fileTimeCreated = SimpleDateFormat("yyyy/MM/dd").format(
+                Date(files[i].lastModified())
+            );
+            list.add(ImageFolder(files[i].name, fileTimeCreated, listPath))
         }
         listFolder = list
         viewModel.fetchData(list)
@@ -245,6 +313,105 @@ class HistoryActivity : BaseActivity() {
             }
         }
         file.delete()
+    }
+
+    private fun sharePDF(o: ImageFolder) {
+        var filePDF = File(filePath(o.name, PDF))
+        var isSuccess = filePDF.createNewFile()
+
+        if (!isSuccess) {
+            DynamicToast.makeError(this@HistoryActivity, "Create file error!")
+                .show()
+            return
+        }
+        val pdfWriter = PdfWriter(filePDF)
+        val pdfDocument = PdfDocument(pdfWriter)
+        val document = Document(pdfDocument)
+
+        var listImg = o.list
+
+        for (i in 0 until listImg.size) {
+            if (!File(listImg[i]).exists()) {
+                DynamicToast.makeError(this@HistoryActivity, "Create file error!")
+                    .show()
+                return
+            }
+
+            val filePath = listImg[i]
+
+            val imageData = ImageDataFactory.create(filePath)
+            val pdfImg = Image(imageData)
+            document.add(pdfImg)
+        }
+
+        document.close()
+        val sharingIntent = Intent(Intent.ACTION_SEND)
+        sharingIntent.putExtra(
+            Intent.EXTRA_STREAM,
+            uriFromFile(this@HistoryActivity, filePDF)
+        )
+        sharingIntent.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
+        sharingIntent.type = "application/pdf"
+        startActivity(Intent.createChooser(sharingIntent, "Share PDF"))
+    }
+
+    private fun shareImage(o: ImageFolder) {
+        val intent = Intent()
+        intent.action = Intent.ACTION_SEND_MULTIPLE
+        intent.putExtra(Intent.EXTRA_SUBJECT, "Here are some files.")
+        intent.type = "image/jpeg"
+        val files = ArrayList<Uri>()
+        val fileRoot = FileUtil(this@HistoryActivity).getRootFolder()
+        var pathNameSaved = "/saved/"
+        var folderSavedPath = fileRoot + pathNameSaved + o.name + "/"
+
+        var folder = File(folderSavedPath)
+        var listFile = folder.listFiles()
+        if (!folder.exists() || listFile == null) {
+            Toast.makeText(
+                this@HistoryActivity,
+                "Cannot share image!",
+                Toast.LENGTH_SHORT
+            ).show()
+            return
+        }
+        for (f in listFile) {
+            val file = File(f.path)
+            val uri = uriFromFile(this@HistoryActivity, file)
+            files.add(uri)
+        }
+        intent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, files)
+        startActivity(Intent.createChooser(intent, "Share Image"))
+    }
+
+    private fun shareDoc() {
+
+    }
+
+    private fun shareText() {
+
+    }
+
+    fun uriFromFile(context: Context, file: File): Uri {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            return FileProvider.getUriForFile(
+                context,
+                BuildConfig.APPLICATION_ID + ".provider",
+                file
+            )
+        } else {
+            return Uri.fromFile(file)
+        }
+    }
+
+    private fun filePath(nameFolder: String, typePath: String): String {
+        var date1 = SimpleDateFormat("yyyy-MM-dd HH.mm.ss").format(Date())
+        var date2 = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
+        var nameFile = "FILE_$date2" + "_Scan $date1"
+        var fileRoot = FileUtil(this@HistoryActivity).getRootFolder()
+        var path = "$fileRoot/saved/$nameFolder$nameFile$typePath"
+        Log.e("filePath", path)
+        return path
     }
 
     override fun observeViewModel() {
@@ -270,7 +437,8 @@ class HistoryActivity : BaseActivity() {
     private fun handleCamera(data: Resource<Boolean>) {
         when (data) {
             is Resource.Success -> {
-                if (!data.data!!) {
+                Log.e("handleCamera", data.data.toString())
+                if (data.data!!) {
                     binding.tbHistory.setNavigationIcon(R.drawable.ic_back)
                 }
             }
@@ -301,5 +469,23 @@ class HistoryActivity : BaseActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         fetchFolder()
         super.onActivityResult(requestCode, resultCode, data)
+    }
+
+    override fun onBackPressed() {
+        val isStartedCamera = viewModel.liveStartCamera.value!!.data
+        if (isStartedCamera == false) {
+            if (isExitAgain) {
+                super.onBackPressed()
+            }
+
+            isExitAgain = true
+            Toast.makeText(this, "Please click BACK again to exit", Toast.LENGTH_SHORT).show()
+
+            Handler(Looper.getMainLooper()).postDelayed(
+                Runnable
+                { isExitAgain = false }, 2000
+            )
+        }
+        super.onBackPressed()
     }
 }

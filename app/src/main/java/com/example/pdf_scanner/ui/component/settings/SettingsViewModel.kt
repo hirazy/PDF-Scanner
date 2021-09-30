@@ -52,7 +52,11 @@ class SettingsViewModel @Inject constructor(var dataRepositorySource: DataReposi
     fun setTextSize(textSize: Int) {
         viewModelScope.launch {
             dataRepositorySource.cacheTextSize(textSize).collect {
-
+                when(it){
+                    is Resource.Success ->{
+                        textSizeEdit.value = Resource.Success(textSize)
+                    }
+                }
             }
         }
     }

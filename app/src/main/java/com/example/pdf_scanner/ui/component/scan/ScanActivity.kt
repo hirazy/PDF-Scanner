@@ -2,27 +2,29 @@ package com.example.pdf_scanner.ui.component.scan
 
 import android.Manifest
 import android.animation.Animator
-import android.annotation.SuppressLint
 import android.app.Dialog
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.graphics.pdf.PdfDocument
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
+import android.print.PrintAttributes
+import android.print.PrintManager
 import android.util.Log
 import android.view.*
 import android.widget.*
 import androidx.activity.viewModels
 import androidx.core.app.ActivityCompat
+import androidx.core.content.FileProvider
 import androidx.fragment.app.*
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.viewpager.widget.ViewPager
 import com.airbnb.lottie.LottieAnimationView
 import com.example.pdf_scanner.*
+import com.example.pdf_scanner.BuildConfig
 import com.example.pdf_scanner.R
 import com.example.pdf_scanner.data.Resource
 import com.example.pdf_scanner.data.dto.*
@@ -44,14 +46,19 @@ import com.example.pdf_scanner.ui.component.scan.dialog.TextEditorDialogFragment
 import com.example.pdf_scanner.utils.FileUtil
 import com.example.pdf_scanner.utils.toObject
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.itextpdf.io.image.ImageDataFactory
+import com.itextpdf.kernel.pdf.PdfDocument
+import com.itextpdf.kernel.pdf.PdfWriter
+import com.itextpdf.layout.Document
+import com.itextpdf.layout.element.Image
 import com.oneadx.vpnclient.utils.observe
 import com.pranavpandey.android.dynamic.toasts.DynamicToast
 import dagger.hilt.android.AndroidEntryPoint
 import ja.burhanrashid52.photoeditor.*
 import ja.burhanrashid52.photoeditor.shape.ShapeBuilder
 import ja.burhanrashid52.photoeditor.shape.ShapeType
-import java.io.ByteArrayOutputStream
 import java.io.File
+import java.net.URL
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
@@ -370,13 +377,18 @@ class ScanActivity : BaseActivity(), ShapeBSFragment.Properties {
                 animSave.repeatCount = 2
                 animSave.playAnimation()
 
+                var folderNameTv = dialog.findViewById<TextView>(R.id.tvFolderName)
+
                 val fileRoot = FileUtil(this@ScanActivity).getRootFolder()
                 var date = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
                 var pathNameSaved = "/saved/"
-                val strTime = "Scan " + date.format(Date()) + "/"
+                var folderName = "Scan " + date.format(Date())
+                val strTime = "$folderName/"
                 var folderSavedPath = fileRoot + pathNameSaved + strTime
                 var folderSaved = File(folderSavedPath)
                 folderSaved.mkdirs()
+
+                folderNameTv.text = folderName
 
                 var txtTime = dialog.findViewById<TextView>(R.id.tvSaveTime)
                 txtTime.text = "Today, " + date.format(Date()).substring(5, 10)
@@ -402,7 +414,8 @@ class ScanActivity : BaseActivity(), ShapeBSFragment.Properties {
                     dialogName.setContentView(R.layout.dialog_rename)
 
                     var textName = dialogName.findViewById<EditText>(R.id.edtReName)
-                    textName.setText(strTime)
+                    textName.setText(folderName)
+                    textName.isFocusableInTouchMode = true
 
                     var deleteName = dialogName.findViewById<ImageButton>(R.id.btnDeleteName)
                     deleteName.setOnClickListener {
@@ -417,8 +430,32 @@ class ScanActivity : BaseActivity(), ShapeBSFragment.Properties {
 
                     var acceptBtn = dialogName.findViewById<Button>(R.id.btnAcceptRename)
                     acceptBtn.setOnClickListener {
-
-                        dialog.dismiss()
+                        if (textName.text.isEmpty()) {
+                            DynamicToast.makeWarning(this@ScanActivity, "Empty Name!").show()
+                            return@setOnClickListener
+                        }
+                        var folderRoot = fileRoot + pathNameSaved
+                        var folderNameTmp = textName.text.toString()
+                        var file = File(folderRoot + folderNameTmp)
+                        var plusName = "(1)"
+                        while (file.exists()) {
+                            file = File(folderRoot + folderNameTmp)
+                            folderNameTmp += plusName
+                        }
+                        var isSuccess = folderSaved.renameTo(file)
+                        if (isSuccess) {
+                            folderNameTv.text = folderNameTmp
+                            DynamicToast.makeSuccess(
+                                this@ScanActivity,
+                                "Rename Folder Successfully!"
+                            ).show()
+                        } else {
+                            DynamicToast.makeError(
+                                this@ScanActivity,
+                                "Cannot rename Folder!"
+                            ).show()
+                        }
+                        dialogName.dismiss()
                     }
                     dialogName.show()
                 }
@@ -428,6 +465,7 @@ class ScanActivity : BaseActivity(), ShapeBSFragment.Properties {
                     dialog.dismiss()
                     var bottomShare = BottomShare(object : BottomShareEvent {
                         override fun sharePDF() {
+
                             var filePDF = File(filePath(strTime, PDF))
                             var isSuccess = filePDF.createNewFile()
 
@@ -436,22 +474,35 @@ class ScanActivity : BaseActivity(), ShapeBSFragment.Properties {
                                     .show()
                                 return
                             }
-//                            for (i in 0 until listImg.size) {
-//                                var fileImage = File(listImg[i])
-//                                val bmOptions = BitmapFactory.Options()
-//                                val image =
-//                                    BitmapFactory.decodeFile(fileImage.absolutePath, bmOptions)
-//
-//                                val stream = ByteArrayOutputStream()
-//                                image.compress(Bitmap.CompressFormat.PNG, 100, stream)
-//                                val byteArray: ByteArray = stream.toByteArray()
-//                                filePDF.writeBytes(byteArray)
-//                            }
+                            val pdfWriter = PdfWriter(filePDF)
+                            val pdfDocument = PdfDocument(pdfWriter)
+                            val document = Document(pdfDocument)
 
+                            for (i in 0 until listImg.size) {
+                                var count = i + 1
+                                var name = ""
+                                if (count < 10) {
+                                    name = "0$count"
+                                } else {
+                                    name = count.toString()
+                                }
+                                var filePath = "$fileRoot/saved/$folderName/$name.jpg"
+                                if (!File(filePath).exists()) {
+                                    DynamicToast.makeError(this@ScanActivity, "Create file error!")
+                                        .show()
+                                    return
+                                }
+
+                                val imageData = ImageDataFactory.create(filePath)
+                                val pdfImg = Image(imageData)
+                                document.add(pdfImg)
+                            }
+
+                            document.close()
                             val sharingIntent = Intent(Intent.ACTION_SEND)
                             sharingIntent.putExtra(
                                 Intent.EXTRA_STREAM,
-                                Uri.parse(filePDF.toString())
+                                uriFromFile(this@ScanActivity, filePDF)
                             )
                             sharingIntent.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
                             sharingIntent.type = "application/pdf"
@@ -466,6 +517,14 @@ class ScanActivity : BaseActivity(), ShapeBSFragment.Properties {
                             val files = ArrayList<Uri>()
                             var fileRoot = File(folderSavedPath)
                             var listFile = fileRoot.listFiles()
+                            if (!fileRoot.exists() || listFile == null) {
+                                Toast.makeText(
+                                    this@ScanActivity,
+                                    "Cannot share image!",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                                return
+                            }
                             for (f in listFile) {
                                 val file = File(f.path)
                                 val uri = Uri.fromFile(file)
@@ -505,7 +564,10 @@ class ScanActivity : BaseActivity(), ShapeBSFragment.Properties {
 
                 var layoutPrint = dialog.findViewById<RelativeLayout>(R.id.layoutSavePrint)
                 layoutPrint.setOnClickListener {
-                    // var managerPrintManager: PrintManager = PrintManager()
+                    var managerPrintManager: PrintManager =
+                        this.getSystemService(Context.PRINT_SERVICE) as PrintManager
+                    // val printAdapter: PrintDocumentAdapter = createPrintDocumentAdapter()
+                    val builder = PrintAttributes.Builder()
 
                 }
 
@@ -513,7 +575,7 @@ class ScanActivity : BaseActivity(), ShapeBSFragment.Properties {
                 layoutToAlbum.setOnClickListener {
                     var intent = Intent(this@ScanActivity, HistoryActivity::class.java)
                     startActivity(intent)
-                    finish() // Finish Acitvity
+                    finish()
                 }
 
                 var layoutEmail = dialog.findViewById<RelativeLayout>(R.id.layoutSaveEmail)
@@ -578,6 +640,18 @@ class ScanActivity : BaseActivity(), ShapeBSFragment.Properties {
         var path = "$fileRoot/saved/$nameFolder$nameFile$typePath"
         Log.e("filePath", path)
         return path
+    }
+
+    fun uriFromFile(context: Context, file: File): Uri {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            return FileProvider.getUriForFile(
+                context,
+                BuildConfig.APPLICATION_ID + ".provider",
+                file
+            )
+        } else {
+            return Uri.fromFile(file)
+        }
     }
 
     private fun showBottomSheetDialogFragment(fragment: BottomSheetDialogFragment?) {
@@ -684,12 +758,13 @@ class ScanActivity : BaseActivity(), ShapeBSFragment.Properties {
             if (file.exists()) {
                 val uri: Uri = Uri.fromFile(file)
                 mPhotoEditorView!!.source.setImageURI(uri)
-                mPhotoEditor!!.setFilterEffect(PhotoFilter.BLACK_WHITE)
             }
 
             mPhotoEditor!!.setOnPhotoEditorListener(this)
             mShapeBuilder = ShapeBuilder()
             mPhotoEditor!!.setShape(mShapeBuilder)
+
+            mPhotoEditor!!.setFilterEffect(PhotoFilter.BLACK_WHITE)
 
             var act = activity as ScanActivity
             act.setOnEdit(object : onEditPhoto {
@@ -821,127 +896,6 @@ class ScanActivity : BaseActivity(), ShapeBSFragment.Properties {
         }
     }
 
-    class ImageScanFragment(var path: String) : Fragment() {
-
-        lateinit var mPhotoEditor: PhotoEditor
-        lateinit var mPhotoEditorView: PhotoEditorView
-        lateinit var mShapeBuilder: ShapeBuilder
-
-        override fun onCreate(savedInstanceState: Bundle?) {
-            super.onCreate(savedInstanceState)
-        }
-
-        override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-            super.onViewCreated(view, savedInstanceState)
-        }
-
-        override fun onCreateView(
-            inflater: LayoutInflater,
-            container: ViewGroup?,
-            savedInstanceState: Bundle?
-        ): View? {
-
-            val root: View = inflater.inflate(R.layout.item_page_image, container, false)
-            val number = requireArguments().getInt(NUMBER)
-            mPhotoEditorView = root!!.findViewById(R.id.photoEditor)
-
-            var file = File(path)
-
-            if (file.exists()) {
-                val uri: Uri = Uri.fromFile(file)
-                mPhotoEditorView!!.source.setImageURI(uri)
-            }
-
-            mPhotoEditor = PhotoEditor.Builder(context, mPhotoEditorView)
-                .setPinchTextScalable(true)
-                .build()
-            // mPhotoEditor!!.setOnPhotoEditorListener(this)
-            mPhotoEditor!!.setFilterEffect(PhotoFilter.BLACK_WHITE)
-            mShapeBuilder = ShapeBuilder()
-            mPhotoEditor!!.setShape(mShapeBuilder)
-
-
-            var act = activity as ScanActivity
-            act.setOnEdit(object : onEditPhoto {
-                override fun addText(inputText: String, styleBuilder: TextStyleBuilder) {
-
-                }
-
-                override fun save() {
-                }
-            })
-            return root
-        }
-
-        fun save(folderName: String) {
-            val saveSettings = SaveSettings.Builder()
-                .setClearViewsEnabled(true)
-                .setTransparencyEnabled(true)
-                .build()
-
-            var fileRoot = FileUtil(requireContext()).getRootFolder()
-            var filePath = "$fileRoot/saved/$folderName"
-
-            if (ActivityCompat.checkSelfPermission(
-                    requireContext(),
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE
-                ) != PackageManager.PERMISSION_GRANTED
-            ) {
-                return
-            }
-            mPhotoEditor!!.saveAsFile(filePath, saveSettings, object : PhotoEditor.OnSaveListener {
-                @SuppressLint("MissingPermission")
-                override fun onSuccess(imagePath: String) {
-
-                }
-
-                override fun onFailure(exception: Exception) {
-
-                }
-            })
-        }
-
-        fun addText(pos: Int, inputText: String, styleBuilder: TextStyleBuilder) {
-            if (pos == requireArguments().getInt("num")) {
-                mPhotoEditor!!.addText(inputText, styleBuilder)
-            }
-        }
-
-        fun rotate() {
-            var drawable = mPhotoEditorView.source
-            drawable.rotation = 90.0F
-            mPhotoEditorView.source.setImageDrawable(drawable.drawable)
-        }
-
-        fun sign() {
-            mPhotoEditor.setBrushDrawingMode(true)
-            mShapeBuilder = ShapeBuilder()
-            mPhotoEditor.setShape(mShapeBuilder)
-            // showBottomSheetDialogFragment(mShapeBSFragment)
-        }
-
-        fun setOnCoLorChanged(colorCode: Int) {
-            mPhotoEditor.setShape(mShapeBuilder.withShapeColor(colorCode))
-        }
-
-        fun setOnOpacityChanged(opacity: Int) {
-            mPhotoEditor.setShape(mShapeBuilder.withShapeOpacity(opacity))
-        }
-
-        fun setOnShapeSizeChanged(shapeSize: Int) {
-            mPhotoEditor.setShape(mShapeBuilder.withShapeSize(shapeSize.toFloat()))
-        }
-
-        fun setOnShapePicker(shapeType: ShapeType) {
-            mPhotoEditor.setShape(mShapeBuilder.withShapeType(shapeType))
-        }
-
-        fun setFilter(filter: PhotoFilter) {
-            mPhotoEditor.setFilterEffect(filter)
-        }
-    }
-
-
     class ImagePageAdapter(fm: FragmentManager, var list: ArrayList<String>) :
         FragmentStatePagerAdapter(fm) {
 
@@ -982,5 +936,4 @@ class ScanActivity : BaseActivity(), ShapeBSFragment.Properties {
             return list.size > 0
         }
     }
-
 }

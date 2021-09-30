@@ -13,6 +13,7 @@
     </data>
 
     <com.chauthai.swipereveallayout.SwipeRevealLayout
+        android:id="@+id/swipeFolder"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
@@ -119,7 +120,7 @@
                 android:orientation="horizontal">
 
                 <RelativeLayout
-                    android:layout_width="@dimen/_63sdp"
+                    android:layout_width="@dimen/_62sdp"
                     android:layout_height="@dimen/_48sdp"
                     android:layout_gravity="center"
                     android:layout_marginLeft="15dp"
@@ -128,10 +129,11 @@
                     <com.google.android.material.imageview.ShapeableImageView
                         android:id="@+id/imgFolder"
                         image="@{o.list[0]}"
+                        android:adjustViewBounds="true"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:background="@drawable/bg_card_image"
-                        android:scaleType="centerCrop"
+                        android:scaleType="fitXY"
                         android:src="@drawable/paris_tower"
                         app:cardCornerRadius="20dp"
                         app:shapeAppearance="@style/cornerCard" />

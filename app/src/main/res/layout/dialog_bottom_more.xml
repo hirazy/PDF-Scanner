@@ -18,6 +18,8 @@
         />
 
     <LinearLayout
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp"
         android:id="@+id/layoutMove"
         android:layout_marginLeft="20dp"
         android:layout_marginTop="20dp"
@@ -28,7 +30,7 @@
             android:layout_gravity="center"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_camera"
+            android:src="@drawable/ic_move"
             />
         <TextView
             android:textSize="16sp"
@@ -43,6 +45,8 @@
     </LinearLayout>
 
     <LinearLayout
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp"
         android:id="@+id/layoutCopy"
         android:layout_marginLeft="20dp"
         android:layout_marginTop="20dp"
@@ -54,7 +58,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:src="@drawable/ic_copy" />
+            android:src="@drawable/ic_copy_more" />
         <TextView
             android:textSize="16sp"
             android:textColor="@color/black"
@@ -68,6 +72,8 @@
     </LinearLayout>
 
     <LinearLayout
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp"
         android:id="@+id/layoutShare"
         android:layout_marginLeft="20dp"
         android:layout_marginTop="20dp"
@@ -79,7 +85,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:src="@drawable/ic_bottom_image" />
+            android:src="@drawable/ic_more_share" />
         <TextView
             android:textSize="16sp"
             android:textColor="@color/black"

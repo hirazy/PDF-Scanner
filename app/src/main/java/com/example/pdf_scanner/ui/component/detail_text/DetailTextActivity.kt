@@ -26,6 +26,7 @@ import com.example.pdf_scanner.utils.toObject
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.pranavpandey.android.dynamic.toasts.DynamicToast
 import dagger.hilt.android.AndroidEntryPoint
+import ja.burhanrashid52.photoeditor.shape.ShapeType
 import net.lucode.hackware.magicindicator.ViewPagerHelper
 import net.lucode.hackware.magicindicator.buildins.UIUtil
 import net.lucode.hackware.magicindicator.buildins.commonnavigator.CommonNavigator
@@ -37,7 +38,7 @@ import net.lucode.hackware.magicindicator.buildins.commonnavigator.titles.ClipPa
 import java.io.File
 
 @AndroidEntryPoint
-class DetailTextActivity : BaseActivity() {
+class DetailTextActivity : BaseActivity(), ShapeBSFragment.Properties {
 
     lateinit var binding: ActivityDetailTextBinding
     lateinit var data: DataDetailText
@@ -64,6 +65,16 @@ class DetailTextActivity : BaseActivity() {
 
                 override fun onOCR(text: String) {
                     textOCR = text
+                }
+
+                override fun onSave() {
+                    finish()
+                }
+
+                override fun onSign() {
+                    var dialog = ShapeBSFragment()
+                    showBottomSheetDialogFragment(dialog)
+                    dialog.setPropertiesChangeListener(this@DetailTextActivity)
                 }
             })
         binding.vpgDetailText.adapter = adapter
@@ -100,6 +111,13 @@ class DetailTextActivity : BaseActivity() {
             finish()
         }
         dialog.show()
+    }
+
+    private fun showBottomSheetDialogFragment(fragment: BottomSheetDialogFragment?) {
+        if (fragment == null || fragment.isAdded) {
+            return
+        }
+        fragment.show(supportFragmentManager, fragment.tag)
     }
 
     private fun initTab() {
@@ -168,11 +186,13 @@ class DetailTextActivity : BaseActivity() {
         when (item.itemId) {
             R.id.itemActionSaveDetail -> {
                 if (textOCR.isNotEmpty()) {
+
                     var path = genPath()
+                    Log.e("onOptionsItemSelected", path)
                     var file = File("$path.txt")
                     file.writeText(textOCR)
                     var isSuccess = file.createNewFile()
-                    if (isSuccess) {
+                    if (file.exists()) {
                         DynamicToast.makeSuccess(
                             this@DetailTextActivity,
                             "Create file successfully!"
@@ -180,8 +200,8 @@ class DetailTextActivity : BaseActivity() {
                     } else {
                         DynamicToast.makeError(this@DetailTextActivity, "Create file error!").show()
                     }
-                    finish()
                 }
+                adapter.save()
             }
         }
         return super.onOptionsItemSelected(item)
@@ -212,8 +232,11 @@ class DetailTextActivity : BaseActivity() {
                     }
 
                     override fun onSign() {
-                        var dialog = ShapeBSFragment()
-                        showBottomSheetDialogFragment(dialog)
+                        e.onSign()
+                    }
+
+                    override fun onSave() {
+                        e.onSave()
                     }
                 })
                 var fragmentOCR = OCRTextFragment(path, object : OCRListener {
@@ -234,5 +257,47 @@ class DetailTextActivity : BaseActivity() {
             }
             fragment.show(frag, fragment.tag)
         }
+
+        fun save() {
+            var imgFragment = list[0] as ImageDetailFragment
+            imgFragment.save()
+        }
+
+        fun changeColor(colorCode: Int) {
+            var imgFragment = list[0] as ImageDetailFragment
+            imgFragment.setOnCoLorChanged(colorCode)
+        }
+
+        fun changeOpacity(opacity: Int) {
+            var imgFragment = list[0] as ImageDetailFragment
+            imgFragment.setOnOpacityChanged(opacity)
+        }
+
+        fun changeShapeSized(shapeSize: Int) {
+            var imgFragment = list[0] as ImageDetailFragment
+            imgFragment.setOnShapeSizeChanged(shapeSize)
+        }
+
+        fun changeShaped(shapeType: ShapeType?) {
+            var imgFragment = list[0] as ImageDetailFragment
+            imgFragment.setShape(shapeType)
+        }
+
+    }
+
+    override fun onColorChanged(colorCode: Int) {
+        adapter.changeColor(colorCode)
+    }
+
+    override fun onOpacityChanged(opacity: Int) {
+        adapter.changeOpacity(opacity)
+    }
+
+    override fun onShapeSizeChanged(shapeSize: Int) {
+        adapter.changeShapeSized(shapeSize)
+    }
+
+    override fun onShapePicked(shapeType: ShapeType?) {
+        adapter.changeShaped(shapeType)
     }
 }

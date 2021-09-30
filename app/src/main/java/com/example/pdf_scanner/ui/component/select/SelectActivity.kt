@@ -37,7 +37,6 @@ class SelectActivity : BaseActivity() {
             }
 
         })
-
         binding.rcclvSelectFolder.layoutManager = LinearLayoutManager(this)
         binding.rcclvSelectFolder.adapter = adapter
 

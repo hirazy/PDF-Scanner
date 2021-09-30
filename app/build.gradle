@@ -151,5 +151,7 @@ dependencies {
 
     implementation 'com.github.hackware1993:MagicIndicator:1.7.0' // for androidx
 
+    // Itext PDF
+    implementation 'com.itextpdf:itext7-core:7.1.7'
 
 }

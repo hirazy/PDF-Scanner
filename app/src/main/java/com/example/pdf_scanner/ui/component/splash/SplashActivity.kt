@@ -37,11 +37,11 @@ class SplashActivity : BaseActivity() {
             override fun onAnimationEnd(animation: Animator?) {
                 binding.laAnimation.cancelAnimation()
                 if (isStartCamera) {
-                    var intent = Intent(this@SplashActivity, HistoryActivity::class.java)
+                    var intent = Intent(this@SplashActivity, MainActivity::class.java)
                     startActivity(intent)
                     finish()
                 } else {
-                    var intent = Intent(this@SplashActivity, MainActivity::class.java)
+                    var intent = Intent(this@SplashActivity, HistoryActivity::class.java)
                     startActivity(intent)
                     finish()
                 }

@@ -13,7 +13,7 @@
     <color name="colorTextScan">#555555</color>
     <color name="colorStatus">#1C1C1C</color>
     <color name="colorApp">#000000</color>
-    <color name="colorCard">#101010</color>
+    <color name="colorCard">#232323</color>
 
     <color name="colorTextSave">#00C356</color>
 
@@ -63,5 +63,7 @@
     <color name="colorPageFolder">#868686</color>
     
     <color name="colorLanguageSelected">#1A1A1A</color>
+
+    <color name="dividerColor">#00BCD4</color>
 
 </resources>

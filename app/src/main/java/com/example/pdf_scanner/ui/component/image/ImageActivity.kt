@@ -4,7 +4,6 @@ import android.content.Intent
 import android.database.Cursor
 import android.os.Handler
 import android.provider.MediaStore
-import android.util.Log
 import android.view.View
 import androidx.activity.viewModels
 import androidx.recyclerview.widget.GridLayoutManager
@@ -29,7 +28,6 @@ import com.example.pdf_scanner.utils.toObject
 import com.kaopiz.kprogresshud.KProgressHUD
 import com.oneadx.vpnclient.utils.observe
 import dagger.hilt.android.AndroidEntryPoint
-import java.lang.ref.WeakReference
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -114,8 +112,8 @@ class ImageActivity : BaseActivity() {
             override fun onOption(index: Int, data: OBase) {
                 var o = data as ImageCard
                 listSelected.removeAt(index)
-                adapterSelected.notifyItemRemoved(index - 1)
                 adapterSelected.setValue(listSelected)
+                adapterSelected.notifyDataSetChanged()
                 if (listSelected.size == 0)
                     binding.btnDoneImg.setBackgroundResource(R.drawable.bg_btn_done)
 

@@ -210,5 +210,17 @@
                     android:textSize="11sp" />
             </LinearLayout>
         </LinearLayout>
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/btnAddImage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/layoutOptionDetail"
+            android:layout_alignParentRight="true"
+            android:layout_marginBottom="20dp"
+            android:layout_marginRight="20dp"
+            android:src="@drawable/ic_detail_add"
+            android:background="@color/colorTextSave"
+            />
     </RelativeLayout>
 </layout>

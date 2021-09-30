@@ -6,12 +6,19 @@
         <item name="android:windowFullscreen">true</item>
         <item name="android:windowContentOverlay">@null</item>
         <item name="bottomSheetDialogTheme">@style/AppBottomSheetDialogTheme</item>
+        <item name="android:actionMenuTextAppearance">@style/styleTextMenu</item>
+    </style>
+    
+    <style name="styleTextMenu">
+        <item name="android:textSize">17sp</item>
+        <item name="android:textStyle">bold</item>
     </style>
 
     <style name="ScanScreenTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowActionBar">false</item>
         <item name="android:actionMenuTextColor">@color/colorTextSave</item>
+        <item name="android:actionMenuTextAppearance">@style/styleTextMenu</item>
         <item name="actionMenuTextColor">@color/colorTextSave</item>
         <item name="android:windowFullscreen">true</item>
         <item name="android:windowContentOverlay">@null</item>
@@ -50,7 +57,7 @@
 
     <style name="cornerCard">
         <item name="cornerSize">15%</item>
-        <item name="background">@color/white</item>
+        <item name="backgroundColor">@color/white</item>
     </style>
 
     <style name="cornerCardDetail">
@@ -60,5 +67,10 @@
 
     <style name="AppTheme.Picker" parent="Theme.AppCompat.Light.NoActionBar" >
         <item name="android:textColorPrimary">@android:color/white</item>
+    </style>
+
+    <style name="DefaultNumberPickerTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:textColorPrimary">@android:color/white</item>
+        <item name="colorControlNormal">@color/dividerColor</item>
     </style>
 </resources>

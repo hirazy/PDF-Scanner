@@ -53,11 +53,11 @@
     </LinearLayout>
 
     <RelativeLayout
-        android:visibility="gone"
         android:id="@+id/layoutOptionSave"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/colorTransparent"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintLeft_toLeftOf="parent"
@@ -70,7 +70,7 @@
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
             android:background="@drawable/bg_dialog_save"
-            android:padding="10dp">
+            android:padding="5dp">
 
             <com.google.android.material.imageview.ShapeableImageView
                 android:id="@+id/imgSave"
@@ -89,7 +89,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:layout_marginTop="20dp"
+                    android:layout_marginTop="25dp"
                     android:gravity="center"
                     android:orientation="horizontal">
 
@@ -107,8 +107,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
-                        android:layout_marginLeft="10dp"
-                        android:src="@drawable/ic_edit_save_name" />
+                        android:layout_marginLeft="5dp"
+                        android:src="@drawable/ic_edit_save" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -299,7 +299,7 @@
                 android:layout_gravity="right"
                 android:background="@null"
                 android:padding="5dp"
-                android:src="@drawable/ic_close_dialog" />
+                android:src="@drawable/ic_cancel_save" />
 
         </RelativeLayout>
     </RelativeLayout>

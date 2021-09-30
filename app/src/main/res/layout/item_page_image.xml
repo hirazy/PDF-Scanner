@@ -7,8 +7,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <ja.burhanrashid52.photoeditor.PhotoEditorView
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:photo_src="@drawable/paris_tower"

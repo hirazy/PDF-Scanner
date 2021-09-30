@@ -62,7 +62,6 @@ class SettingsActivity : BaseActivity() {
     }
 
     @SuppressLint("ResourceAsColor")
-    @RequiresApi(Build.VERSION_CODES.Q)
     private fun setTextSize() {
         var dialog = Dialog(this)
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
@@ -70,11 +69,22 @@ class SettingsActivity : BaseActivity() {
         dialog.setCancelable(false)
         dialog.setContentView(R.layout.dialog_text_size)
 
+
+        var listNumber = ArrayList<String>()
+        for (i in 10 until 51) {
+            listNumber.add(i.toString())
+        }
+
+        val valuePicker = viewModel.liveTextSizeEdit.value!!.data!!
+
         var numberPicker = dialog.findViewById<NumberPicker>(R.id.numberPickerTextSize)
         numberPicker.isSelected = false
-        numberPicker.maxValue = 10
-        numberPicker.minValue = 50
         numberPicker.wrapSelectorWheel = false
+        numberPicker.displayedValues = listNumber.toTypedArray()
+        numberPicker.minValue = 1
+        numberPicker.maxValue = 41
+
+        numberPicker.value = valuePicker - 9
         numberPicker.descendantFocusability = NumberPicker.FOCUS_BLOCK_DESCENDANTS
 
         var btnCancel = dialog.findViewById<Button>(R.id.btnCancelTextSize)
@@ -84,8 +94,8 @@ class SettingsActivity : BaseActivity() {
 
         var btnAccept = dialog.findViewById<Button>(R.id.btnSetTextSize)
         btnAccept.setOnClickListener {
-            viewModel.setTextSize(numberPicker.value)
-            binding.tvTextSignSize.text = numberPicker.value.toString()
+            val valuePicker = numberPicker.value + 9
+            viewModel.setTextSize(valuePicker)
             dialog.dismiss()
         }
         dialog.show()

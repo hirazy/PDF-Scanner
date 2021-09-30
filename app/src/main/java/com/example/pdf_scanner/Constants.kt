@@ -31,6 +31,12 @@ const val ADMOB_AD_UNIT_ID = "ca-app-pub-3940256099942544/2247696110"
 const val KEY_DATABASE = "key_database"
 const val DATA_CONFIG_APP = "data_config"
 
+/**
+ * WIDTH, HEIGHT RESOLUTION
+ */
+const val RESOLUTION_WIDTH = 2560
+const val RESOLUTION_HEIGHT = 3840
+
 // KEY Data save set string language ocr
 const val KEY_LANGUAGE_OCR = "key_language_ocr"
 

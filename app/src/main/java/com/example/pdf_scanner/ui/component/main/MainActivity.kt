@@ -5,8 +5,10 @@ import android.app.Dialog
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Color
+import android.graphics.Matrix
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
@@ -53,12 +55,14 @@ import net.lucode.hackware.magicindicator.buildins.commonnavigator.abs.CommonNav
 import net.lucode.hackware.magicindicator.buildins.commonnavigator.abs.IPagerIndicator
 import net.lucode.hackware.magicindicator.buildins.commonnavigator.abs.IPagerTitleView
 import net.lucode.hackware.magicindicator.buildins.commonnavigator.titles.ClipPagerTitleView
+import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
 import java.nio.charset.StandardCharsets
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
+
 
 /**
  * @author hirazy2001
@@ -109,15 +113,24 @@ class MainActivity : BaseActivity() {
         }
 
         mBounceAnimation = AnimationUtils.loadAnimation(this, R.anim.anim_bounce_start)
+
         binding.btnMainCapture.setOnClickListener {
             binding.btnMainCapture.startAnimation(mBounceAnimation)
             hud!!.show()
-                binding.cameraKit.captureImage(object : CameraKitView.ImageCallback {
+            binding.cameraKit.captureImage(object : CameraKitView.ImageCallback {
                 @RequiresApi(Build.VERSION_CODES.KITKAT)
                 override fun onImage(p0: CameraKitView?, p1: ByteArray?) {
 
                     val str = String(p1!!, StandardCharsets.UTF_8)
-                    val bmp = BitmapFactory.decodeByteArray(p1, 0, p1!!.size)
+                    val bmp = getResizedBitmap(
+                        BitmapFactory.decodeByteArray(p1, 0, p1!!.size),
+                        RESOLUTION_WIDTH,
+                        RESOLUTION_HEIGHT
+                    )
+                    val streamByte = ByteArrayOutputStream()
+                    bmp!!.compress(Bitmap.CompressFormat.PNG, 100, streamByte)
+                    val bmpArray = streamByte.toByteArray()
+                    // val bmp = BitmapFactory.decodeByteArray(p1, 0, p1!!.size)
                     val fileRoot = FileUtil(this@MainActivity).getRootFolder()
                     var date = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
                     val strTime = "Scan " + date.format(Date())
@@ -127,7 +140,7 @@ class MainActivity : BaseActivity() {
                     file.parentFile.mkdirs()
                     file.createNewFile()
                     val stream = FileOutputStream(file)
-                    stream.write(p1)
+                    stream.write(bmpArray)
                     stream.flush()
                     stream.close()
                     /**
@@ -187,8 +200,12 @@ class MainActivity : BaseActivity() {
                 }
                 dialog.show()
             } else {
+                val isStartedCamera = viewModel.liveStartCamera.value!!.data
                 var intent = Intent(this, HistoryActivity::class.java)
                 startActivity(intent)
+                if (isStartedCamera == false) {
+                    finish()
+                }
             }
         }
         binding.btnImage.setOnClickListener {
@@ -242,6 +259,22 @@ class MainActivity : BaseActivity() {
                 deleteFilePath(listFiles[i].path)
             }
         }
+    }
+
+    fun getResizedBitmap(bm: Bitmap, newWidth: Int, newHeight: Int): Bitmap? {
+        val width = bm.width
+        val height = bm.height
+        val scaleWidth = newWidth.toFloat() / width
+        val scaleHeight = newHeight.toFloat() / height
+        // CREATE A MATRIX FOR THE MANIPULATION
+        val matrix = Matrix()
+        // RESIZE THE BIT MAP
+        matrix.postScale(scaleWidth, scaleHeight)
+
+        // "RECREATE" THE NEW BITMAP
+        return Bitmap.createBitmap(
+            bm, 0, 0, width, height, matrix, false
+        )
     }
 
     private fun deleteFilePath(path: String) {
@@ -387,7 +420,7 @@ class MainActivity : BaseActivity() {
 
     override fun onStart() {
         super.onStart()
-         binding.cameraKit.onStart()
+        binding.cameraKit.onStart()
     }
 
     override fun onResume() {
@@ -410,13 +443,16 @@ class MainActivity : BaseActivity() {
             super.onBackPressed()
         }
 
-        isExitAgain = true
-        Toast.makeText(this, "Please click BACK again to exit", Toast.LENGTH_SHORT).show()
+        var isStartedCamera = viewModel.liveStartCamera.value!!.data
+        if (isStartedCamera == true) {
+            isExitAgain = true
+            Toast.makeText(this, "Please click BACK again to exit", Toast.LENGTH_SHORT).show()
 
-        Handler(Looper.getMainLooper()).postDelayed(
-            Runnable
-            { isExitAgain = false }, 2000
-        )
+            Handler(Looper.getMainLooper()).postDelayed(
+                Runnable
+                { isExitAgain = false }, 2000
+            )
+        }
     }
 
     override fun onRequestPermissionsResult(
@@ -424,8 +460,8 @@ class MainActivity : BaseActivity() {
         permissions: Array<out String>,
         grantResults: IntArray
     ) {
-        // binding.cameraKit.onRequestPermissionsResult(requestCode, permissions, grantResults)
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        // binding.cameraKit.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

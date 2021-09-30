@@ -8,10 +8,16 @@ interface OnImageTextListener {
     fun onDelete()
 
     fun onSign()
+
+    fun onSave()
 }
 
 interface OnTextListener{
     fun onDelete()
 
     fun onOCR(text: String)
+
+    fun onSave()
+
+    fun onSign()
 }
