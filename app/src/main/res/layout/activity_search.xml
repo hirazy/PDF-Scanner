@@ -118,25 +118,26 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             >
-            <ImageView
+            <com.airbnb.lottie.LottieAnimationView
+                android:id="@+id/animSearch"
+                android:layout_width="200dp"
+                android:layout_height="200dp"
                 android:layout_centerHorizontal="true"
-                android:id="@+id/icFolderEmpty"
-                android:layout_width="100dp"
-                android:layout_height="100dp"
-                android:src="@drawable/ic_empty_folder"
                 />
 
             <TextView
-                android:textSize="@dimen/_18ssp"
-                android:fontFamily="@font/font4"
-                android:textColor="@color/white"
-                android:layout_marginTop="10dp"
-                android:text="@string/tvFolderEmpty"
+                android:layout_below="@+id/animSearch"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
                 android:layout_centerHorizontal="true"
-                android:layout_below="@+id/icFolderEmpty"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                />
+                android:layout_marginTop="15dp"
+                android:fontFamily="@font/font_empty1"
+                android:gravity="center"
+                android:text="@string/tvFolderEmpty"
+                android:textColor="@color/white"
+                android:textSize="@dimen/_15ssp" />
         </RelativeLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>

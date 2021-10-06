@@ -23,3 +23,7 @@
 -keepclasseswithmembers class com.camerakit.preview.CameraSurfaceView {
     native <methods>;
 }
+
+-dontwarn com.yalantis.ucrop**
+-keep class com.yalantis.ucrop** { *; }
+-keep interface com.yalantis.ucrop** { *; }

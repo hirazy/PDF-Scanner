@@ -8,153 +8,194 @@
     </data>
 
     <RelativeLayout
-        android:background="@color/colorApp"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="@color/colorApp"
         tools:context=".ui.component.history.HistoryActivity">
-        <com.google.android.material.appbar.AppBarLayout
-            android:id="@+id/appBarHistory"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/colorApp">
 
-            <androidx.appcompat.widget.Toolbar
-                app:menu="@menu/item_action_history"
-                android:id="@+id/tbHistory"
+        <RelativeLayout
+            android:id="@+id/layoutHistoryFolder"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_above="@+id/layoutHistoryBar"
+            android:orientation="vertical">
+
+            <com.google.android.material.appbar.AppBarLayout
+                android:id="@+id/appBarHistory"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:title="@string/tvHistory"
-                app:titleTextColor="@color/white" />
+                android:background="@color/colorApp">
 
-        </com.google.android.material.appbar.AppBarLayout>
+                <androidx.appcompat.widget.Toolbar
+                    android:id="@+id/tbHistory"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:menu="@menu/item_action_history"
+                    app:title="@string/tvHistory"
+                    app:titleTextColor="@color/white" />
 
+            </com.google.android.material.appbar.AppBarLayout>
+
+
+            <LinearLayout
+                android:id="@+id/layoutSearchFolder"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/appBarHistory"
+                android:layout_marginLeft="20dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginRight="20dp"
+                android:background="@drawable/bg_search_history"
+                android:orientation="horizontal"
+                android:paddingTop="6dp"
+                android:paddingBottom="6dp">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginLeft="15dp"
+                    android:src="@drawable/ic_search" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginLeft="10dp"
+                    android:gravity="center"
+                    android:text="@string/tvSearch"
+                    android:textColor="@color/colorHistory"
+                    android:textSize="15sp" />
+
+            </LinearLayout>
+
+            <RelativeLayout
+                android:id="@+id/layoutFolderEmpty"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true">
+
+                <com.airbnb.lottie.LottieAnimationView
+                    android:id="@+id/animFolderEmpty"
+                    android:layout_width="200dp"
+                    android:layout_height="200dp"
+                    android:layout_centerHorizontal="true"
+                    />
+
+                <TextView
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="20dp"
+                    android:layout_centerHorizontal="true"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/animFolderEmpty"
+                    android:layout_marginTop="15dp"
+                    android:fontFamily="@font/font_empty1"
+                    android:gravity="center"
+                    android:text="@string/tvFolderEmpty"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/_15ssp" />
+            </RelativeLayout>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rcclvFolder"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_below="@+id/layoutSearchFolder"
+                android:layout_marginTop="10dp" />
+
+        </RelativeLayout>
 
         <LinearLayout
             android:id="@+id/layoutHistoryBar"
-            android:paddingTop="8dp"
-            android:paddingBottom="8dp"
-            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:background="@color/colorHistory"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            >
-            <ImageView
-                android:layout_gravity="center"
-                android:layout_marginLeft="10dp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/ic_folder"
-                />
-
-            <TextView
-                android:textColor="@color/colorHistoryBar"
-                android:textSize="17sp"
-                android:layout_marginLeft="10dp"
-                android:gravity="center"
-                android:layout_gravity="center"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/tvHistory"
-                />
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/layoutSearchFolder"
-            android:paddingTop="6dp"
-            android:paddingBottom="6dp"
             android:orientation="horizontal"
-            android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp"
-            android:background="@drawable/bg_search_history"
-            android:layout_marginTop="10dp"
-            android:layout_below="@id/appBarHistory"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            >
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp">
+
             <ImageView
-                android:layout_gravity="center"
-                android:layout_marginLeft="15dp"
-                android:src="@drawable/ic_search"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                />
+                android:layout_gravity="center"
+                android:layout_marginLeft="10dp"
+                android:src="@drawable/ic_folder" />
 
             <TextView
-                android:textSize="17sp"
-                android:layout_gravity="center"
-                android:gravity="center"
-                android:layout_marginLeft="10dp"
-                android:textColor="@color/colorHistory"
-                android:text="@string/tvSearch"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                />
-
+                android:layout_gravity="center"
+                android:layout_marginLeft="10dp"
+                android:gravity="center"
+                android:text="@string/tvHistory"
+                android:textColor="@color/colorHistoryBar"
+                android:textSize="17sp" />
         </LinearLayout>
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:layout_above="@+id/layoutHistoryBar"
-            android:layout_marginTop="10dp"
-            android:layout_below="@+id/layoutSearchFolder"
+        <RelativeLayout
+            android:id="@+id/layoutCopy"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/rcclvFolder"
-            />
+            android:layout_height="match_parent"
+            android:layout_above="@id/layoutHistoryBar"
+            android:background="@color/colorApp"
+            android:visibility="gone">
+
+            <Button
+                android:id="@+id/btnCancelCopyHistory"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="10dp"
+                android:background="@null"
+                android:text="@string/tvCancel"
+                android:textAllCaps="false"
+                android:textColor="@color/colorUnSave"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <Button
+                android:id="@+id/btnConfirmCopyHistory"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_marginTop="10dp"
+                android:layout_marginRight="10dp"
+                android:background="@null"
+                android:text="@string/tvConfirm"
+                android:textAllCaps="false"
+                android:textColor="@color/colorTextSave"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+        </RelativeLayout>
 
         <com.github.clans.fab.FloatingActionMenu
             android:id="@+id/floatingMenu"
-            android:layout_marginBottom="10dp"
-            android:layout_marginRight="10dp"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentRight="true"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            >
+            android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginRight="10dp"
+            android:layout_marginBottom="10dp">
+
             <com.github.clans.fab.FloatingActionButton
-                app:fab_label="@string/tvNewFolder"
                 android:id="@+id/fabNewFolder"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:src="@drawable/ic_add_folder"
                 app:fabSize="mini"
-                app:fab_size="mini"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                />
+                app:fab_label="@string/tvNewFolder"
+                app:fab_size="mini" />
+
             <com.github.clans.fab.FloatingActionButton
                 android:id="@+id/fabNewScan"
-                app:fab_label="@string/tvNewScan"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:src="@drawable/ic_fab_camera"
-                app:fab_size="mini"
                 app:fabSize="mini"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                />
+                app:fab_label="@string/tvNewScan"
+                app:fab_size="mini" />
         </com.github.clans.fab.FloatingActionMenu>
-
-        <RelativeLayout
-            android:id="@+id/layoutFolderEmpty"
-            android:layout_centerInParent="true"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            >
-            <ImageView
-                android:layout_centerHorizontal="true"
-                android:id="@+id/icFolderEmpty"
-                android:layout_width="100dp"
-                android:layout_height="100dp"
-                android:src="@drawable/ic_empty_folder"
-                />
-
-            <TextView
-                android:gravity="center"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/icFolderEmpty"
-                android:layout_marginTop="15dp"
-                android:fontFamily="@font/font_empty"
-                android:text="@string/tvFolderEmpty"
-                android:textColor="@color/white"
-                android:textSize="@dimen/_12ssp" />
-        </RelativeLayout>
     </RelativeLayout>
 </layout>

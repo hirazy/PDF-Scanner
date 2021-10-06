@@ -154,16 +154,7 @@ class ImageActivity : BaseActivity() {
         adapterSelected.setData(listSelected)
 
         binding.btnDoneImg.setOnClickListener {
-            if (listSelected.size > 0) {
-                var intent = Intent(this@ImageActivity, ScanActivity::class.java)
-                var listImage = ArrayList<String>()
-                for (i in 0 until listSelected.size) {
-                    listImage.add(listSelected[i].path)
-                }
-                intent.putExtra(KEY_DATA_SCAN, DataScan(listImage, dataO.status, false).toJSON())
-                startActivity(intent)
-                finish()
-            }
+            onDoneImage()
         }
 
         binding.rcclvImage.addOnScrollListener(object : RecyclerView.OnScrollListener() {
@@ -197,6 +188,19 @@ class ImageActivity : BaseActivity() {
         }
         cursor.close()
         viewModel.fetchImage(ArrayList(list.reversed()))
+    }
+
+    private fun onDoneImage(){
+        if (listSelected.size > 0) {
+            var intent = Intent(this@ImageActivity, ScanActivity::class.java)
+            var listImage = ArrayList<String>()
+            for (i in 0 until listSelected.size) {
+                listImage.add(listSelected[i].path)
+            }
+            intent.putExtra(KEY_DATA_SCAN, DataScan(listImage, dataO.status, false).toJSON())
+            startActivity(intent)
+            finish()
+        }
     }
 
     private fun addMore() {

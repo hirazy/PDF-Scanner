@@ -90,6 +90,7 @@
 
     <string name="tvCancel">Cancel</string>
     <string name="tvConfirm">Confirm</string>
+    <string name="tvReplace">Replace</string>
 
     <string name="tvPremium">Premium</string>
     <string name="tvFeedBack">Feedback &amp; Support</string>
@@ -115,6 +116,11 @@
     <string name="tvDocumentWord">Document(Word)</string>
     <string name="tvTxt">Text(TXT)</string>
 
-    <string name="tvFolderEmpty">The folders is empty!</string>
+    <string name="tvFolderEmpty">The folders is empty! Click the "+" to add docs or folders</string>
+    
+    <string name="tvTipsCopy">files with the same already exists.</string>
+
+    <string name="aboutUS">About Us</string>
+    <string name="copyRight">Copyright 2018-2021 PDF Document Scanner All Rights Reserved</string>
 
 </resources>

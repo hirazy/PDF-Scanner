@@ -2,12 +2,15 @@ package com.example.pdf_scanner.ui.component.detail_text.fragment
 
 import android.Manifest
 import android.app.Dialog
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.pdf.PdfDocument
 import android.graphics.pdf.PdfDocument.PageInfo
 import android.net.Uri
 import android.os.Bundle
+import android.print.PrintAttributes
+import android.print.PrintManager
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -21,10 +24,17 @@ import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import com.example.pdf_scanner.DIALOG_CONTENT_DELETE
 import com.example.pdf_scanner.DIALOG_TITLE_DELETE
+import com.example.pdf_scanner.PDF
 import com.example.pdf_scanner.R
 import com.example.pdf_scanner.ui.component.detail.dialog.BottomShare
 import com.example.pdf_scanner.ui.component.detail.dialog.BottomShareEvent
-import com.example.pdf_scanner.ui.component.scan.dialog.ShapeBSFragment
+import com.example.pdf_scanner.utils.FileUtil
+import com.example.pdf_scanner.utils.PDFDocumentAdapter
+import com.itextpdf.io.image.ImageDataFactory
+import com.itextpdf.kernel.pdf.PdfWriter
+import com.itextpdf.layout.Document
+import com.itextpdf.layout.element.Image
+import com.pranavpandey.android.dynamic.toasts.DynamicToast
 import ja.burhanrashid52.photoeditor.PhotoEditor
 import ja.burhanrashid52.photoeditor.PhotoEditorView
 import ja.burhanrashid52.photoeditor.PhotoFilter
@@ -84,7 +94,7 @@ class ImageDetailFragment(var path: String, var e: OnImageTextListener) : Fragme
 
         var layoutPrint = view.findViewById<LinearLayout>(R.id.layoutImagePrintText)
         layoutPrint.setOnClickListener {
-
+            printImageDetail()
         }
 
         var layoutSave = view.findViewById<LinearLayout>(R.id.layoutImageAlbumText)
@@ -211,6 +221,38 @@ class ImageDetailFragment(var path: String, var e: OnImageTextListener) : Fragme
         startActivity(Intent.createChooser(intent, "Share Image"))
     }
 
+    private fun printImageDetail() {
+        var splitList = path.split('/')
+        var length = splitList.size
+        var fileAllName = splitList[length - 2]
+
+        var filePDF = File(filePath("$fileAllName", PDF))
+        var isSuccess = filePDF.createNewFile()
+
+        if (!isSuccess) {
+            DynamicToast.makeError(requireContext(), "Create file error!")
+                .show()
+            return
+        }
+        val pdfWriter = PdfWriter(filePDF)
+        val pdfDocument = com.itextpdf.kernel.pdf.PdfDocument(pdfWriter)
+        val document = Document(pdfDocument)
+
+        val imageData = ImageDataFactory.create(path)
+        val pdfImg = Image(imageData)
+        document.add(pdfImg)
+
+        document.close()
+
+        var printManager = requireActivity().getSystemService(Context.PRINT_SERVICE) as PrintManager
+        val printAdapter = PDFDocumentAdapter(filePDF)
+        try {
+            printManager.print("Document", printAdapter, PrintAttributes.Builder().build())
+        } catch (e: Exception) {
+            Log.e("printDetail", e.message.toString())
+        }
+    }
+
     private fun shareWordDetail() {
 
     }
@@ -244,5 +286,13 @@ class ImageDetailFragment(var path: String, var e: OnImageTextListener) : Fragme
         mShapeBuilder = ShapeBuilder()
         mPhotoEditor.setShape(mShapeBuilder)
         e.onSign()
+    }
+
+    private fun filePath(nameFolder: String, typePath: String): String {
+        var nameFile = "FILE_$nameFolder"
+        var fileRoot = FileUtil(requireContext()).getRootFolder()
+        var path = "$fileRoot/saved/$nameFolder/$nameFile$typePath"
+        Log.e("filePath", path)
+        return path
     }
 }

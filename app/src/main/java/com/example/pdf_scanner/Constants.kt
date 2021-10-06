@@ -37,6 +37,9 @@ const val DATA_CONFIG_APP = "data_config"
 const val RESOLUTION_WIDTH = 2560
 const val RESOLUTION_HEIGHT = 3840
 
+const val RESOLUTION_WIDTH_FLOAT = 2560f
+const val RESOLUTION_HEIGHT_FLOAT = 3840f
+
 // KEY Data save set string language ocr
 const val KEY_LANGUAGE_OCR = "key_language_ocr"
 
@@ -136,6 +139,7 @@ const val TOAST_BATCH = "Hold your Phone over a document and Continuous shooting
 const val TOAST_CARD = "Hold your phone over the ID Card/Passport/Business Card to take pictures."
 
 const val SAVE_SUCCESSFULLY = "Successfully save photo to the album"
+const val TIPS_CONTENT = "... files with the same already exists."
 
 const val WHITE_BOARD = "Whiteboard"
 const val OCR = "OCR"

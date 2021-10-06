@@ -43,6 +43,7 @@ import com.itextpdf.layout.Document
 import com.itextpdf.layout.element.Image
 import com.oneadx.vpnclient.utils.observe
 import com.pranavpandey.android.dynamic.toasts.DynamicToast
+import com.yalantis.ucrop.util.FileUtils
 import dagger.hilt.android.AndroidEntryPoint
 import java.io.File
 import java.text.SimpleDateFormat
@@ -58,6 +59,7 @@ class HistoryActivity : BaseActivity() {
     lateinit var adapter: FolderAdapter
     lateinit var listFolder: ArrayList<ImageFolder>
     private var isExitAgain: Boolean = false
+    lateinit var dataFolder: ImageFolder
 
     override fun initViewBinding() {
 
@@ -75,19 +77,23 @@ class HistoryActivity : BaseActivity() {
         }
 
         binding.fabNewScan.setOnClickListener {
-            if (viewModel.liveStartCamera.value!!.data == true) {
-                var intent = Intent(this@HistoryActivity, MainActivity::class.java)
-                startActivity(intent)
-            } else {
-                finish()
-            }
+            onNewScan()
         }
 
         binding.layoutSearchFolder.setOnClickListener {
-            var intent = Intent(this@HistoryActivity, SearchActivity::class.java)
-            intent.putExtra(KEY_DATA_SEARCH, DataSearch(listFolder).toJSON())
-            startActivityForResult(intent, 1)
+            onSearchFolder()
         }
+
+        binding.btnCancelCopyHistory.setOnClickListener {
+            statusFolder()
+        }
+
+        binding.btnConfirmCopyHistory.setOnClickListener {
+            onCopy(dataFolder)
+        }
+
+        binding.animFolderEmpty.setAnimation(R.raw.empty_box)
+        binding.animFolderEmpty.playAnimation()
 
         adapter = FolderAdapter(object : RecycleFolderListener {
             override fun onItemSelected(index: Int, data: OBase) {
@@ -98,35 +104,8 @@ class HistoryActivity : BaseActivity() {
             }
 
             override fun onItemDelete(index: Int, data: OBase) {
-                var dialog = Dialog(this@HistoryActivity)
-                dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-                dialog.window!!.setBackgroundDrawableResource(android.R.color.transparent)
-                dialog.setCancelable(false)
-                dialog.setContentView(R.layout.dialog_leave_scan)
-
-                var txtTitle = dialog.findViewById<TextView>(R.id.tvContentLeave)
-                txtTitle.setText(R.string.tvDelete)
-
-                var txtContent = dialog.findViewById<TextView>(R.id.tvContentLeaveScan)
-                txtContent.setText(R.string.tvContentDelete)
-
-                var btnCancel = dialog.findViewById<Button>(R.id.btnDecline)
-                btnCancel.setText(R.string.tvCancel)
-                btnCancel.setOnClickListener {
-                    dialog.dismiss()
-                }
-                var btnDelete = dialog.findViewById<Button>(R.id.btnAcceptLeave)
-                btnDelete.setText(R.string.tvDelete)
-                btnDelete.setOnClickListener {
-                    var o = data as ImageFolder
-                    var pathUtil = FileUtil(this@HistoryActivity).getRootFolder()
-                    var filePath = pathUtil + "/saved/" + o.name
-                    var file = File(filePath)
-                    recursiveDelete(file)
-                    fetchFolder()
-                    dialog.dismiss()
-                }
-                dialog.show()
+                var o = data as ImageFolder
+                onDeleteItem(o)
             }
 
             override fun onItemRename(index: Int, data: OBase) {
@@ -206,8 +185,8 @@ class HistoryActivity : BaseActivity() {
                     }
 
                     override fun onCopy() {
-                        // var folderCopy = File()
-
+                        statusCopyMove()
+                        dataFolder = o
                     }
 
                     override fun onShare() {
@@ -217,20 +196,7 @@ class HistoryActivity : BaseActivity() {
                             }
 
                             override fun shareImage() {
-                                val intent = Intent()
-                                intent.action = Intent.ACTION_SEND_MULTIPLE
-                                intent.putExtra(Intent.EXTRA_SUBJECT, "Here are some files.")
-                                intent.type = "image/jpeg"
-                                val files = ArrayList<Uri>()
-                                var fileRoot = File(folderSavedPath)
-                                var listFile = fileRoot.listFiles()
-                                for (f in listFile) {
-                                    val file = File(f.path)
-                                    val uri = Uri.fromFile(file)
-                                    files.add(uri)
-                                }
-                                intent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, files)
-                                startActivity(Intent.createChooser(intent, "Share Image"))
+                                shareImage(o)
                             }
 
                             override fun shareWord() {
@@ -260,7 +226,6 @@ class HistoryActivity : BaseActivity() {
                         bottomShare.show(supportFragmentManager, bottomShare.tag)
                     }
                 })
-
                 bottomMore.show(supportFragmentManager, bottomMore.tag)
             }
         })
@@ -268,6 +233,63 @@ class HistoryActivity : BaseActivity() {
         binding.rcclvFolder.layoutManager = LinearLayoutManager(this)
         binding.rcclvFolder.adapter = adapter
         fetchFolder()
+    }
+
+    private fun onCopy(o: ImageFolder) {
+        var dialog = Dialog(this)
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.window!!.setBackgroundDrawableResource(android.R.color.transparent)
+        dialog.setCancelable(false)
+        dialog.setContentView(R.layout.dialog_copy)
+
+        var txtContent = dialog.findViewById<TextView>(R.id.tvContentCopy)
+        txtContent.text = o.name + TIPS_CONTENT
+
+        var btnConfirm = dialog.findViewById<Button>(R.id.btnConfirmCopy)
+        btnConfirm.setOnClickListener {
+            binding.layoutCopy.visibility = View.GONE
+
+            var nameFolder = o.name
+            val fileRoot = FileUtil(this@HistoryActivity).getRootFolder()
+            val pathNameSaved = "/saved/"
+            var folderRoot = fileRoot + pathNameSaved
+            var pathFolderCur = folderRoot + nameFolder
+
+            var fileCur = File(pathFolderCur)
+
+            var cnt = 1
+            var plusName = "($cnt)"
+            var fileCopy = File("$pathFolderCur$plusName/")
+
+            while (fileCopy.exists()) {
+                cnt++
+                plusName = "($cnt)"
+                fileCopy = File("$pathFolderCur$plusName/")
+            }
+
+            Log.e("fileCopy", "$pathFolderCur/$plusName/")
+
+            fileCopy.mkdirs()
+
+            // Copy Folder
+
+            dialog.dismiss()
+
+            statusFolder()
+            fetchFolder()
+        }
+
+        var btnReplace = dialog.findViewById<Button>(R.id.btnReplaceCopy)
+        btnReplace.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        var btnCancel = dialog.findViewById<Button>(R.id.btnCancelCopy)
+        btnCancel.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialog.show()
     }
 
     private fun fetchFolder() {
@@ -302,6 +324,53 @@ class HistoryActivity : BaseActivity() {
         }
         listFolder = list
         viewModel.fetchData(list)
+    }
+
+    private fun onSearchFolder() {
+        var intent = Intent(this@HistoryActivity, SearchActivity::class.java)
+        intent.putExtra(KEY_DATA_SEARCH, DataSearch(listFolder).toJSON())
+        startActivityForResult(intent, 1)
+    }
+
+    private fun onNewScan() {
+        if (viewModel.liveStartCamera.value!!.data == false) {
+            var intent = Intent(this@HistoryActivity, MainActivity::class.java)
+            startActivity(intent)
+        } else {
+            finish()
+        }
+    }
+
+    private fun onDeleteItem(data: ImageFolder) {
+        var dialog = Dialog(this@HistoryActivity)
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.window!!.setBackgroundDrawableResource(android.R.color.transparent)
+        dialog.setCancelable(false)
+        dialog.setContentView(R.layout.dialog_leave_scan)
+
+        var txtTitle = dialog.findViewById<TextView>(R.id.tvContentLeave)
+        txtTitle.setText(R.string.tvDelete)
+
+        var txtContent = dialog.findViewById<TextView>(R.id.tvContentLeaveScan)
+        txtContent.setText(R.string.tvContentDelete)
+
+        var btnCancel = dialog.findViewById<Button>(R.id.btnDecline)
+        btnCancel.setText(R.string.tvCancel)
+        btnCancel.setOnClickListener {
+            dialog.dismiss()
+        }
+        var btnDelete = dialog.findViewById<Button>(R.id.btnAcceptLeave)
+        btnDelete.setText(R.string.tvDelete)
+        btnDelete.setOnClickListener {
+            var o = data
+            var pathUtil = FileUtil(this@HistoryActivity).getRootFolder()
+            var filePath = pathUtil + "/saved/" + o.name
+            var file = File(filePath)
+            recursiveDelete(file)
+            fetchFolder()
+            dialog.dismiss()
+        }
+        dialog.show()
     }
 
     private fun recursiveDelete(file: File) {
@@ -363,7 +432,7 @@ class HistoryActivity : BaseActivity() {
         val files = ArrayList<Uri>()
         val fileRoot = FileUtil(this@HistoryActivity).getRootFolder()
         var pathNameSaved = "/saved/"
-        var folderSavedPath = fileRoot + pathNameSaved + o.name + "/"
+        var folderSavedPath = fileRoot + pathNameSaved + o.name
 
         var folder = File(folderSavedPath)
         var listFile = folder.listFiles()
@@ -392,7 +461,7 @@ class HistoryActivity : BaseActivity() {
 
     }
 
-    fun uriFromFile(context: Context, file: File): Uri {
+    private fun uriFromFile(context: Context, file: File): Uri {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             return FileProvider.getUriForFile(
                 context,
@@ -412,6 +481,16 @@ class HistoryActivity : BaseActivity() {
         var path = "$fileRoot/saved/$nameFolder$nameFile$typePath"
         Log.e("filePath", path)
         return path
+    }
+
+    private fun statusFolder() {
+        binding.layoutHistoryFolder.visibility = View.VISIBLE
+        binding.layoutCopy.visibility = View.GONE
+    }
+
+    private fun statusCopyMove() {
+        binding.layoutHistoryFolder.visibility = View.GONE
+        binding.layoutCopy.visibility = View.VISIBLE
     }
 
     override fun observeViewModel() {
@@ -485,7 +564,8 @@ class HistoryActivity : BaseActivity() {
                 Runnable
                 { isExitAgain = false }, 2000
             )
+        } else {
+            super.onBackPressed()
         }
-        super.onBackPressed()
     }
 }

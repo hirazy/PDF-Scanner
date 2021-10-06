@@ -152,6 +152,7 @@ class OCRTextFragment(var path: String, var e: OCRListener) : Fragment() {
             }).addOnFailureListener(OnFailureListener { // handling an error listener.
                 DynamicToast.makeError(requireContext(), "Cannot convert text from this image!!!")
                     .show()
+                btnRecognize.isClickable = true
             })
     }
 

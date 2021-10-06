@@ -5,6 +5,8 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
+import android.print.PrintAttributes
+import android.print.PrintManager
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
@@ -29,6 +31,7 @@ import com.example.pdf_scanner.ui.component.detail.dialog.BottomShare
 import com.example.pdf_scanner.ui.component.detail.dialog.BottomShareEvent
 import com.example.pdf_scanner.ui.component.detail_text.DetailTextActivity
 import com.example.pdf_scanner.utils.FileUtil
+import com.example.pdf_scanner.utils.PDFDocumentAdapter
 import com.example.pdf_scanner.utils.toObject
 import com.itextpdf.io.image.ImageDataFactory
 import com.itextpdf.kernel.pdf.PdfDocument
@@ -87,7 +90,7 @@ class DetailActivity : BaseActivity() {
         }
 
         binding.btnAddImage.setOnClickListener {
-
+            // var intent = Intent(this@DetailActivity, )
         }
 
         adapter = CardImageDetail(object : RecyclerItemListener {
@@ -113,7 +116,7 @@ class DetailActivity : BaseActivity() {
         var date2 = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
         var nameFile = "FILE_$date2" + "_Scan $date1"
         var fileRoot = FileUtil(this@DetailActivity).getRootFolder()
-        var path = "$fileRoot/saved/$nameFolder$nameFile$typePath"
+        var path = "$fileRoot/saved/$nameFolder/$nameFile$typePath"
         Log.e("filePath", path)
         return path
     }
@@ -160,7 +163,7 @@ class DetailActivity : BaseActivity() {
         startActivity(Intent.createChooser(sharingIntent, "Share PDF"))
     }
 
-    fun shareImage(){
+    private fun shareImageDetail() {
         val intent = Intent()
         intent.action = Intent.ACTION_SEND_MULTIPLE
         intent.putExtra(Intent.EXTRA_SUBJECT, "Here are some files.")
@@ -180,11 +183,11 @@ class DetailActivity : BaseActivity() {
         startActivity(Intent.createChooser(intent, "Share Image"))
     }
 
-    fun shareText(){
+    private fun shareText() {
 
     }
 
-    fun shareWord(){
+    private fun shareWord() {
 
     }
 
@@ -195,11 +198,11 @@ class DetailActivity : BaseActivity() {
             }
 
             override fun shareImage() {
-                shareImage()
+                shareImageDetail()
             }
 
             override fun shareWord() {
-
+                shareWord()
             }
 
             override fun shareText() {
@@ -227,6 +230,41 @@ class DetailActivity : BaseActivity() {
 
     private fun printDetail() {
 
+        var filePDF = File(filePath(dataImage.name + "/", PDF))
+        var isSuccess = filePDF.createNewFile()
+
+        if (!isSuccess) {
+            DynamicToast.makeError(this@DetailActivity, "Create file error!")
+                .show()
+            return
+        }
+        val pdfWriter = PdfWriter(filePDF)
+        val pdfDocument = PdfDocument(pdfWriter)
+        val document = Document(pdfDocument)
+        var list = dataImage.list
+
+        for (i in 0 until list.size) {
+            var filePath = list[i]
+            if (!File(filePath).exists()) {
+                DynamicToast.makeError(this@DetailActivity, "Create file error!")
+                    .show()
+                return
+            }
+
+            val imageData = ImageDataFactory.create(filePath)
+            val pdfImg = Image(imageData)
+            document.add(pdfImg)
+        }
+
+        document.close()
+
+        var printManager = this.getSystemService(Context.PRINT_SERVICE) as PrintManager
+        val printAdapter = PDFDocumentAdapter(filePDF)
+        try {
+            printManager.print("Document", printAdapter, PrintAttributes.Builder().build())
+        } catch (e: Exception) {
+            Log.e("printDetail", e.message.toString())
+        }
     }
 
     private fun textDetail() {
@@ -264,15 +302,25 @@ class DetailActivity : BaseActivity() {
             val pathNameSaved = "/saved/"
             var folderRoot = fileRoot + pathNameSaved
             var folderNameTmp = edtFileName.text.toString()
+
+            if (nameFolder == folderNameTmp) {
+                dialog.dismiss()
+                return@setOnClickListener
+            }
+
             var folderSavedPath = "$fileRoot/saved/$nameFolder"
             var fileSaved = File(folderSavedPath)
 
             var file = File(folderRoot + folderNameTmp)
 
-            var plusName = "(1)"
+            var cnt = 1
+            var folderNameChange = folderNameTmp
+
             while (file.exists()) {
-                folderNameTmp += plusName
-                file = File(folderRoot + folderNameTmp)
+                var plusName = "($cnt)"
+                folderNameChange = folderNameTmp + plusName
+                file = File(folderRoot + folderNameChange)
+                cnt++
             }
 
             var isSuccess = fileSaved.renameTo(file)

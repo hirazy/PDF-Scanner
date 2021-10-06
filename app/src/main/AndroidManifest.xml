@@ -42,6 +42,12 @@
         <activity android:name=".ui.component.detail_text.DetailTextActivity"
             android:theme="@style/ScanScreenTheme"
             />
+
+        <activity
+            android:name="com.yalantis.ucrop.UCropActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar"/>
+
         <activity android:name=".ui.component.filter.FilterActivity"
             android:theme="@style/ScanScreenTheme"/>
         <activity android:name=".ui.component.about.AboutActivity"

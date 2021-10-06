@@ -186,9 +186,7 @@ class DetailTextActivity : BaseActivity(), ShapeBSFragment.Properties {
         when (item.itemId) {
             R.id.itemActionSaveDetail -> {
                 if (textOCR.isNotEmpty()) {
-
                     var path = genPath()
-                    Log.e("onOptionsItemSelected", path)
                     var file = File("$path.txt")
                     file.writeText(textOCR)
                     var isSuccess = file.createNewFile()

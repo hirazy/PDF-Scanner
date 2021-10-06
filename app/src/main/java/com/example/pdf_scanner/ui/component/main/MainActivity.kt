@@ -121,7 +121,7 @@ class MainActivity : BaseActivity() {
                 @RequiresApi(Build.VERSION_CODES.KITKAT)
                 override fun onImage(p0: CameraKitView?, p1: ByteArray?) {
 
-                    val str = String(p1!!, StandardCharsets.UTF_8)
+                    // val str = String(p1!!, StandardCharsets.UTF_8)
                     val bmp = getResizedBitmap(
                         BitmapFactory.decodeByteArray(p1, 0, p1!!.size),
                         RESOLUTION_WIDTH,
@@ -135,9 +135,8 @@ class MainActivity : BaseActivity() {
                     var date = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
                     val strTime = "Scan " + date.format(Date())
 
-                    val filePath = "${fileRoot}/${strTime}"
+                    val filePath = "${fileRoot}/${strTime}$JPG"
                     var file = File(filePath)
-                    file.parentFile.mkdirs()
                     file.createNewFile()
                     val stream = FileOutputStream(file)
                     stream.write(bmpArray)
@@ -179,50 +178,14 @@ class MainActivity : BaseActivity() {
         }
 
         binding.btnDocument.setOnClickListener {
-            if (listImg.size > 0) {
-                var dialog = Dialog(this)
-                dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-                dialog.window!!.setBackgroundDrawableResource(android.R.color.transparent)
-                dialog.setCancelable(false)
-                dialog.setContentView(R.layout.dialog_leave_scan)
-
-                var btnCancel = dialog.findViewById<Button>(R.id.btnDecline)
-                btnCancel.setOnClickListener {
-                    dialog.dismiss()
-                }
-                var btnLeave = dialog.findViewById<Button>(R.id.btnAcceptLeave)
-                btnLeave.setOnClickListener {
-                    listImg = ArrayList()
-                    binding.btnDocument.setImageResource(R.drawable.ic_document)
-                    binding.btnImage.visibility = View.VISIBLE
-                    binding.layoutBadgeImage.visibility = View.GONE
-                    dialog.dismiss()
-                }
-                dialog.show()
-            } else {
-                val isStartedCamera = viewModel.liveStartCamera.value!!.data
-                var intent = Intent(this, HistoryActivity::class.java)
-                startActivity(intent)
-                if (isStartedCamera == false) {
-                    finish()
-                }
-            }
+            onDocument()
         }
         binding.btnImage.setOnClickListener {
-            var intent = Intent(this, ImageActivity::class.java)
-            intent.putExtra(KEY_INTENT_IMAGE, DataImage(statusOption).toJSON())
-            startActivity(intent)
+            onImage()
         }
 
         binding.layoutBadgeImage.setOnClickListener {
-            var intent = Intent(this, ScanActivity::class.java)
-            var status = binding.vpgM.currentItem
-            if (statusOption == KEY_OCR) {
-                intent.putExtra(KEY_DATA_SCAN, DataScan(listImg, status, true).toJSON())
-            } else {
-                intent.putExtra(KEY_DATA_SCAN, DataScan(listImg, status, false).toJSON())
-            }
-            startActivity(intent)
+            onImageScan()
         }
 
         adapter = OptionCameraAdapter(object : RecyclerItemListener {
@@ -234,6 +197,7 @@ class MainActivity : BaseActivity() {
 
             }
         })
+
         layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
         val displayMetrics = DisplayMetrics()
         windowManager.defaultDisplay.getMetrics(displayMetrics)
@@ -243,6 +207,55 @@ class MainActivity : BaseActivity() {
          */
         deleteFileSaved()
         setContentView(binding.root)
+    }
+
+    private fun onDocument() {
+        if (listImg.size > 0) {
+            var dialog = Dialog(this)
+            dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+            dialog.window!!.setBackgroundDrawableResource(android.R.color.transparent)
+            dialog.setCancelable(false)
+            dialog.setContentView(R.layout.dialog_leave_scan)
+
+            var btnCancel = dialog.findViewById<Button>(R.id.btnDecline)
+            btnCancel.setOnClickListener {
+                dialog.dismiss()
+            }
+            var btnLeave = dialog.findViewById<Button>(R.id.btnAcceptLeave)
+            btnLeave.setOnClickListener {
+                listImg = ArrayList()
+                binding.btnDocument.setImageResource(R.drawable.ic_document)
+                binding.btnImage.visibility = View.VISIBLE
+                binding.layoutBadgeImage.visibility = View.GONE
+                dialog.dismiss()
+            }
+            dialog.show()
+        } else {
+            val isStartedCamera = viewModel.liveStartCamera.value!!.data
+            if (isStartedCamera == true) {
+                var intent = Intent(this, HistoryActivity::class.java)
+                startActivity(intent)
+            } else {
+                finish()
+            }
+        }
+    }
+
+    private fun onImage() {
+        var intent = Intent(this, ImageActivity::class.java)
+        intent.putExtra(KEY_INTENT_IMAGE, DataImage(statusOption).toJSON())
+        startActivity(intent)
+    }
+
+    private fun onImageScan() {
+        var intent = Intent(this, ScanActivity::class.java)
+        var status = binding.vpgM.currentItem
+        if (statusOption == KEY_OCR) {
+            intent.putExtra(KEY_DATA_SCAN, DataScan(listImg, status, true).toJSON())
+        } else {
+            intent.putExtra(KEY_DATA_SCAN, DataScan(listImg, status, false).toJSON())
+        }
+        startActivity(intent)
     }
 
     private fun deleteFileSaved() {
@@ -261,7 +274,7 @@ class MainActivity : BaseActivity() {
         }
     }
 
-    fun getResizedBitmap(bm: Bitmap, newWidth: Int, newHeight: Int): Bitmap? {
+    private fun getResizedBitmap(bm: Bitmap, newWidth: Int, newHeight: Int): Bitmap? {
         val width = bm.width
         val height = bm.height
         val scaleWidth = newWidth.toFloat() / width
@@ -452,6 +465,8 @@ class MainActivity : BaseActivity() {
                 Runnable
                 { isExitAgain = false }, 2000
             )
+        } else {
+            super.onBackPressed()
         }
     }
 

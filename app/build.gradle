@@ -62,6 +62,8 @@ android {
     kotlinOptions {
         jvmTarget = '1.8'
     }
+
+    aaptOptions { cruncherEnabled = false }
 }
 
 dependencies {
@@ -153,5 +155,11 @@ dependencies {
 
     // Itext PDF
     implementation 'com.itextpdf:itext7-core:7.1.7'
+
+    // Round ImageView
+    implementation 'com.rishabhharit.roundedimageview:RoundedImageView:0.8.4'
+
+    // Crop
+    implementation 'com.github.yalantis:ucrop:2.2.6'
 
 }

@@ -29,13 +29,14 @@
                 android:layout_height="match_parent"
                 android:background="@drawable/bg_corner_white">
 
-                <com.google.android.material.imageview.ShapeableImageView
+                <com.rishabhharit.roundedimageview.RoundedImageView
                     android:id="@+id/imgSelected"
                     image="@{o.path}"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:background="@color/white"
                     android:scaleType="centerCrop"
+                    app:cornerRadius="@dimen/_10sdp"
                     app:shapeAppearance="@style/cornerCard" />
 
                 <ImageButton

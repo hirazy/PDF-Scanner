@@ -6,7 +6,6 @@ import android.app.Dialog
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -44,6 +43,7 @@ import com.example.pdf_scanner.ui.component.scan.dialog.BottomScanEvent
 import com.example.pdf_scanner.ui.component.scan.dialog.ShapeBSFragment
 import com.example.pdf_scanner.ui.component.scan.dialog.TextEditorDialogFragment
 import com.example.pdf_scanner.utils.FileUtil
+import com.example.pdf_scanner.utils.PDFDocumentAdapter
 import com.example.pdf_scanner.utils.toObject
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.itextpdf.io.image.ImageDataFactory
@@ -53,12 +53,12 @@ import com.itextpdf.layout.Document
 import com.itextpdf.layout.element.Image
 import com.oneadx.vpnclient.utils.observe
 import com.pranavpandey.android.dynamic.toasts.DynamicToast
+import com.yalantis.ucrop.UCrop
 import dagger.hilt.android.AndroidEntryPoint
 import ja.burhanrashid52.photoeditor.*
 import ja.burhanrashid52.photoeditor.shape.ShapeBuilder
 import ja.burhanrashid52.photoeditor.shape.ShapeType
 import java.io.File
-import java.net.URL
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
@@ -115,8 +115,7 @@ class ScanActivity : BaseActivity(), ShapeBSFragment.Properties {
 
             viewModel.fetchLanguage()
             binding.layoutScanLanguage.setOnClickListener {
-                var intent = Intent(this@ScanActivity, OCRActivity::class.java)
-                startActivityForResult(intent, KEY_RESULT_OCR)
+                onScanLanguage()
             }
         }
 
@@ -150,7 +149,7 @@ class ScanActivity : BaseActivity(), ShapeBSFragment.Properties {
         }
 
         binding.layoutCropImage.setOnClickListener {
-
+            cropImg()
         }
 
         binding.layoutSignImage.setOnClickListener {
@@ -225,6 +224,11 @@ class ScanActivity : BaseActivity(), ShapeBSFragment.Properties {
         dialog.show()
     }
 
+    private fun onScanLanguage() {
+        var intent = Intent(this@ScanActivity, OCRActivity::class.java)
+        startActivityForResult(intent, KEY_RESULT_OCR)
+    }
+
     private fun addImage() {
         var bottomDialog = BottomScan(object : BottomScanEvent {
             override fun takePhoto() {
@@ -238,6 +242,27 @@ class ScanActivity : BaseActivity(), ShapeBSFragment.Properties {
             }
         })
         bottomDialog.show(supportFragmentManager, bottomDialog.tag)
+    }
+
+    private fun cropImg() {
+        var ind = binding.vpgImg.currentItem
+
+        // var uriFile = uriFromFile(this, File(listImg[ind]))
+
+        var uriFile= Uri.fromFile(File(listImg[ind]))
+
+        Log.e("cropImg", uriFile.path.toString())
+
+        //  /storage/emulated/0
+
+        // /external_files/Android/data/
+
+        adapterImg.cropImage({
+            UCrop.of(uriFile, uriFile)
+                .withAspectRatio(RESOLUTION_WIDTH_FLOAT, RESOLUTION_HEIGHT_FLOAT)
+                .withMaxResultSize(RESOLUTION_WIDTH, RESOLUTION_HEIGHT)
+                .start(this)
+        }, ind)
     }
 
     private fun rotateImage() {
@@ -331,7 +356,7 @@ class ScanActivity : BaseActivity(), ShapeBSFragment.Properties {
 
         fun addText(inputText: String, styleBuilder: TextStyleBuilder)
 
-        fun save()
+        fun savePhoto()
     }
 
     @JvmName("setOnEdit1")
@@ -374,7 +399,7 @@ class ScanActivity : BaseActivity(), ShapeBSFragment.Properties {
                 dialog.setContentView(R.layout.dialog_save)
                 var animSave = dialog.findViewById<LottieAnimationView>(R.id.animSave)
                 animSave.setAnimation(R.raw.save_scan)
-                animSave.repeatCount = 2
+                animSave.repeatCount = 1
                 animSave.playAnimation()
 
                 var folderNameTv = dialog.findViewById<TextView>(R.id.tvFolderName)
@@ -437,6 +462,7 @@ class ScanActivity : BaseActivity(), ShapeBSFragment.Properties {
                         var folderRoot = fileRoot + pathNameSaved
                         var folderNameTmp = textName.text.toString()
                         var file = File(folderRoot + folderNameTmp)
+
                         var plusName = "(1)"
                         while (file.exists()) {
                             file = File(folderRoot + folderNameTmp)
@@ -564,11 +590,7 @@ class ScanActivity : BaseActivity(), ShapeBSFragment.Properties {
 
                 var layoutPrint = dialog.findViewById<RelativeLayout>(R.id.layoutSavePrint)
                 layoutPrint.setOnClickListener {
-                    var managerPrintManager: PrintManager =
-                        this.getSystemService(Context.PRINT_SERVICE) as PrintManager
-                    // val printAdapter: PrintDocumentAdapter = createPrintDocumentAdapter()
-                    val builder = PrintAttributes.Builder()
-
+                    printFolder(folderName)
                 }
 
                 var layoutToAlbum = dialog.findViewById<RelativeLayout>(R.id.layoutSaveToAlbum)
@@ -586,6 +608,8 @@ class ScanActivity : BaseActivity(), ShapeBSFragment.Properties {
                 var btnClose = dialog.findViewById<ImageButton>(R.id.btnCloseSave)
                 btnClose.setOnClickListener {
                     dialog.dismiss()
+                    var intent = Intent(this@ScanActivity, HistoryActivity::class.java)
+                    startActivity(intent)
                     finish()
                 }
 
@@ -638,8 +662,45 @@ class ScanActivity : BaseActivity(), ShapeBSFragment.Properties {
         var nameFile = "FILE_$date2" + "_Scan $date1"
         var fileRoot = FileUtil(this@ScanActivity).getRootFolder()
         var path = "$fileRoot/saved/$nameFolder$nameFile$typePath"
-        Log.e("filePath", path)
         return path
+    }
+
+    private fun printFolder(nameFolder: String) {
+        var filePDF = File(filePath("$nameFolder/", PDF))
+        var isSuccess = filePDF.createNewFile()
+
+        if (!isSuccess) {
+            DynamicToast.makeError(this@ScanActivity, "Create file error!")
+                .show()
+            return
+        }
+        val pdfWriter = PdfWriter(filePDF)
+        val pdfDocument = PdfDocument(pdfWriter)
+        val document = Document(pdfDocument)
+        var list = listImg
+
+        for (i in 0 until list.size) {
+            var filePath = list[i]
+            if (!File(filePath).exists()) {
+                DynamicToast.makeError(this@ScanActivity, "Create file error!")
+                    .show()
+                return
+            }
+
+            val imageData = ImageDataFactory.create(filePath)
+            val pdfImg = Image(imageData)
+            document.add(pdfImg)
+        }
+
+        document.close()
+
+        var printManager = this.getSystemService(Context.PRINT_SERVICE) as PrintManager
+        val printAdapter = PDFDocumentAdapter(filePDF)
+        try {
+            printManager.print("Document", printAdapter, PrintAttributes.Builder().build())
+        } catch (e: Exception) {
+            Log.e("printDetail", e.message.toString())
+        }
     }
 
     fun uriFromFile(context: Context, file: File): Uri {
@@ -705,7 +766,14 @@ class ScanActivity : BaseActivity(), ShapeBSFragment.Properties {
                         }
                     }
                 }
+
+                UCrop.REQUEST_CROP -> {
+                    adapterImg.listFrg[binding.vpgImg.currentItem].resetSrc()
+                }
             }
+        }
+        else if (resultCode == UCrop.RESULT_ERROR) {
+            var cropError = UCrop.getError(data!!)
         }
         super.onActivityResult(requestCode, resultCode, data)
     }
@@ -774,7 +842,7 @@ class ScanActivity : BaseActivity(), ShapeBSFragment.Properties {
                     }
                 }
 
-                override fun save() {
+                override fun savePhoto() {
 
                 }
             })
@@ -788,6 +856,16 @@ class ScanActivity : BaseActivity(), ShapeBSFragment.Properties {
                 requireActivity(),
                 android.R.layout.simple_list_item_1, list
             )
+        }
+
+        fun resetSrc(){
+            val number = requireArguments().getInt(NUMBER)
+            var file = File(list[number])
+
+            if (file.exists()) {
+                val uri: Uri = Uri.fromFile(file)
+                mPhotoEditorView!!.source.setImageURI(uri)
+            }
         }
 
         fun addTextO(inputText: String, styleBuilder: TextStyleBuilder) {
@@ -855,6 +933,33 @@ class ScanActivity : BaseActivity(), ShapeBSFragment.Properties {
 
             mPhotoEditor!!.saveAsFile(filePath, saveSettings, object : PhotoEditor.OnSaveListener {
                 override fun onSuccess(imagePath: String) {
+
+                }
+
+                override fun onFailure(exception: Exception) {
+
+                }
+            })
+        }
+
+        fun saveCrop(filePath: String, call: () -> Unit) {
+            val saveSettings = SaveSettings.Builder()
+                .setClearViewsEnabled(true)
+                .setTransparencyEnabled(true)
+                .build()
+
+            if (ActivityCompat.checkSelfPermission(
+                    requireContext(),
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                return
+            }
+
+            mPhotoEditor!!.saveAsFile(filePath, saveSettings, object : PhotoEditor.OnSaveListener {
+                override fun onSuccess(imagePath: String) {
+                    Log.e("saveAsFile", "1")
+                    call.invoke()
                 }
 
                 override fun onFailure(exception: Exception) {
@@ -891,7 +996,7 @@ class ScanActivity : BaseActivity(), ShapeBSFragment.Properties {
             mPhotoEditor.addText(inputText, styleBuilder)
         }
 
-        override fun save() {
+        override fun savePhoto() {
 
         }
     }
@@ -934,6 +1039,14 @@ class ScanActivity : BaseActivity(), ShapeBSFragment.Properties {
 
         fun canDelete(): Boolean {
             return list.size > 0
+        }
+
+        fun cropImage(call: () -> Unit, position: Int) {
+            var frag = listFrg[position]
+            frag.saveCrop(list[position]) {
+                call.invoke()
+                Log.e("saveAsFile", "2")
+            }
         }
     }
 }
