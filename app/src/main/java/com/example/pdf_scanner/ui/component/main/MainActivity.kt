@@ -13,6 +13,7 @@ import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.util.DisplayMetrics
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -25,6 +26,7 @@ import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.viewpager.widget.ViewPager
 import com.camerakit.CameraKitView
 import com.camerakit.type.CameraFlash
 import com.example.pdf_scanner.*
@@ -55,10 +57,10 @@ import net.lucode.hackware.magicindicator.buildins.commonnavigator.abs.CommonNav
 import net.lucode.hackware.magicindicator.buildins.commonnavigator.abs.IPagerIndicator
 import net.lucode.hackware.magicindicator.buildins.commonnavigator.abs.IPagerTitleView
 import net.lucode.hackware.magicindicator.buildins.commonnavigator.titles.ClipPagerTitleView
+import okhttp3.internal.notify
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
-import java.nio.charset.StandardCharsets
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
@@ -166,8 +168,6 @@ class MainActivity : BaseActivity() {
             })
         }
 
-        hasStoragePermission(1)
-
         setSupportActionBar(binding.tbMain)
         binding.tbMain.title = "" // set Title
         supportActionBar!!.setDisplayShowTitleEnabled(false);
@@ -206,7 +206,75 @@ class MainActivity : BaseActivity() {
          * Delete File Saved
          */
         deleteFileSaved()
+
+        listOption.add(OptionCamera(WHITE_BOARD, false))
+        listOption.add(OptionCamera(OCR, false))
+        listOption.add(OptionCamera(SINGLE, true))
+        listOption.add(OptionCamera(BATCH, false))
+        listOption.add(OptionCamera(CARD, false))
+
+        mExamplePagerAdapter = OptionAdapter(listOption)
+        binding.vpgM.adapter = mExamplePagerAdapter
+        initViewpager()
+
+
         setContentView(binding.root)
+
+        // hasStoragePermission(1)
+    }
+
+    private fun initViewpager() {
+        val commonNavigator = CommonNavigator(this@MainActivity)
+        commonNavigator.isSkimOver = true
+        val padding = UIUtil.getScreenWidth(this) / 2
+        commonNavigator.rightPadding = padding
+        commonNavigator.leftPadding = padding
+        commonNavigator.setAdapter(object : CommonNavigatorAdapter() {
+            override fun getCount(): Int {
+                return listOption.size
+            }
+
+            override fun getTitleView(context: Context, index: Int): IPagerTitleView {
+                val clipPagerTitleView = ClipPagerTitleView(context)
+                clipPagerTitleView.text = listOption[index].name
+                clipPagerTitleView.textColor = Color.parseColor("#4C4C4C")
+                clipPagerTitleView.clipColor = Color.RED
+                clipPagerTitleView.setOnClickListener {
+                    if (index != binding.vpgM.currentItem) {
+                        statusOption = index
+                        binding.vpgM.setCurrentItem(index, true)
+                        binding.vpgMain.navigator = commonNavigator
+                        ViewPagerHelper.bind(binding.vpgMain, binding.vpgM)
+                        var msgStatus = ""
+                        when (index) {
+                            KEY_WHITEBOARD -> {
+                                msgStatus = TOAST_WHITEBOARD
+                            }
+                            KEY_OCR -> {
+                                msgStatus = TOAST_OCR
+                            }
+                            KEY_SINGLE -> {
+                                msgStatus = TOAST_SINGLE
+                            }
+                            KEY_BATCH -> {
+                                msgStatus = TOAST_BATCH
+                            }
+                            KEY_CARD -> {
+                                msgStatus = TOAST_CARD
+                            }
+                        }
+                        viewModel.showToast(msgStatus)
+                    }
+                }
+                return clipPagerTitleView
+            }
+
+            override fun getIndicator(context: Context): IPagerIndicator? {
+                return null
+            }
+        })
+        binding.vpgMain.navigator = commonNavigator
+        ViewPagerHelper.bind(binding.vpgMain, binding.vpgM)
     }
 
     private fun onDocument() {
@@ -301,65 +369,14 @@ class MainActivity : BaseActivity() {
         }
     }
 
-    private fun initViewpager() {
-        val commonNavigator = CommonNavigator(this)
-        commonNavigator.isSkimOver = true
-        val padding = UIUtil.getScreenWidth(this) / 2
-        commonNavigator.rightPadding = padding
-        commonNavigator.leftPadding = padding
-        commonNavigator.adapter = object : CommonNavigatorAdapter() {
-            override fun getCount(): Int {
-                return listOption.size
-            }
-
-            override fun getTitleView(context: Context, index: Int): IPagerTitleView {
-                val clipPagerTitleView = ClipPagerTitleView(context)
-                clipPagerTitleView.text = listOption[index].name
-                clipPagerTitleView.textColor = Color.parseColor("#4C4C4C")
-                clipPagerTitleView.clipColor = Color.RED
-                clipPagerTitleView.setOnClickListener {
-                    if (index != binding.vpgM.currentItem) {
-                        statusOption = index
-                        binding.vpgM.setCurrentItem(index, true)
-                        var msgStatus = ""
-                        when (index) {
-                            KEY_WHITEBOARD -> {
-                                msgStatus = TOAST_WHITEBOARD
-                            }
-                            KEY_OCR -> {
-                                msgStatus = TOAST_OCR
-                            }
-                            KEY_SINGLE -> {
-                                msgStatus = TOAST_SINGLE
-                            }
-                            KEY_BATCH -> {
-                                msgStatus = TOAST_BATCH
-                            }
-                            KEY_CARD -> {
-                                msgStatus = TOAST_CARD
-                            }
-                        }
-                        viewModel.showToast(msgStatus)
-                    }
-                }
-                return clipPagerTitleView
-            }
-
-            override fun getIndicator(context: Context): IPagerIndicator? {
-                return null
-            }
-        }
-        binding.vpgMain.navigator = commonNavigator
-        ViewPagerHelper.bind(binding.vpgMain, binding.vpgM)
-    }
-
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.item_action_main, menu)
         return super.onCreateOptionsMenu(menu)
     }
 
+    @RequiresApi(Build.VERSION_CODES.M)
     private fun hasStoragePermission(requestCode: Int): Boolean {
-        var permission = arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE)
+        binding.cameraKit.requestPermissions(this@MainActivity)
 
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED &&
@@ -386,9 +403,6 @@ class MainActivity : BaseActivity() {
             is Resource.Success -> {
                 adapter.setData(list.data!!)
                 listOption = list.data!!
-                mExamplePagerAdapter = OptionAdapter(listOption)
-                binding.vpgM.adapter = mExamplePagerAdapter
-                initViewpager()
             }
         }
     }
@@ -416,7 +430,7 @@ class MainActivity : BaseActivity() {
                         statusCamera = 2
                         binding.tbMain.menu.findItem(R.id.itemFlash).icon =
                             ContextCompat.getDrawable(this, R.drawable.ic_light)
-                        binding.cameraKit.flash = CameraFlash.AUTO.ordinal
+                        binding.cameraKit.flash = CameraFlash.TORCH.ordinal
                     }
 
                     2 -> {
@@ -437,6 +451,7 @@ class MainActivity : BaseActivity() {
     }
 
     override fun onResume() {
+        Log.e("onResume", "onResume")
         super.onResume()
         binding.cameraKit.onResume()
     }
@@ -476,7 +491,9 @@ class MainActivity : BaseActivity() {
         grantResults: IntArray
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        // binding.cameraKit.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        binding.cameraKit.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        Log.e("onRequest", "cameraKit")
+
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

@@ -4,5 +4,7 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class DataImage(
-    var status: Int = 0
+    var status: Int = 0,
+
+    var pathFolder : String = ""
 ): OBase()

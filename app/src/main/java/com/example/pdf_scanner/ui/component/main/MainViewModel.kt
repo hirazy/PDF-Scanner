@@ -35,7 +35,6 @@ class MainViewModel @Inject constructor(dataRepositorySource: DataRepositorySour
         list.add(OptionCamera(SINGLE, true))
         list.add(OptionCamera(BATCH, false))
         list.add(OptionCamera(CARD, false))
-        list.add(OptionCamera(QRCODE, false))
 
         listOptionData.value = Resource.Success(list)
 

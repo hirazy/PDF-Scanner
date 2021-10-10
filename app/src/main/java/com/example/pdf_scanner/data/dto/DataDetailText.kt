@@ -4,5 +4,6 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class DataDetailText (
-    var filePath: String = ""
+    var filePath: String = "",
+
         ): OBase()

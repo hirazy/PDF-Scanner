@@ -44,7 +44,8 @@ import ja.burhanrashid52.photoeditor.shape.ShapeType
 import java.io.File
 
 
-class ImageDetailFragment(var path: String, var e: OnImageTextListener) : Fragment() {
+class ImageDetailFragment(var path: String, var e: OnImageTextListener,
+                    ) : Fragment() {
 
     lateinit var mPhotoEditor: PhotoEditor
     lateinit var mPhotoEditorView: PhotoEditorView

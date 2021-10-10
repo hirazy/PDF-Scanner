@@ -140,6 +140,7 @@
                 android:src="@drawable/ic_selection_round" />
 
             <ScrollView
+                android:fadeScrollbars="false"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
@@ -158,7 +159,7 @@
             <androidx.viewpager.widget.ViewPager
                 android:id="@+id/vpgM"
                 android:layout_width="wrap_content"
-                android:layout_height="0dp" />
+                android:layout_height="1dp" />
         </LinearLayout>
 
         <com.camerakit.CameraKitView

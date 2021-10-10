@@ -30,9 +30,9 @@ import com.example.pdf_scanner.data.dto.*
 import com.example.pdf_scanner.databinding.ActivityScanBinding
 import com.example.pdf_scanner.ui.base.BaseActivity
 import com.example.pdf_scanner.ui.base.listener.RecyclerItemListener
+import com.example.pdf_scanner.ui.component.detail.DetailActivity
 import com.example.pdf_scanner.ui.component.detail.dialog.BottomShare
 import com.example.pdf_scanner.ui.component.detail.dialog.BottomShareEvent
-import com.example.pdf_scanner.ui.component.detail_text.DetailTextActivity
 import com.example.pdf_scanner.ui.component.filter.FilterActivity
 import com.example.pdf_scanner.ui.component.history.HistoryActivity
 import com.example.pdf_scanner.ui.component.image.ImageActivity
@@ -247,15 +247,7 @@ class ScanActivity : BaseActivity(), ShapeBSFragment.Properties {
     private fun cropImg() {
         var ind = binding.vpgImg.currentItem
 
-        // var uriFile = uriFromFile(this, File(listImg[ind]))
-
-        var uriFile= Uri.fromFile(File(listImg[ind]))
-
-        Log.e("cropImg", uriFile.path.toString())
-
-        //  /storage/emulated/0
-
-        // /external_files/Android/data/
+        var uriFile = Uri.fromFile(File(listImg[ind]))
 
         adapterImg.cropImage({
             UCrop.of(uriFile, uriFile)
@@ -644,12 +636,77 @@ class ScanActivity : BaseActivity(), ShapeBSFragment.Properties {
             }
 
             R.id.actionOCR -> {
-                var intent = Intent(this@ScanActivity, DetailTextActivity::class.java)
-                intent.putExtra(
-                    KEY_DATA_DETAIL_TEXT,
-                    DataDetailText(listImg[binding.vpgImg.currentItem]).toJSON()
-                )
-                startActivity(intent)
+                var dialog = Dialog(this)
+                dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+                dialog.window!!.setBackgroundDrawableResource(android.R.color.transparent)
+                dialog.setCancelable(false)
+                dialog.setContentView(R.layout.dialog_save)
+                var animSave = dialog.findViewById<LottieAnimationView>(R.id.animSave)
+                animSave.setAnimation(R.raw.save_scan)
+                animSave.repeatCount = 1
+                animSave.playAnimation()
+
+                var folderNameTv = dialog.findViewById<TextView>(R.id.tvFolderName)
+
+                val fileRoot = FileUtil(this@ScanActivity).getRootFolder()
+                var date = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+                var pathNameSaved = "/saved/"
+                var folderName = "Scan " + date.format(Date())
+                val strTime = "$folderName/"
+                var folderSavedPath = fileRoot + pathNameSaved + strTime
+                var folderSaved = File(folderSavedPath)
+                folderSaved.mkdirs()
+
+                folderNameTv.text = folderName
+
+                var txtTime = dialog.findViewById<TextView>(R.id.tvSaveTime)
+                txtTime.text = "Today, " + date.format(Date()).substring(5, 10)
+                var listPath = ArrayList<String>()
+                var filePath: String = ""
+
+                for (i in 0 until listImg.size) {
+                    var count = i + 1
+                    var name = ""
+                    if (count < 10) {
+                        name = "0$count"
+                    } else {
+                        name = count.toString()
+                    }
+                    filePath = "$fileRoot/saved/$folderName/$name.jpg"
+                    listPath.add(filePath)
+                    adapterImg.listFrg[i].save(strTime, name)
+                }
+
+                var layoutAnimation = dialog.findViewById<LinearLayout>(R.id.layoutAnimationSave)
+                animSave.addAnimatorListener(object : Animator.AnimatorListener {
+                    override fun onAnimationStart(animation: Animator?) {
+
+                    }
+
+                    override fun onAnimationEnd(animation: Animator?) {
+                        var intent = Intent(this@ScanActivity, DetailActivity::class.java)
+                        intent.putExtra(
+                            KEY_DATA_DETAIL,
+                            ImageFolder(
+                                folderName, strTime, listPath
+                            ).toJSON()
+                        )
+
+                        layoutAnimation.visibility = View.GONE
+                        dialog.dismiss()
+                        startActivity(intent)
+                        finish() // Finish Activity
+                    }
+
+                    override fun onAnimationCancel(animation: Animator?) {
+
+                    }
+
+                    override fun onAnimationRepeat(animation: Animator?) {
+
+                    }
+                })
+                dialog.show()
             }
         }
 
@@ -771,8 +828,7 @@ class ScanActivity : BaseActivity(), ShapeBSFragment.Properties {
                     adapterImg.listFrg[binding.vpgImg.currentItem].resetSrc()
                 }
             }
-        }
-        else if (resultCode == UCrop.RESULT_ERROR) {
+        } else if (resultCode == UCrop.RESULT_ERROR) {
             var cropError = UCrop.getError(data!!)
         }
         super.onActivityResult(requestCode, resultCode, data)
@@ -858,7 +914,7 @@ class ScanActivity : BaseActivity(), ShapeBSFragment.Properties {
             )
         }
 
-        fun resetSrc(){
+        fun resetSrc() {
             val number = requireArguments().getInt(NUMBER)
             var file = File(list[number])
 

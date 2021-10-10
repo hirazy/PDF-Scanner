@@ -141,12 +141,16 @@ const val TOAST_CARD = "Hold your phone over the ID Card/Passport/Business Card 
 const val SAVE_SUCCESSFULLY = "Successfully save photo to the album"
 const val TIPS_CONTENT = "... files with the same already exists."
 
-const val WHITE_BOARD = "Whiteboard"
+const val WHITE_BOARD = "White Board"
 const val OCR = "OCR"
 const val SINGLE = "Single"
 const val BATCH = "Batch"
 const val CARD = "Card"
 const val QRCODE = "QR Code"
+const val CREATE_FOLDER = "Create Folder"
+const val ADD_FOLDER = "Add Folder"
+
+const val CREATE = "Create"
 
 const val KEY_STATUS_OPTION = "key_status_option"
 const val KEY_WHITEBOARD = 0
@@ -154,6 +158,8 @@ const val KEY_OCR = 1
 const val KEY_SINGLE = 2
 const val KEY_BATCH = 3
 const val KEY_CARD = 4
+const val KEY_FOLDER = 5
+const val KEY_ADD_FOLDER = 6
 
 // KEY INTENT
 const val KEY_INTENT_LISTIMG = "key_intent_listimg"

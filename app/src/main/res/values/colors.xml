@@ -13,7 +13,7 @@
     <color name="colorTextScan">#555555</color>
     <color name="colorStatus">#1C1C1C</color>
     <color name="colorApp">#000000</color>
-    <color name="colorCard">#232323</color>
+    <color name="colorCard">#292929</color>
 
     <color name="colorTextSave">#00C356</color>
     <color name="colorReplace">#53534F</color>
@@ -66,5 +66,12 @@
     <color name="colorLanguageSelected">#1A1A1A</color>
 
     <color name="dividerColor">#00BCD4</color>
+    
+    <color name="colorTextSelectAll">#A3A3A3</color>
+
+    <color name="colorBgUnDelete">#4E4E4E</color>
+    <color name="colorTextUnDelete">#878787</color>
+
+    <color name="colorBgDelete">#ED2828</color>
 
 </resources>

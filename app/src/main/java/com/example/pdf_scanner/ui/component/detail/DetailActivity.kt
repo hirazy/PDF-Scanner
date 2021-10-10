@@ -10,6 +10,7 @@ import android.print.PrintManager
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import android.view.Window
 import android.widget.Button
 import android.widget.EditText
@@ -19,10 +20,7 @@ import androidx.core.content.FileProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.pdf_scanner.*
 import com.example.pdf_scanner.data.Resource
-import com.example.pdf_scanner.data.dto.DataDetailText
-import com.example.pdf_scanner.data.dto.ImageDetail
-import com.example.pdf_scanner.data.dto.ImageFolder
-import com.example.pdf_scanner.data.dto.OBase
+import com.example.pdf_scanner.data.dto.*
 import com.example.pdf_scanner.databinding.ActivityDetailBinding
 import com.example.pdf_scanner.ui.base.BaseActivity
 import com.example.pdf_scanner.ui.base.listener.RecyclerItemListener
@@ -30,6 +28,7 @@ import com.example.pdf_scanner.ui.component.detail.adapter.CardImageDetail
 import com.example.pdf_scanner.ui.component.detail.dialog.BottomShare
 import com.example.pdf_scanner.ui.component.detail.dialog.BottomShareEvent
 import com.example.pdf_scanner.ui.component.detail_text.DetailTextActivity
+import com.example.pdf_scanner.ui.component.image.ImageActivity
 import com.example.pdf_scanner.utils.FileUtil
 import com.example.pdf_scanner.utils.PDFDocumentAdapter
 import com.example.pdf_scanner.utils.toObject
@@ -62,6 +61,15 @@ class DetailActivity : BaseActivity() {
 
         binding.tvListImage.text = dataImage.name
 
+        binding.tbDetail.setNavigationOnClickListener {
+            if(isListSelected()){
+                changeList()
+            }
+            else{
+                finish()
+            }
+        }
+
         binding.layoutCommentDetail.setOnClickListener {
 
         }
@@ -91,6 +99,16 @@ class DetailActivity : BaseActivity() {
 
         binding.btnAddImage.setOnClickListener {
             // var intent = Intent(this@DetailActivity, )
+            var intent = Intent(this@DetailActivity, ImageActivity::class.java)
+            var folderRoot = FileUtil(this@DetailActivity).getRootFolder()
+            var pathNameSaved = "/saved/"
+            intent.putExtra(
+                KEY_INTENT_IMAGE, DataImage(
+                    KEY_ADD_FOLDER, folderRoot + pathNameSaved
+                            + dataImage.name + "/"
+                ).toJSON()
+            )
+            startActivity(intent)
         }
 
         adapter = CardImageDetail(object : RecyclerItemListener {
@@ -109,6 +127,20 @@ class DetailActivity : BaseActivity() {
         binding.rcclvDetail.layoutManager = GridLayoutManager(this, 2)
         viewModel.fetchData(dataImage.list)
         setContentView(binding.root)
+    }
+
+    private fun isListSelected(): Boolean{
+        return binding.layoutDetailSelect.visibility == View.VISIBLE
+    }
+
+    private fun changeListSelected(){
+        binding.layoutDetailSelect.visibility = View.VISIBLE
+        binding.layoutDetailList.visibility = View.GONE
+    }
+
+    private fun changeList(){
+        binding.layoutDetailSelect.visibility = View.GONE
+        binding.layoutDetailList.visibility = View.VISIBLE
     }
 
     private fun filePath(nameFolder: String, typePath: String): String {
@@ -353,10 +385,16 @@ class DetailActivity : BaseActivity() {
         }
     }
 
+    private fun showList(){
+
+    }
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.itemListSelected -> {
-
+                if(!isListSelected()){
+                    changeListSelected()
+                }
             }
         }
         return super.onOptionsItemSelected(item)
@@ -380,12 +418,17 @@ class DetailActivity : BaseActivity() {
     }
 
     private fun reFetchData() {
-        var listFile = dataImage.list
+        Log.e("reFetchData", "reFetchData")
+        var pathSaved = "/saved/"
+        var filePath = FileUtil(this@DetailActivity).getRootFolder() + pathSaved
+        val directory = File(filePath + dataImage.name + "/")
+        val files: Array<File> = directory.listFiles()
+
         var listData = ArrayList<String>()
-        for (i in 0 until listFile.size) {
-            var file = File(listFile[i])
-            if (file.exists()) {
-                listData.add(listFile[i])
+        for (element in files) {
+            var file = element
+            if (file.exists() && file.path.endsWith(JPG)) {
+                listData.add(file.path)
             }
         }
         dataImage.list = listData
@@ -402,8 +445,9 @@ class DetailActivity : BaseActivity() {
     }
 
     override fun onResume() {
-        reFetchData()
+        Log.e("onResume", "onResume")
         super.onResume()
+        reFetchData()
     }
 
     override fun onBackPressed() {

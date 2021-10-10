@@ -4,15 +4,13 @@ import android.content.Intent
 import android.database.Cursor
 import android.os.Handler
 import android.provider.MediaStore
+import android.util.Log
 import android.view.View
 import androidx.activity.viewModels
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.pdf_scanner.KEY_DATA_SCAN
-import com.example.pdf_scanner.KEY_INTENT_IMAGE
-import com.example.pdf_scanner.KEY_SINGLE
-import com.example.pdf_scanner.R
+import com.example.pdf_scanner.*
 import com.example.pdf_scanner.data.Resource
 import com.example.pdf_scanner.data.dto.DataImage
 import com.example.pdf_scanner.data.dto.DataScan
@@ -28,8 +26,10 @@ import com.example.pdf_scanner.utils.toObject
 import com.kaopiz.kprogresshud.KProgressHUD
 import com.oneadx.vpnclient.utils.observe
 import dagger.hilt.android.AndroidEntryPoint
+import java.io.File
 import java.util.*
 import kotlin.collections.ArrayList
+import kotlin.math.min
 
 @AndroidEntryPoint
 class ImageActivity : BaseActivity() {
@@ -50,8 +50,18 @@ class ImageActivity : BaseActivity() {
 
         dataO = intent.getStringExtra(KEY_INTENT_IMAGE)!!.toObject()
 
-        if (dataO.status == KEY_SINGLE) {
-            binding.layoutImageSelected.visibility = View.GONE
+        when (dataO.status) {
+            KEY_SINGLE -> {
+                binding.layoutImageSelected.visibility = View.GONE
+            }
+
+            KEY_ADD_FOLDER -> {
+                binding.layoutImageSelected.visibility = View.GONE
+            }
+
+            KEY_FOLDER -> {
+                binding.btnDoneImg.text = CREATE
+            }
         }
 
         binding.tbImage.setNavigationIcon(R.drawable.ic_back)
@@ -78,6 +88,23 @@ class ImageActivity : BaseActivity() {
                         DataScan(listImage, dataO.status, false).toJSON()
                     )
                     startActivity(intent)
+                    finish()
+                }
+                else if(dataO.status == KEY_ADD_FOLDER){
+                    var o = data as ImageCard
+                    var fileCur = File(o.path)
+
+                    var cnt = 1
+                    var pathFile = dataO.pathFolder + cnt + JPG
+                    var fileCopy = File(pathFile)
+                    while(fileCopy.exists()){
+                        cnt++
+                        pathFile = dataO.pathFolder + cnt + JPG
+                        fileCopy = File(pathFile)
+                    }
+
+                    fileCur.copyTo(fileCopy)
+
                     finish()
                 }
 
@@ -190,7 +217,7 @@ class ImageActivity : BaseActivity() {
         viewModel.fetchImage(ArrayList(list.reversed()))
     }
 
-    private fun onDoneImage(){
+    private fun onDoneImage() {
         if (listSelected.size > 0) {
             var intent = Intent(this@ImageActivity, ScanActivity::class.java)
             var listImage = ArrayList<String>()
@@ -206,7 +233,7 @@ class ImageActivity : BaseActivity() {
     private fun addMore() {
         var listAll = viewModel.listAll
         var ind = list.size
-        for (i in ind until Math.min(ind + 20, listAll.size)) {
+        for (i in ind until min(ind + 20, listAll.size)) {
             list.add(listAll[i])
         }
         adapter.notifyItemRangeInserted(ind, list.size - ind)

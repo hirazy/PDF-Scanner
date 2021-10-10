@@ -12,10 +12,7 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentStatePagerAdapter
-import com.example.pdf_scanner.IMAGE
-import com.example.pdf_scanner.KEY_DATA_DETAIL_TEXT
-import com.example.pdf_scanner.R
-import com.example.pdf_scanner.TEXT
+import com.example.pdf_scanner.*
 import com.example.pdf_scanner.data.dto.DataDetailText
 import com.example.pdf_scanner.data.dto.OCRListener
 import com.example.pdf_scanner.databinding.ActivityDetailTextBinding
@@ -54,11 +51,21 @@ class DetailTextActivity : BaseActivity(), ShapeBSFragment.Properties {
         binding.tbDetailText.setNavigationOnClickListener {
             back()
         }
+
         adapter =
             PagerAdapter(supportFragmentManager, data.filePath, object : OnTextListener {
                 override fun onDelete() {
                     var file = File(data.filePath)
                     file.delete()
+
+                    var fileTxtPath = data.filePath.substring(0,
+                        data.filePath.length - 4 ) + TXT
+
+                    var fileTxt = File(fileTxtPath)
+
+                    if(fileTxt.exists()){
+                        fileTxt.delete()
+                    }
                     setResult(RESULT_OK)
                     finish()
                 }

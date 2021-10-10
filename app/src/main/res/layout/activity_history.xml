@@ -77,8 +77,8 @@
 
                 <com.airbnb.lottie.LottieAnimationView
                     android:id="@+id/animFolderEmpty"
-                    android:layout_width="200dp"
-                    android:layout_height="200dp"
+                    android:layout_width="@dimen/_150sdp"
+                    android:layout_height="@dimen/_150sdp"
                     android:layout_centerHorizontal="true"
                     />
 
@@ -94,7 +94,7 @@
                     android:gravity="center"
                     android:text="@string/tvFolderEmpty"
                     android:textColor="@color/white"
-                    android:textSize="@dimen/_15ssp" />
+                    android:textSize="@dimen/_14ssp" />
             </RelativeLayout>
 
             <androidx.recyclerview.widget.RecyclerView

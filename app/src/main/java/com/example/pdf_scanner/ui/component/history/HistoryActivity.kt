@@ -18,10 +18,7 @@ import androidx.core.content.FileProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.pdf_scanner.*
 import com.example.pdf_scanner.data.Resource
-import com.example.pdf_scanner.data.dto.DataSearch
-import com.example.pdf_scanner.data.dto.DataSelect
-import com.example.pdf_scanner.data.dto.ImageFolder
-import com.example.pdf_scanner.data.dto.OBase
+import com.example.pdf_scanner.data.dto.*
 import com.example.pdf_scanner.databinding.ActivityHistoryBinding
 import com.example.pdf_scanner.ui.base.BaseActivity
 import com.example.pdf_scanner.ui.base.listener.RecycleFolderListener
@@ -31,6 +28,7 @@ import com.example.pdf_scanner.ui.component.detail.dialog.BottomShareEvent
 import com.example.pdf_scanner.ui.component.history.adapter.FolderAdapter
 import com.example.pdf_scanner.ui.component.history.dialog.BottomMore
 import com.example.pdf_scanner.ui.component.history.dialog.BottomMoreEvent
+import com.example.pdf_scanner.ui.component.image.ImageActivity
 import com.example.pdf_scanner.ui.component.main.MainActivity
 import com.example.pdf_scanner.ui.component.search.SearchActivity
 import com.example.pdf_scanner.ui.component.select.SelectActivity
@@ -82,6 +80,15 @@ class HistoryActivity : BaseActivity() {
 
         binding.layoutSearchFolder.setOnClickListener {
             onSearchFolder()
+        }
+
+        binding.fabNewFolder.setOnClickListener {
+            var intent = Intent(this@HistoryActivity, ImageActivity::class.java)
+            intent.putExtra(KEY_INTENT_IMAGE, DataImage(status = KEY_FOLDER).toJSON())
+            startActivity(intent)
+            if(viewModel.liveStartCamera.value!!.data == true){
+                finish()
+            }
         }
 
         binding.btnCancelCopyHistory.setOnClickListener {
@@ -255,23 +262,24 @@ class HistoryActivity : BaseActivity() {
             var folderRoot = fileRoot + pathNameSaved
             var pathFolderCur = folderRoot + nameFolder
 
-            var fileCur = File(pathFolderCur)
-
             var cnt = 1
             var plusName = "($cnt)"
-            var fileCopy = File("$pathFolderCur$plusName/")
+            var folderCopy = File("$pathFolderCur$plusName/")
 
-            while (fileCopy.exists()) {
+            while (folderCopy.exists()) {
                 cnt++
                 plusName = "($cnt)"
-                fileCopy = File("$pathFolderCur$plusName/")
+                folderCopy = File("$pathFolderCur$plusName/")
             }
 
-            Log.e("fileCopy", "$pathFolderCur/$plusName/")
+            folderCopy.mkdirs()
 
-            fileCopy.mkdirs()
-
-            // Copy Folder
+            for(i in 0 until o.list.size){
+                var cnt = i + 1
+                var fileCur = File(o.list[i])
+                var fileCopy = File("$pathFolderCur$plusName/$cnt$JPG")
+                fileCur.copyTo(fileCopy)
+            }
 
             dialog.dismiss()
 
@@ -533,12 +541,6 @@ class HistoryActivity : BaseActivity() {
         when (item.itemId) {
             R.id.itemSettings -> {
                 var intent = Intent(this, SettingsActivity::class.java)
-                startActivity(intent)
-            }
-
-            R.id.itemDocSelected -> {
-                var intent = Intent(this@HistoryActivity, SelectActivity::class.java)
-                intent.putExtra(KEY_DATA_SELECT, DataSelect(listFolder).toJSON())
                 startActivity(intent)
             }
         }

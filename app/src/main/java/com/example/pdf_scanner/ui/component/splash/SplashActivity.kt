@@ -1,9 +1,13 @@
 package com.example.pdf_scanner.ui.component.splash
 
+import android.Manifest
 import android.animation.Animator
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.os.Build
 import androidx.activity.viewModels
+import androidx.annotation.RequiresApi
+import androidx.core.app.ActivityCompat
 import com.example.pdf_scanner.R
 import com.example.pdf_scanner.data.Resource
 import com.example.pdf_scanner.databinding.ActivitySplashBinding
@@ -34,17 +38,10 @@ class SplashActivity : BaseActivity() {
 
             }
 
+            @RequiresApi(Build.VERSION_CODES.M)
             override fun onAnimationEnd(animation: Animator?) {
                 binding.laAnimation.cancelAnimation()
-                if (isStartCamera) {
-                    var intent = Intent(this@SplashActivity, MainActivity::class.java)
-                    startActivity(intent)
-                    finish()
-                } else {
-                    var intent = Intent(this@SplashActivity, HistoryActivity::class.java)
-                    startActivity(intent)
-                    finish()
-                }
+                changeAct()
             }
 
             override fun onAnimationCancel(animation: Animator?) {
@@ -54,6 +51,34 @@ class SplashActivity : BaseActivity() {
             }
 
         })
+    }
+
+    @RequiresApi(Build.VERSION_CODES.M)
+    private fun changeAct() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            while (
+                checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED &&
+                checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
+            ) {
+                ActivityCompat.requestPermissions(
+                    this, arrayOf(
+                        Manifest.permission.READ_EXTERNAL_STORAGE,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE
+                    ),
+                    1
+                );
+            }
+        }
+
+        if (isStartCamera) {
+            var intent = Intent(this@SplashActivity, MainActivity::class.java)
+            startActivity(intent)
+            finish()
+        } else {
+            var intent = Intent(this@SplashActivity, HistoryActivity::class.java)
+            startActivity(intent)
+            finish()
+        }
     }
 
     private fun getVersion(): String {
