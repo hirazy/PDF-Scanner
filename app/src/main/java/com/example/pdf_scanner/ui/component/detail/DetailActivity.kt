@@ -32,6 +32,7 @@ import com.example.pdf_scanner.ui.component.image.ImageActivity
 import com.example.pdf_scanner.utils.FileUtil
 import com.example.pdf_scanner.utils.PDFDocumentAdapter
 import com.example.pdf_scanner.utils.toObject
+import com.flurry.sdk.it
 import com.itextpdf.io.image.ImageDataFactory
 import com.itextpdf.kernel.pdf.PdfDocument
 import com.itextpdf.kernel.pdf.PdfWriter
@@ -40,7 +41,10 @@ import com.itextpdf.layout.element.Image
 import com.oneadx.vpnclient.utils.observe
 import com.pranavpandey.android.dynamic.toasts.DynamicToast
 import dagger.hilt.android.AndroidEntryPoint
+import java.io.BufferedReader
 import java.io.File
+import java.io.FileReader
+import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
@@ -71,11 +75,11 @@ class DetailActivity : BaseActivity() {
         }
 
         binding.layoutCommentDetail.setOnClickListener {
-
+            commentDetail()
         }
 
         binding.layoutEmailDetail.setOnClickListener {
-
+            shareEmail()
         }
 
         binding.layoutShareDetail.setOnClickListener {
@@ -151,6 +155,65 @@ class DetailActivity : BaseActivity() {
         var path = "$fileRoot/saved/$nameFolder/$nameFile$typePath"
         Log.e("filePath", path)
         return path
+    }
+
+    private fun getTextFile(file: File): String{
+        val text = StringBuilder()
+
+        try {
+            val br = BufferedReader(FileReader(file))
+            var line: String?
+            while (br.readLine().also { line = it } != null) {
+                text.append(line)
+                text.append('\n')
+            }
+            br.close()
+            Log.e("BufferedReader", text.toString())
+        } catch (e: IOException) {
+            Log.e("BufferedReader", "IOException")
+        }
+        return text.toString()
+    }
+
+    private fun commentDetail(){
+        var dialog = Dialog(this)
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.window!!.setBackgroundDrawableResource(android.R.color.transparent)
+        dialog.setCancelable(false)
+        dialog.setContentView(R.layout.dialog_comment)
+
+        var folderRoot = FileUtil(this@DetailActivity).getRootFolder()
+        var pathNameSaved = "/saved/"
+        var fileCommentPath = "$folderRoot$pathNameSaved" + dataImage.name + "/$COMMENT$TXT"
+
+        var edtComment = dialog.findViewById<EditText>(R.id.edtComment)
+
+        var fileComment = File(fileCommentPath)
+        if(fileComment.exists()){
+            var text = getTextFile(fileComment)
+            edtComment.setText(text)
+        }
+
+        var btnCancel = dialog.findViewById<Button>(R.id.btnCancelComment)
+        btnCancel.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        var btnAccept = dialog.findViewById<Button>(R.id.btnAcceptComment)
+
+        btnAccept.setOnClickListener {
+            if(!fileComment.exists()){
+                fileComment.createNewFile()
+            }
+            fileComment.writeText(edtComment.text.toString())
+            dialog.dismiss()
+        }
+
+        dialog.show()
+    }
+
+    private fun shareEmail(){
+        shareFilePDF()
     }
 
     private fun shareFilePDF() {

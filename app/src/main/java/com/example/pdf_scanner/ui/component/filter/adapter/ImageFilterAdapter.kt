@@ -13,16 +13,15 @@ import ja.burhanrashid52.photoeditor.PhotoEditor
 import java.io.File
 
 @LayoutId(R.layout.card_image_filter)
-class ImageFilterAdapter(var e: RecyclerItemListener, var context: Context): AdapterBase<ImageFilter, CardImageFilterBinding>(e) {
+class ImageFilterAdapter(var e: RecyclerItemListener,
+                         var uri: Uri , var context: Context): AdapterBase<ImageFilter, CardImageFilterBinding>(e) {
     override fun bindView(itemBinding: BaseHolder<CardImageFilterBinding>, position: Int) {
         itemBinding.itemBinding.o = listData[position]
 
         var mPhotoEditor = PhotoEditor.Builder(context, itemBinding.itemBinding.imageFilter)
             .setPinchTextScalable(true)
             .build()
-        var file = File(listData[position].path)
 
-        val uri: Uri = Uri.fromFile(file)
         itemBinding.itemBinding.imageFilter.source.setImageURI(uri)
 
         mPhotoEditor.setFilterEffect(listData[position].filter)

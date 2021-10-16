@@ -2,16 +2,12 @@ package com.example.pdf_scanner.ui.component.filter
 
 import android.content.Intent
 import android.net.Uri
-import androidx.appcompat.app.AppCompatActivity
-import android.os.Bundle
-import android.util.Log
+import android.os.Handler
 import android.view.View
 import androidx.activity.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.pdf_scanner.KEY_DATA_FILTER
 import com.example.pdf_scanner.KEY_FILTER
-import com.example.pdf_scanner.KEY_RESULT_FILTER
-import com.example.pdf_scanner.R
 import com.example.pdf_scanner.data.dto.DataFilter
 import com.example.pdf_scanner.data.dto.DataResultFilter
 import com.example.pdf_scanner.data.dto.ImageFilter
@@ -21,6 +17,7 @@ import com.example.pdf_scanner.ui.base.BaseActivity
 import com.example.pdf_scanner.ui.base.listener.RecyclerItemListener
 import com.example.pdf_scanner.ui.component.filter.adapter.ImageFilterAdapter
 import com.example.pdf_scanner.utils.toObject
+import com.kaopiz.kprogresshud.KProgressHUD
 import dagger.hilt.android.AndroidEntryPoint
 import ja.burhanrashid52.photoeditor.PhotoEditor
 import ja.burhanrashid52.photoeditor.PhotoFilter
@@ -34,6 +31,7 @@ class FilterActivity : BaseActivity() {
     val viewModel: FilterViewModel by viewModels()
     lateinit var mPhotoEditor: PhotoEditor
     lateinit var list: ArrayList<ImageFilter>
+    private var hud: KProgressHUD? = null
     var path: String = ""
     lateinit var data: DataFilter
 
@@ -42,24 +40,28 @@ class FilterActivity : BaseActivity() {
 
         data = intent.getStringExtra(KEY_DATA_FILTER)!!.toObject<DataFilter>()
 
+        hud = KProgressHUD.create(this)
+            .setStyle(KProgressHUD.Style.SPIN_INDETERMINATE)
+
+
         /**
          * Path image
          */
         path = data.path
 
         if(!data.isFilterAll){
-            binding.layoutFilterAll.visibility = View.GONE
+            binding.layoutFilterAll1.visibility = View.GONE
         }
 
-        binding.layoutFilterCancel.setOnClickListener {
+        binding.layoutFilterCancel1.setOnClickListener {
             finish()
         }
 
-        binding.layoutFilterDone.setOnClickListener {
+        binding.layoutFilterDone1.setOnClickListener {
             filterDone()
         }
 
-        binding.btnFilterNormal.setOnClickListener {
+        binding.btnFilterNormal1.setOnClickListener {
             // Update Normal
             for(i in 0 until list.size){
                 list[i].isSelected = false
@@ -67,13 +69,13 @@ class FilterActivity : BaseActivity() {
             mPhotoEditor.setFilterEffect(PhotoFilter.NONE)
         }
 
-        mPhotoEditor = PhotoEditor.Builder(this, binding.imgFilter)
+        mPhotoEditor = PhotoEditor.Builder(this, binding.imgFilter1)
             .setPinchTextScalable(true)
             .build()
 
         var file = File(path)
         val uri: Uri = Uri.fromFile(file)
-        binding.imgFilter.source.setImageURI(uri)
+        binding.imgFilter1.source.setImageURI(uri)
 
 
         adapter = ImageFilterAdapter(object : RecyclerItemListener {
@@ -94,7 +96,7 @@ class FilterActivity : BaseActivity() {
             override fun onOption(index: Int, data: OBase) {
 
             }
-        }, this)
+        }, uri, this)
 
         list = ArrayList()
 
@@ -104,9 +106,9 @@ class FilterActivity : BaseActivity() {
         list.add(ImageFilter(path, PhotoFilter.FISH_EYE))
 
         adapter.setData(list)
-        binding.rcclvFilter.layoutManager =
+        binding.rcclvFilter1.layoutManager =
             LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
-        binding.rcclvFilter.adapter = adapter
+        binding.rcclvFilter1.adapter = adapter
 
         setContentView(binding.root)
     }
@@ -116,13 +118,13 @@ class FilterActivity : BaseActivity() {
         var isFiltered = false
         for(i in 0 until list.size){
             if(list[i].isSelected){
-                intent.putExtra(KEY_FILTER, DataResultFilter(list[i].filter, binding.swFilterAll.isEnabled).toJSON())
+                intent.putExtra(KEY_FILTER, DataResultFilter(list[i].filter, binding.swFilterAll1.isChecked).toJSON())
                 isFiltered = true
                 break
             }
         }
         if(!isFiltered){
-            intent.putExtra(KEY_FILTER, DataResultFilter(PhotoFilter.NONE, binding.swFilterAll.isEnabled).toJSON())
+            intent.putExtra(KEY_FILTER, DataResultFilter(PhotoFilter.NONE, binding.swFilterAll1.isChecked).toJSON())
         }
         setResult(RESULT_OK, intent)
         finish()

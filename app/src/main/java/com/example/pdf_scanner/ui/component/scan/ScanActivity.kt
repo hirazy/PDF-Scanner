@@ -14,6 +14,7 @@ import android.print.PrintAttributes
 import android.print.PrintManager
 import android.util.Log
 import android.view.*
+import android.view.animation.Animation
 import android.widget.*
 import androidx.activity.viewModels
 import androidx.core.app.ActivityCompat
@@ -34,6 +35,7 @@ import com.example.pdf_scanner.ui.component.detail.DetailActivity
 import com.example.pdf_scanner.ui.component.detail.dialog.BottomShare
 import com.example.pdf_scanner.ui.component.detail.dialog.BottomShareEvent
 import com.example.pdf_scanner.ui.component.filter.FilterActivity
+import com.example.pdf_scanner.ui.component.filter.adapter.ImageFilterAdapter
 import com.example.pdf_scanner.ui.component.history.HistoryActivity
 import com.example.pdf_scanner.ui.component.image.ImageActivity
 import com.example.pdf_scanner.ui.component.ocr.OCRActivity
@@ -45,6 +47,9 @@ import com.example.pdf_scanner.ui.component.scan.dialog.TextEditorDialogFragment
 import com.example.pdf_scanner.utils.FileUtil
 import com.example.pdf_scanner.utils.PDFDocumentAdapter
 import com.example.pdf_scanner.utils.toObject
+import com.google.android.gms.ads.*
+import com.google.android.gms.ads.interstitial.InterstitialAd
+import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.itextpdf.io.image.ImageDataFactory
 import com.itextpdf.kernel.pdf.PdfDocument
@@ -75,12 +80,17 @@ class ScanActivity : BaseActivity(), ShapeBSFragment.Properties {
     lateinit var binding: ActivityScanBinding
     val viewModel: ScanViewModel by viewModels()
     lateinit var adapterImg: ImagePageAdapter
+    lateinit var adapterFilter: ImageFilterAdapter
     lateinit var adapterLanguageSelected: LanguageSelectedAdapter
     lateinit var listImg: ArrayList<String>
+    lateinit var listFilter: ArrayList<ImageFilter>
     lateinit var dataScan: DataScan
     lateinit var handler: Handler
     var optionSelected = 0
     lateinit var onEdit: onEditPhoto
+    lateinit var mPhotoEditor: PhotoEditor
+    private var mInterstitialAd: InterstitialAd? = null // ADS
+    private lateinit var adRequest: AdRequest
 
     override fun initViewBinding() {
 
@@ -89,6 +99,11 @@ class ScanActivity : BaseActivity(), ShapeBSFragment.Properties {
             window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
             window.statusBarColor = resources.getColor(R.color.color_app)
         }
+
+        MobileAds.initialize(this) {}
+        adRequest = AdRequest.Builder().build()
+
+        initAds()
 
         binding = ActivityScanBinding.inflate(layoutInflater)
         dataScan = intent.getStringExtra(KEY_DATA_SCAN)!!.toObject() as DataScan
@@ -164,6 +179,10 @@ class ScanActivity : BaseActivity(), ShapeBSFragment.Properties {
             addFilter()
         }
 
+        binding.layoutFilterCancel.setOnClickListener {
+            isScan()
+        }
+
         binding.layoutEraser.setOnClickListener {
             binding.tbScan.title = ERASER
             adapterImg.listFrg[binding.vpgImg.currentItem].erase()
@@ -180,6 +199,28 @@ class ScanActivity : BaseActivity(), ShapeBSFragment.Properties {
         binding.btnPageNext.setOnClickListener {
             pageNext()
         }
+
+        init()
+
+        binding.animScan.addAnimatorListener(object : Animator.AnimatorListener {
+            override fun onAnimationStart(animation: Animator?) {
+
+            }
+
+            override fun onAnimationEnd(animation: Animator?) {
+                Log.e("onAnimationEnd", "animation")
+                showAds()
+            }
+
+            override fun onAnimationCancel(animation: Animator?) {
+                Log.e("onAnimationEnd", "animation")
+                showAds()
+            }
+
+            override fun onAnimationRepeat(animation: Animator?) {
+
+            }
+        })
 
         binding.vpgImg.offscreenPageLimit = listImg.size
 
@@ -204,6 +245,69 @@ class ScanActivity : BaseActivity(), ShapeBSFragment.Properties {
         adapterImg = ImagePageAdapter(supportFragmentManager, listImg)
         binding.vpgImg.adapter = adapterImg
         setContentView(binding.root)
+    }
+
+    private fun initAds() {
+        InterstitialAd.load(
+            this,
+            "ca-app-pub-3940256099942544/1033173712",
+            adRequest,
+            object : InterstitialAdLoadCallback() {
+                override fun onAdFailedToLoad(adError: LoadAdError) {
+                    mInterstitialAd = null
+                }
+
+                override fun onAdLoaded(interstitialAd: InterstitialAd) {
+                    mInterstitialAd = interstitialAd
+                }
+            })
+
+        mInterstitialAd?.fullScreenContentCallback = object : FullScreenContentCallback() {
+            override fun onAdDismissedFullScreenContent() {
+            }
+
+            override fun onAdFailedToShowFullScreenContent(adError: AdError?) {
+            }
+
+            override fun onAdShowedFullScreenContent() {
+                mInterstitialAd = null;
+            }
+        }
+    }
+
+    private fun init() {
+        binding.layoutFilterDone.setOnClickListener {
+            filterDone()
+        }
+
+        binding.btnFilterNormal.setOnClickListener {
+            // Update Normal
+            for (i in 0 until listFilter.size) {
+                listFilter[i].isSelected = false
+            }
+            mPhotoEditor.setFilterEffect(PhotoFilter.NONE)
+        }
+
+        mPhotoEditor = PhotoEditor.Builder(this, binding.imgFilter)
+            .setPinchTextScalable(true)
+            .build()
+
+        // Init ADS
+        initAds()
+    }
+
+    /**
+     * Show ADS
+     */
+    private fun showAds() {
+        val rand = (0..100).random()
+        Log.e("showAds", rand.toString())
+        if (mInterstitialAd != null) {
+            mInterstitialAd?.show(this)
+        } else {
+            Log.d("TAG", "The interstitial ad wasn't ready yet.")
+        }
+        initAds()
     }
 
     private fun backToMain() {
@@ -284,7 +388,41 @@ class ScanActivity : BaseActivity(), ShapeBSFragment.Properties {
         })
     }
 
+    private fun isScan() {
+        binding.layoutScanImage.visibility = View.VISIBLE
+        binding.layoutFilterImageScan.visibility = View.GONE
+        binding.appBarScan.visibility = View.VISIBLE
+        binding.vpgImg.visibility = View.VISIBLE
+    }
+
+    private fun isFilter() {
+        binding.appBarScan.visibility = View.GONE
+        binding.swFilterAll.isChecked = false
+        binding.layoutFilterImageScan.visibility = View.VISIBLE
+        binding.layoutScanImage.visibility = View.GONE
+        binding.vpgImg.visibility = View.GONE
+    }
+
+    private fun filterDone() {
+        for (i in 0 until listFilter.size) {
+            if (listFilter[i].isSelected) {
+                if (listFilter[i].filter != PhotoFilter.NONE) {
+                    if (binding.swFilterAll.isChecked) {
+                        for (i in 0 until listImg.size) {
+                            adapterImg.listFrg[i].setFilter(listFilter[i].filter)
+                        }
+                    } else {
+                        adapterImg.listFrg[binding.vpgImg.currentItem].setFilter(listFilter[i].filter)
+                    }
+                }
+            }
+        }
+        isScan()
+    }
+
     private fun addFilter() {
+        // isFilter()
+
         var intent = Intent(this@ScanActivity, FilterActivity::class.java)
         /**
          * listImg.size > 1 to Filter All
@@ -294,6 +432,49 @@ class ScanActivity : BaseActivity(), ShapeBSFragment.Properties {
             DataFilter(listImg.size > 1, listImg[binding.vpgImg.currentItem]).toJSON()
         )
         startActivityForResult(intent, KEY_RESULT_FILTER)
+
+
+//        /**
+//         * Path image
+//         */
+//        var path = listImg[binding.vpgImg.currentItem]
+//
+//        var file = File(path)
+//        val uri: Uri = Uri.fromFile(file)
+//        binding.imgFilter.source.setImageURI(uri)
+//
+//        adapterFilter = ImageFilterAdapter(object : RecyclerItemListener {
+//            override fun onItemSelected(index: Int, data: OBase) {
+//                var o = data as ImageFilter
+//                if (!o.isSelected) {
+//                    mPhotoEditor.setFilterEffect(o.filter)
+//                    for (i in 0 until listFilter.size) {
+//                        if (listFilter[i].isSelected) {
+//                            listFilter[i].isSelected = false
+//                            break
+//                        }
+//                    }
+//                }
+//                listFilter[index].isSelected = true
+//            }
+//
+//            override fun onOption(index: Int, data: OBase) {
+//
+//            }
+//        }, this)
+//
+//        listFilter = ArrayList()
+//
+//        listFilter.add(ImageFilter(path, PhotoFilter.BLACK_WHITE))
+//        listFilter.add(ImageFilter(path, PhotoFilter.GRAIN))
+//        listFilter.add(ImageFilter(path, PhotoFilter.GRAIN))
+//        listFilter.add(ImageFilter(path, PhotoFilter.FISH_EYE))
+//
+//        adapterFilter.setData(listFilter)
+//        binding.rcclvFilter.layoutManager =
+//            LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+//        binding.rcclvFilter.adapter = adapterFilter
+
     }
 
     private fun deleteImage() {
@@ -714,8 +895,9 @@ class ScanActivity : BaseActivity(), ShapeBSFragment.Properties {
     }
 
     private fun filePath(nameFolder: String, typePath: String): String {
-        var date1 = SimpleDateFormat("yyyy-MM-dd HH.mm.ss").format(Date())
-        var date2 = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
+        var date = Date()
+        var date1 = SimpleDateFormat("yyyy-MM-dd HH.mm.ss").format(date)
+        var date2 = SimpleDateFormat("yyyyMMdd_HHmmss").format(date)
         var nameFile = "FILE_$date2" + "_Scan $date1"
         var fileRoot = FileUtil(this@ScanActivity).getRootFolder()
         var path = "$fileRoot/saved/$nameFolder$nameFile$typePath"
@@ -813,15 +995,15 @@ class ScanActivity : BaseActivity(), ShapeBSFragment.Properties {
                      * Set Filter for current page
                      */
                     var filter = data!!.getStringExtra(KEY_FILTER)!!.toObject<DataResultFilter>()
-                    if (filter.filter != PhotoFilter.NONE) {
-                        if (filter.isFilterAll) {
-                            for (i in 0 until listImg.size) {
-                                adapterImg.listFrg[i].setFilter(filter.filter)
-                            }
-                        } else {
-                            adapterImg.listFrg[binding.vpgImg.currentItem].setFilter(filter.filter)
+                    //if (filter.filter != PhotoFilter.NONE) {
+                    if (filter.isFilterAll) {
+                        for (i in 0 until listImg.size) {
+                            adapterImg.listFrg[i].setFilter(filter.filter)
                         }
+                    } else {
+                        adapterImg.listFrg[binding.vpgImg.currentItem].setFilter(filter.filter)
                     }
+                    //}
                 }
 
                 UCrop.REQUEST_CROP -> {

@@ -13,50 +13,51 @@
         tools:context=".ui.component.filter.FilterActivity">
 
         <ja.burhanrashid52.photoeditor.PhotoEditorView
-            android:id="@+id/imgFilter"
+            android:id="@+id/imgFilter1"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_above="@+id/layoutFilterAll" />
+            android:layout_above="@+id/layoutFilterAll1"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginRight="10dp" />
 
         <RelativeLayout
-            android:layout_marginTop="8dp"
-            android:id="@+id/layoutFilterAll"
-            android:layout_above="@+id/layoutOptionFilter"
+            android:id="@+id/layoutFilterAll1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            >
+            android:layout_above="@+id/layoutOptionFilter1"
+            android:layout_marginTop="8dp">
+
             <TextView
-                android:layout_marginRight="10dp"
-                android:layout_centerVertical="true"
-                android:layout_toLeftOf="@+id/swFilterAll"
-                android:textColor="@color/colorBorderReName"
-                android:text="@string/tvAllPages"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                />
+                android:layout_centerVertical="true"
+                android:layout_marginRight="10dp"
+                android:layout_toLeftOf="@+id/swFilterAll1"
+                android:text="@string/tvAllPages"
+                android:textColor="@color/colorBorderReName" />
 
             <androidx.appcompat.widget.SwitchCompat
-                android:theme="@style/theme_switch"
-                android:layout_marginRight="10dp"
-                android:layout_centerVertical="true"
-                android:layout_alignParentRight="true"
+                android:id="@+id/swFilterAll1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/swFilterAll"
-                />
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:layout_marginRight="10dp"
+                android:theme="@style/theme_switch" />
         </RelativeLayout>
 
         <LinearLayout
-            android:layout_marginTop="10dp"
-            android:id="@+id/layoutOptionFilter"
+            android:id="@+id/layoutOptionFilter1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_above="@+id/layoutConfirmFilter"
+            android:layout_above="@+id/layoutConfirmFilter1"
+            android:layout_marginTop="10dp"
             android:layout_marginBottom="10dp"
             android:orientation="horizontal">
 
             <ImageButton
-                android:id="@+id/btnFilterNormal"
+                android:id="@+id/btnFilterNormal1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
@@ -66,14 +67,14 @@
                 android:src="@drawable/ic_ban" />
 
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rcclvFilter"
+                android:id="@+id/rcclvFilter1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center" />
         </LinearLayout>
 
         <LinearLayout
-            android:id="@+id/layoutConfirmFilter"
+            android:id="@+id/layoutConfirmFilter1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
@@ -81,7 +82,7 @@
             android:paddingBottom="20dp">
 
             <LinearLayout
-                android:id="@+id/layoutFilterCancel"
+                android:id="@+id/layoutFilterCancel1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
@@ -89,19 +90,18 @@
                 android:gravity="center">
 
                 <TextView
-                    android:textSize="17sp"
-                    android:layout_gravity="center"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_gravity="center"
                     android:text="@string/tvCancel"
                     android:textAllCaps="false"
                     android:textColor="@color/white"
-                    android:textStyle="bold"
-                    />
+                    android:textSize="17sp"
+                    android:textStyle="bold" />
             </LinearLayout>
 
             <LinearLayout
-                android:id="@+id/layoutFilterDone"
+                android:id="@+id/layoutFilterDone1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
@@ -109,15 +109,14 @@
                 android:gravity="center">
 
                 <TextView
-                    android:textSize="17sp"
-                    android:layout_gravity="center"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_gravity="center"
                     android:text="@string/tvDone"
                     android:textAllCaps="false"
                     android:textColor="@color/colorTextSave"
-                    android:textStyle="bold"
-                    />
+                    android:textSize="17sp"
+                    android:textStyle="bold" />
             </LinearLayout>
         </LinearLayout>
     </RelativeLayout>

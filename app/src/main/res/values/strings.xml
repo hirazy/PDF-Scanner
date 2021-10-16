@@ -90,6 +90,7 @@
 
     <string name="tvCancel">Cancel</string>
     <string name="tvConfirm">Confirm</string>
+    <string name="tvOK">OK</string>
     <string name="tvReplace">Replace</string>
 
     <string name="tvPremium">Premium</string>

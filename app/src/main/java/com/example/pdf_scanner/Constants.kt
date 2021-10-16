@@ -71,6 +71,8 @@ const val JPG = ".jpg"
 const val DOC = ".doc"
 const val TXT = ".txt"
 
+const val COMMENT = "comment"
+
 const val START_CAMERA = "start_camera"
 
 

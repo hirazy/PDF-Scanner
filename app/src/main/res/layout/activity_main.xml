@@ -175,5 +175,17 @@
             app:camera_focus="continuous"
             app:camera_permissions="camera" />
 
+        <com.google.android.gms.ads.AdView
+            android:layout_marginTop="10dp"
+            android:layout_below="@id/appBarMain"
+            xmlns:ads="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/adViewMain"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            ads:adSize="BANNER"
+            ads:adUnitId="ca-app-pub-3940256099942544/6300978111">
+        </com.google.android.gms.ads.AdView>
+
     </RelativeLayout>
 </layout>

@@ -13,342 +13,447 @@
         android:background="@color/colorApp"
         tools:context=".ui.component.scan.ScanActivity">
 
-        <com.google.android.material.appbar.AppBarLayout
-            android:id="@+id/appBarScan"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/colorApp">
-
-            <androidx.appcompat.widget.Toolbar
-                android:id="@+id/tbScan"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:menu="@menu/item_action_scan"
-                app:title="Camera"
-                app:titleTextColor="@color/white" />
-        </com.google.android.material.appbar.AppBarLayout>
-
-
-        <HorizontalScrollView
-            android:layout_centerHorizontal="true"
-            android:id="@+id/hscvScan"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_marginBottom="10dp"
-            android:fillViewport="true"
-            android:scrollbars="none">
-
-            <RelativeLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerHorizontal="true"
-                    android:layout_gravity="center"
-                    android:gravity="center"
-                    android:orientation="horizontal"
-                    android:paddingTop="10dp">
-
-                        <LinearLayout
-                        android:id="@+id/layoutAddImage"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="30dp"
-                        android:orientation="vertical">
-
-                        <ImageView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center"
-                            android:src="@drawable/ic_add" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center"
-                            android:layout_marginTop="15dp"
-                            android:gravity="center"
-                            android:text="Add"
-                            android:textColor="@color/colorTextScan"
-                            android:textSize="14sp" />
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:id="@+id/layoutRotateImage"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="30dp"
-                        android:orientation="vertical">
-
-                        <ImageView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center"
-                            android:src="@drawable/ic_rotate" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center"
-                            android:layout_marginTop="15dp"
-                            android:gravity="center"
-                            android:text="@string/tvRotate"
-                            android:textColor="@color/colorTextScan"
-                            android:textSize="14sp" />
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:id="@+id/layoutCropImage"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="30dp"
-                        android:orientation="vertical">
-
-                        <ImageView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center"
-                            android:src="@drawable/ic_crop" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center"
-                            android:layout_marginTop="15dp"
-                            android:gravity="center"
-                            android:text="@string/tvCrop"
-                            android:textColor="@color/colorTextScan"
-                            android:textSize="14sp" />
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:id="@+id/layoutSignImage"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="30dp"
-                        android:orientation="vertical">
-
-                        <ImageView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center"
-                            android:src="@drawable/ic_sign" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center"
-                            android:layout_marginTop="15dp"
-                            android:gravity="center"
-                            android:text="@string/tvSign"
-                            android:textColor="@color/colorTextScan"
-                            android:textSize="14sp" />
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:id="@+id/layoutText"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="30dp"
-                        android:orientation="vertical">
-
-                        <ImageView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center"
-                            android:src="@drawable/ic_text" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center"
-                            android:layout_marginTop="15dp"
-                            android:gravity="center"
-                            android:text="@string/tvText"
-                            android:textColor="@color/colorTextScan"
-                            android:textSize="14sp" />
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:id="@+id/layoutFilter"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="30dp"
-                        android:orientation="vertical">
-
-                        <ImageView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center"
-                            android:src="@drawable/ic_filter" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center"
-                            android:layout_marginTop="15dp"
-                            android:gravity="center"
-                            android:text="@string/tvFilter"
-                            android:textColor="@color/colorTextScan"
-                            android:textSize="14sp" />
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:id="@+id/layoutEraser"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="30dp"
-                        android:orientation="vertical">
-
-                        <ImageView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center"
-                            android:src="@drawable/ic_eraser" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center"
-                            android:layout_marginTop="15dp"
-                            android:gravity="center"
-                            android:text="@string/tvEraser"
-                            android:textColor="@color/colorTextScan"
-                            android:textSize="14sp" />
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:id="@+id/layoutDeleteImage"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="30dp"
-                        android:layout_marginRight="30dp"
-                        android:orientation="vertical">
-
-                        <ImageView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center"
-                            android:src="@drawable/ic_delete" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center"
-                            android:layout_marginTop="15dp"
-                            android:gravity="center"
-                            android:text="@string/tvDelete"
-                            android:textColor="@color/colorTextScan"
-                            android:textSize="14sp" />
-                    </LinearLayout>
-                </LinearLayout>
-            </RelativeLayout>
-        </HorizontalScrollView>
-
-        <androidx.viewpager.widget.ViewPager
-            android:layout_marginTop="5dp"
-            android:id="@+id/vpgImg"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_above="@+id/hscvScan"
-            android:layout_below="@id/layoutScanLanguage"
-            android:layout_marginBottom="32dp" />
-
-        <com.airbnb.lottie.LottieAnimationView
-            android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp"
-            android:id="@+id/animScan"
+        <RelativeLayout
+            android:background="@color/colorApp"
+            android:id="@+id/layoutScanImage"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_above="@+id/hscvScan"
-            android:layout_below="@id/appBarScan"
-            android:background="@android:color/transparent" />
+            >
 
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_above="@+id/hscvScan"
-            android:layout_centerHorizontal="true"
-            android:layout_marginBottom="30dp"
-            android:background="@drawable/bg_page_img"
-            android:paddingLeft="10dp"
-            android:paddingTop="3dp"
-            android:paddingRight="10dp"
-            android:paddingBottom="3dp">
+            <com.google.android.material.appbar.AppBarLayout
+                android:id="@+id/appBarScan"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/colorApp">
 
-            <ImageButton
-                android:id="@+id/btnPageBack"
+                <androidx.appcompat.widget.Toolbar
+                    android:id="@+id/tbScan"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:menu="@menu/item_action_scan"
+                    app:title="Camera"
+                    app:titleTextColor="@color/white" />
+            </com.google.android.material.appbar.AppBarLayout>
+
+
+            <HorizontalScrollView
+                android:id="@+id/hscvScan"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginRight="10dp"
-                android:background="@null"
-                android:padding="5dp"
-                android:src="@drawable/ic_page_back" />
+                android:layout_alignParentBottom="true"
+                android:layout_centerHorizontal="true"
+                android:layout_marginBottom="10dp"
+                android:fillViewport="true"
+                android:scrollbars="none">
 
-            <TextView
-                android:id="@+id/tvCountPage"
+                <RelativeLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerHorizontal="true"
+                        android:layout_gravity="center"
+                        android:gravity="center"
+                        android:orientation="horizontal"
+                        android:paddingTop="10dp">
+
+                        <LinearLayout
+                            android:id="@+id/layoutAddImage"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="30dp"
+                            android:orientation="vertical">
+
+                            <ImageView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center"
+                                android:src="@drawable/ic_add" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center"
+                                android:layout_marginTop="15dp"
+                                android:gravity="center"
+                                android:text="Add"
+                                android:textColor="@color/colorTextScan"
+                                android:textSize="14sp" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:id="@+id/layoutRotateImage"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="30dp"
+                            android:orientation="vertical">
+
+                            <ImageView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center"
+                                android:src="@drawable/ic_rotate" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center"
+                                android:layout_marginTop="15dp"
+                                android:gravity="center"
+                                android:text="@string/tvRotate"
+                                android:textColor="@color/colorTextScan"
+                                android:textSize="14sp" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:id="@+id/layoutCropImage"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="30dp"
+                            android:orientation="vertical">
+
+                            <ImageView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center"
+                                android:src="@drawable/ic_crop" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center"
+                                android:layout_marginTop="15dp"
+                                android:gravity="center"
+                                android:text="@string/tvCrop"
+                                android:textColor="@color/colorTextScan"
+                                android:textSize="14sp" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:id="@+id/layoutSignImage"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="30dp"
+                            android:orientation="vertical">
+
+                            <ImageView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center"
+                                android:src="@drawable/ic_sign" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center"
+                                android:layout_marginTop="15dp"
+                                android:gravity="center"
+                                android:text="@string/tvSign"
+                                android:textColor="@color/colorTextScan"
+                                android:textSize="14sp" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:id="@+id/layoutText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="30dp"
+                            android:orientation="vertical">
+
+                            <ImageView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center"
+                                android:src="@drawable/ic_text" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center"
+                                android:layout_marginTop="15dp"
+                                android:gravity="center"
+                                android:text="@string/tvText"
+                                android:textColor="@color/colorTextScan"
+                                android:textSize="14sp" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:id="@+id/layoutFilter"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="30dp"
+                            android:orientation="vertical">
+
+                            <ImageView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center"
+                                android:src="@drawable/ic_filter" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center"
+                                android:layout_marginTop="15dp"
+                                android:gravity="center"
+                                android:text="@string/tvFilter"
+                                android:textColor="@color/colorTextScan"
+                                android:textSize="14sp" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:id="@+id/layoutEraser"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="30dp"
+                            android:orientation="vertical">
+
+                            <ImageView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center"
+                                android:src="@drawable/ic_eraser" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center"
+                                android:layout_marginTop="15dp"
+                                android:gravity="center"
+                                android:text="@string/tvEraser"
+                                android:textColor="@color/colorTextScan"
+                                android:textSize="14sp" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:id="@+id/layoutDeleteImage"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="30dp"
+                            android:layout_marginRight="30dp"
+                            android:orientation="vertical">
+
+                            <ImageView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center"
+                                android:src="@drawable/ic_delete" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center"
+                                android:layout_marginTop="15dp"
+                                android:gravity="center"
+                                android:text="@string/tvDelete"
+                                android:textColor="@color/colorTextScan"
+                                android:textSize="14sp" />
+                        </LinearLayout>
+                    </LinearLayout>
+                </RelativeLayout>
+            </HorizontalScrollView>
+
+            <androidx.viewpager.widget.ViewPager
+                android:id="@+id/vpgImg"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_above="@+id/hscvScan"
+                android:layout_below="@id/layoutScanLanguage"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="32dp" />
+
+            <com.airbnb.lottie.LottieAnimationView
+                android:id="@+id/animScan"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_above="@+id/hscvScan"
+                android:layout_below="@id/appBarScan"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:background="@android:color/transparent" />
+
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:text="1 / 1"
-                android:textColor="@color/white" />
+                android:layout_above="@+id/hscvScan"
+                android:layout_centerHorizontal="true"
+                android:layout_marginBottom="30dp"
+                android:background="@drawable/bg_page_img"
+                android:paddingLeft="10dp"
+                android:paddingTop="3dp"
+                android:paddingRight="10dp"
+                android:paddingBottom="3dp">
 
-            <ImageButton
-                android:id="@+id/btnPageNext"
-                android:layout_width="wrap_content"
+                <ImageButton
+                    android:id="@+id/btnPageBack"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginRight="10dp"
+                    android:background="@null"
+                    android:padding="5dp"
+                    android:src="@drawable/ic_page_back" />
+
+                <TextView
+                    android:id="@+id/tvCountPage"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="1 / 1"
+                    android:textColor="@color/white" />
+
+                <ImageButton
+                    android:id="@+id/btnPageNext"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginLeft="10dp"
+                    android:background="@null"
+                    android:padding="5dp"
+                    android:src="@drawable/ic_page_next" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/layoutScanLanguage"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginLeft="10dp"
-                android:background="@null"
-                android:padding="5dp"
-                android:src="@drawable/ic_page_next" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:visibility="gone"
-            android:id="@+id/layoutScanLanguage"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/appBarScan"
-            android:gravity="center"
-            android:orientation="horizontal">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
+                android:layout_below="@+id/appBarScan"
                 android:gravity="center"
-                android:text="@string/tvLanguage"
-                android:textColor="@color/white" />
+                android:orientation="horizontal"
+                android:visibility="gone">
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rcclvScanLanguage"
-                android:layout_width="wrap_content"
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:text="@string/tvLanguage"
+                    android:textColor="@color/white" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rcclvScanLanguage"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginLeft="15dp" />
+            </LinearLayout>
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:visibility="gone"
+            android:background="@color/colorApp"
+            android:id="@+id/layoutFilterImageScan"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <ja.burhanrashid52.photoeditor.PhotoEditorView
+                android:layout_marginTop="50dp"
+                android:id="@+id/imgFilter"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_above="@+id/layoutFilterAll" />
+
+            <RelativeLayout
+                android:id="@+id/layoutFilterAll"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginLeft="15dp"
-                />
-        </LinearLayout>
+                android:layout_above="@+id/layoutOptionFilter"
+                android:layout_marginTop="8dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginRight="10dp"
+                    android:layout_toLeftOf="@+id/swFilterAll"
+                    android:text="@string/tvAllPages"
+                    android:textColor="@color/colorBorderReName" />
+
+                <androidx.appcompat.widget.SwitchCompat
+                    android:id="@+id/swFilterAll"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginRight="10dp"
+                    android:theme="@style/theme_switch" />
+            </RelativeLayout>
+
+            <LinearLayout
+                android:id="@+id/layoutOptionFilter"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_above="@+id/layoutConfirmFilter"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
+                android:orientation="horizontal">
+
+                <ImageButton
+                    android:id="@+id/btnFilterNormal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="20dp"
+                    android:background="@null"
+                    android:src="@drawable/ic_ban" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rcclvFilter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center" />
+            </LinearLayout>
 
 
-        <!--        <androidx.viewpager2.widget.ViewPager2-->
-        <!--            android:layout_width="match_parent"-->
-        <!--            android:layout_height="wrap_content"-->
-        <!--                -->
-        <!--            />-->
-        <!--        <ja.burhanrashid52.photoeditor.PhotoEditorView-->
-        <!--            android:id="@+id/photoEditorView"-->
-        <!--            android:layout_width="0dp"-->
-        <!--            android:layout_height="0dp"-->
-        <!--            app:layout_constraintBottom_toTopOf="@+id/rvConstraintTools"-->
-        <!--            app:layout_constraintLeft_toLeftOf="parent"-->
-        <!--            app:layout_constraintRight_toRightOf="parent"-->
-        <!--            app:layout_constraintTop_toTopOf="parent"-->
-        <!--            app:photo_src="@drawable/blank_image" />-->
+            <LinearLayout
+                android:id="@+id/layoutConfirmFilter"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:paddingTop="20dp"
+                android:paddingBottom="20dp">
 
+                <LinearLayout
+                    android:id="@+id/layoutFilterCancel"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_weight="1"
+                    android:gravity="center">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:text="@string/tvCancel"
+                        android:textAllCaps="false"
+                        android:textColor="@color/white"
+                        android:textSize="17sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/layoutFilterDone"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_weight="1"
+                    android:gravity="center">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:text="@string/tvDone"
+                        android:textAllCaps="false"
+                        android:textColor="@color/colorTextSave"
+                        android:textSize="17sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+            </LinearLayout>
+        </RelativeLayout>
     </RelativeLayout>
 </layout>

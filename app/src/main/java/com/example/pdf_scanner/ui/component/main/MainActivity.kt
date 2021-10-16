@@ -26,7 +26,6 @@ import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.viewpager.widget.ViewPager
 import com.camerakit.CameraKitView
 import com.camerakit.type.CameraFlash
 import com.example.pdf_scanner.*
@@ -46,6 +45,11 @@ import com.example.pdf_scanner.ui.component.purchase.PurchaseActivity
 import com.example.pdf_scanner.ui.component.scan.ScanActivity
 import com.example.pdf_scanner.utils.FileUtil
 import com.example.pdf_scanner.utils.SingleEvent
+import com.google.android.gms.ads.AdListener
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.LoadAdError
+import com.google.android.gms.ads.MobileAds
+import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.kaopiz.kprogresshud.KProgressHUD
 import com.oneadx.vpnclient.utils.observe
 import com.oneadx.vpnclient.utils.observeEvent
@@ -57,7 +61,6 @@ import net.lucode.hackware.magicindicator.buildins.commonnavigator.abs.CommonNav
 import net.lucode.hackware.magicindicator.buildins.commonnavigator.abs.IPagerIndicator
 import net.lucode.hackware.magicindicator.buildins.commonnavigator.abs.IPagerTitleView
 import net.lucode.hackware.magicindicator.buildins.commonnavigator.titles.ClipPagerTitleView
-import okhttp3.internal.notify
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
@@ -88,13 +91,14 @@ class MainActivity : BaseActivity() {
     private var isExitAgain: Boolean = false
     private lateinit var mExamplePagerAdapter: OptionAdapter
 
-
     override fun initViewBinding() {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             val window: Window = window
             window.statusBarColor = resources.getColor(R.color.colorApp)
         }
+
+        MobileAds.initialize(this)
 
         binding = ActivityMainBinding.inflate(layoutInflater)
 
@@ -116,56 +120,63 @@ class MainActivity : BaseActivity() {
 
         mBounceAnimation = AnimationUtils.loadAnimation(this, R.anim.anim_bounce_start)
 
+        // binding.cameraKit.set
+
+        binding.cameraKit.errorListener = CameraKitView.ErrorListener { _, e ->
+            Toast.makeText(this, "Camera error!", Toast.LENGTH_SHORT).show()
+        }
+
         binding.btnMainCapture.setOnClickListener {
             binding.btnMainCapture.startAnimation(mBounceAnimation)
             hud!!.show()
-            binding.cameraKit.captureImage(object : CameraKitView.ImageCallback {
-                @RequiresApi(Build.VERSION_CODES.KITKAT)
-                override fun onImage(p0: CameraKitView?, p1: ByteArray?) {
 
-                    // val str = String(p1!!, StandardCharsets.UTF_8)
-                    val bmp = getResizedBitmap(
-                        BitmapFactory.decodeByteArray(p1, 0, p1!!.size),
-                        RESOLUTION_WIDTH,
-                        RESOLUTION_HEIGHT
-                    )
-                    val streamByte = ByteArrayOutputStream()
-                    bmp!!.compress(Bitmap.CompressFormat.PNG, 100, streamByte)
-                    val bmpArray = streamByte.toByteArray()
-                    // val bmp = BitmapFactory.decodeByteArray(p1, 0, p1!!.size)
-                    val fileRoot = FileUtil(this@MainActivity).getRootFolder()
-                    var date = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
-                    val strTime = "Scan " + date.format(Date())
+            /**
+             * Capture Image
+             */
+            binding.cameraKit.captureImage { _, p1 -> // val str = String(p1!!, StandardCharsets.UTF_8)
+                val bmp = getResizedBitmap(
+                    BitmapFactory.decodeByteArray(p1, 0, p1!!.size),
+                    RESOLUTION_WIDTH,
+                    RESOLUTION_HEIGHT
+                )
+                val streamByte = ByteArrayOutputStream()
+                bmp!!.compress(Bitmap.CompressFormat.PNG, 100, streamByte)
+                val bmpArray = streamByte.toByteArray()
+                val fileRoot = FileUtil(this@MainActivity).getRootFolder()
+                var date = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+                val strTime = "Scan " + date.format(Date())
 
-                    val filePath = "${fileRoot}/${strTime}$JPG"
-                    var file = File(filePath)
-                    file.createNewFile()
-                    val stream = FileOutputStream(file)
-                    stream.write(bmpArray)
-                    stream.flush()
-                    stream.close()
-                    /**
-                     * Add image file saved
-                     */
-                    listImg.add(filePath)
-                    if (listImg.size == 1) {
-                        binding.btnImage.visibility = View.GONE
-                        binding.layoutBadgeImage.visibility = View.VISIBLE
-                        binding.circleImg.setImageBitmap(bmp!!)
-                        binding.btnDocument.setImageResource(R.drawable.ic_close)
-                        binding.vpgMain.isActivated = false
-                        if (statusOption == KEY_SINGLE) {
-                            var intent = Intent(this@MainActivity, ScanActivity::class.java)
-                            intent.putExtra(
-                                KEY_DATA_SCAN,
-                                DataScan(listImg, statusOption, false).toJSON()
-                            )
-                            startActivity(intent)
-                        }
+                val filePath = "${fileRoot}/${strTime}$JPG"
+                var file = File(filePath)
+                file.createNewFile()
+                val stream = FileOutputStream(file)
+                stream.write(bmpArray)
+                stream.flush()
+                stream.close()
+                /**
+                 * Add image file saved
+                 */
+                /**
+                 * Add image file saved
+                 */
+                listImg.add(filePath)
+                if (listImg.size == 1) {
+                    binding.btnImage.visibility = View.GONE
+                    binding.layoutBadgeImage.visibility = View.VISIBLE
+                    binding.circleImg.setImageBitmap(bmp!!)
+                    binding.btnDocument.setImageResource(R.drawable.ic_close)
+                    binding.vpgMain.isActivated = false
+                    if (statusOption == KEY_SINGLE) {
+                        var intent = Intent(this@MainActivity, ScanActivity::class.java)
+                        intent.putExtra(
+                            KEY_DATA_SCAN,
+                            DataScan(listImg, statusOption, false).toJSON()
+                        )
+                        startActivity(intent)
                     }
-                    hud!!.dismiss()
                 }
-            })
+                hud!!.dismiss()
+            }
         }
 
         setSupportActionBar(binding.tbMain)
@@ -216,11 +227,37 @@ class MainActivity : BaseActivity() {
         mExamplePagerAdapter = OptionAdapter(listOption)
         binding.vpgM.adapter = mExamplePagerAdapter
         initViewpager()
-
-
+        initADS()
         setContentView(binding.root)
+    }
 
-        // hasStoragePermission(1)
+    private fun initADS(){
+        val adRequest = AdRequest.Builder().build()
+        binding.adViewMain.loadAd(adRequest)
+
+        binding.adViewMain.adListener = object: AdListener() {
+            override fun onAdLoaded() {
+                // Code to be executed when an ad finishes loading.
+            }
+
+            override fun onAdFailedToLoad(adError : LoadAdError) {
+                // Code to be executed when an ad request fails.
+            }
+
+            override fun onAdOpened() {
+                // Code to be executed when an ad opens an overlay that
+                // covers the screen.
+            }
+
+            override fun onAdClicked() {
+                // Code to be executed when the user clicks on an ad.
+            }
+
+            override fun onAdClosed() {
+                // Code to be executed when the user is about to return
+                // to the app after tapping on an ad.
+            }
+        }
     }
 
     private fun initViewpager() {
@@ -446,22 +483,25 @@ class MainActivity : BaseActivity() {
     }
 
     override fun onStart() {
+        Log.e("on_Start", "onStart")
         super.onStart()
         binding.cameraKit.onStart()
     }
 
     override fun onResume() {
-        Log.e("onResume", "onResume")
+        Log.e("on_Resume", "onResume")
         super.onResume()
         binding.cameraKit.onResume()
     }
 
     override fun onPause() {
+        Log.e("on_Pause", "onPause")
         binding.cameraKit.onPause()
         super.onPause()
     }
 
     override fun onStop() {
+        Log.e("on_Stop", "onStop")
         binding.cameraKit.onStop()
         super.onStop()
     }
