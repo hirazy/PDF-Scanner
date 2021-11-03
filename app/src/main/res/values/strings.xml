@@ -42,6 +42,7 @@
     <string name="tvLeaveScanning">Leave Scanning</string>
     <string name="tvContentLeave">This will delete all scanned pages. Are you sure?</string>
     <string name="tvContentDelete">Are you sure yu want to delete the entire document?</string>
+    <string name="tvDeleteSelect">Are you sure to delete these items?</string>
 
     <string name="tvLanguage">Language:</string>
 
@@ -90,6 +91,7 @@
 
     <string name="tvCancel">Cancel</string>
     <string name="tvConfirm">Confirm</string>
+    <string name="tvSelectAll">Select all</string>
     <string name="tvOK">OK</string>
     <string name="tvReplace">Replace</string>
 
@@ -123,5 +125,6 @@
 
     <string name="aboutUS">About Us</string>
     <string name="copyRight">Copyright 2018-2021 PDF Document Scanner All Rights Reserved</string>
+
 
 </resources>

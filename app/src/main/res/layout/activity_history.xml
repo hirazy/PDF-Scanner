@@ -17,7 +17,6 @@
             android:id="@+id/layoutHistoryFolder"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_above="@+id/layoutHistoryBar"
             android:orientation="vertical">
 
             <com.google.android.material.appbar.AppBarLayout
@@ -79,17 +78,16 @@
                     android:id="@+id/animFolderEmpty"
                     android:layout_width="@dimen/_150sdp"
                     android:layout_height="@dimen/_150sdp"
-                    android:layout_centerHorizontal="true"
-                    />
+                    android:layout_centerHorizontal="true" />
 
                 <TextView
-                    android:layout_marginLeft="20dp"
-                    android:layout_marginRight="20dp"
-                    android:layout_centerHorizontal="true"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/animFolderEmpty"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginLeft="20dp"
                     android:layout_marginTop="15dp"
+                    android:layout_marginRight="20dp"
                     android:fontFamily="@font/font_empty1"
                     android:gravity="center"
                     android:text="@string/tvFolderEmpty"
@@ -104,98 +102,270 @@
                 android:layout_below="@+id/layoutSearchFolder"
                 android:layout_marginTop="10dp" />
 
-        </RelativeLayout>
-
-        <LinearLayout
-            android:id="@+id/layoutHistoryBar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:background="@color/colorHistory"
-            android:orientation="horizontal"
-            android:paddingTop="8dp"
-            android:paddingBottom="8dp">
-
-            <ImageView
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:id="@+id/layoutHistoryBar"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginLeft="10dp"
-                android:src="@drawable/ic_folder" />
+                android:layout_alignParentBottom="true"
+                android:background="@color/colorHistory"
+                android:orientation="horizontal"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginLeft="10dp"
-                android:gravity="center"
-                android:text="@string/tvHistory"
-                android:textColor="@color/colorHistoryBar"
-                android:textSize="17sp" />
-        </LinearLayout>
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginLeft="10dp"
+                    android:src="@drawable/ic_folder" />
 
-        <RelativeLayout
-            android:id="@+id/layoutCopy"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_above="@id/layoutHistoryBar"
-            android:background="@color/colorApp"
-            android:visibility="gone">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginLeft="10dp"
+                    android:gravity="center"
+                    android:text="@string/tvHistory"
+                    android:textColor="@color/colorHistoryBar"
+                    android:textSize="17sp" />
+            </LinearLayout>
 
-            <Button
-                android:id="@+id/btnCancelCopyHistory"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp"
-                android:layout_marginTop="10dp"
-                android:background="@null"
-                android:text="@string/tvCancel"
-                android:textAllCaps="false"
-                android:textColor="@color/colorUnSave"
-                android:textSize="18sp"
-                android:textStyle="bold" />
-
-            <Button
-                android:id="@+id/btnConfirmCopyHistory"
+            <com.github.clans.fab.FloatingActionMenu
+                android:id="@+id/floatingMenu"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
-                android:layout_marginTop="10dp"
+                android:layout_alignParentBottom="true"
                 android:layout_marginRight="10dp"
-                android:background="@null"
-                android:text="@string/tvConfirm"
-                android:textAllCaps="false"
-                android:textColor="@color/colorTextSave"
-                android:textSize="18sp"
-                android:textStyle="bold" />
+                android:layout_marginBottom="10dp">
+
+                <com.github.clans.fab.FloatingActionButton
+                    android:id="@+id/fabNewFolder"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_add_folder"
+                    app:fabSize="mini"
+                    app:fab_label="@string/tvNewFolder"
+                    app:fab_size="mini" />
+
+                <com.github.clans.fab.FloatingActionButton
+                    android:id="@+id/fabNewScan"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_fab_camera"
+                    app:fabSize="mini"
+                    app:fab_label="@string/tvNewScan"
+                    app:fab_size="mini" />
+            </com.github.clans.fab.FloatingActionMenu>
+
         </RelativeLayout>
 
-        <com.github.clans.fab.FloatingActionMenu
-            android:id="@+id/floatingMenu"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentBottom="true"
-            android:layout_marginRight="10dp"
-            android:layout_marginBottom="10dp">
+        <RelativeLayout
+            android:id="@+id/layoutHistoryCopy"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/colorApp"
+            android:visibility="gone">
 
-            <com.github.clans.fab.FloatingActionButton
-                android:id="@+id/fabNewFolder"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/ic_add_folder"
-                app:fabSize="mini"
-                app:fab_label="@string/tvNewFolder"
-                app:fab_size="mini" />
+            <RelativeLayout
+                android:id="@+id/toolBarCopy"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
 
-            <com.github.clans.fab.FloatingActionButton
-                android:id="@+id/fabNewScan"
-                android:layout_width="wrap_content"
+                <Button
+                    android:id="@+id/btnCancelCopyHistory"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginTop="10dp"
+                    android:background="@null"
+                    android:text="@string/tvCancel"
+                    android:textAllCaps="false"
+                    android:textColor="@color/colorUnSave"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <Button
+                    android:id="@+id/btnConfirmCopyHistory"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginRight="10dp"
+                    android:background="@null"
+                    android:text="@string/tvCopy"
+                    android:textAllCaps="false"
+                    android:textColor="@color/colorTextSave"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+            </RelativeLayout>
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/layoutHistorySelect"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/colorApp"
+            android:visibility="gone">
+
+            <RelativeLayout
+                android:id="@+id/toolBarSelect"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <Button
+                    android:id="@+id/btnCancelSelectHistory"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginTop="10dp"
+                    android:background="@null"
+                    android:text="@string/tvCancel"
+                    android:textAllCaps="false"
+                    android:textColor="@color/colorUnSave"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <Button
+                    android:id="@+id/btnConfirmSelectHistory"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginRight="10dp"
+                    android:background="@null"
+                    android:text="@string/tvSelectAll"
+                    android:textAllCaps="false"
+                    android:textColor="@color/colorTextSave"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+            </RelativeLayout>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rcvSelectHistory"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:src="@drawable/ic_fab_camera"
-                app:fabSize="mini"
-                app:fab_label="@string/tvNewScan"
-                app:fab_size="mini" />
-        </com.github.clans.fab.FloatingActionMenu>
+                android:layout_above="@+id/layoutOptionHistory"
+                android:layout_below="@+id/toolBarSelect"
+                android:layout_marginTop="15dp" />
+
+
+            <LinearLayout
+                android:id="@+id/layoutOptionHistory"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:background="@color/colorStatus"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:paddingTop="15dp"
+                android:paddingBottom="20dp">
+
+                <LinearLayout
+                    android:id="@+id/layoutSelectMove"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"
+                    android:clickable="false"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:id="@+id/icSelectMove"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/ic_select_no_move" />
+
+                    <TextView
+                        android:id="@+id/tvSelectMove"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:text="@string/tvMove"
+                        android:textColor="@color/colorTextUnSelected" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/layoutSelectCopy"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"
+                    android:clickable="false"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:id="@+id/icSelectCopy"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/ic_select_no_copy" />
+
+                    <TextView
+                        android:id="@+id/tvSelectCopy"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:text="@string/tvCopy"
+                        android:textColor="@color/colorTextUnSelected" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/layoutSelectEmail"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"
+                    android:clickable="false"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:id="@+id/icSelectEmail"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/ic_select_no_email" />
+
+                    <TextView
+                        android:id="@+id/tvSelectEmail"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:text="@string/tvEmail"
+                        android:textColor="@color/colorTextUnSelected" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/layoutSelectDelete"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"
+                    android:clickable="false"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:id="@+id/icSelectDelete"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/ic_select_no_delete" />
+
+                    <TextView
+                        android:id="@+id/tvSelectDelete"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:text="@string/tvDelete"
+                        android:textColor="@color/colorTextUnSelected" />
+                </LinearLayout>
+            </LinearLayout>
+        </RelativeLayout>
     </RelativeLayout>
 </layout>

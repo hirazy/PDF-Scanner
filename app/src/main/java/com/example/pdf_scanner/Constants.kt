@@ -80,6 +80,7 @@ const val KEY_MANAGE_APPS = "key_manage_apps"
 
 const val KEY_SAVE_PURCHASE = "key_save_purchase"
 
+const val KEY_DATA_MAIN = "key_data_main"
 const val KEY_DATA_SCAN = "key_data_scan"
 const val KEY_DATA_OCR = "key_data_ocr"
 const val KEY_DATA_SEARCH = "key_data_search"
@@ -163,12 +164,15 @@ const val KEY_CARD = 4
 const val KEY_FOLDER = 5
 const val KEY_ADD_FOLDER = 6
 
+
+
 // KEY INTENT
 const val KEY_INTENT_LISTIMG = "key_intent_listimg"
 
 // KEY_RESULT
 const val KEY_RESULT_OCR = 1
 const val KEY_RESULT_FILTER = 2
+const val KEY_RESULT_MAIN = 3
 
 const val DIALOG_TITLE_LEAVE = "Leave Scanning"
 const val DIALOG_CONTENT_LEAVE = "This will delete all scanned pages. Are you sure?"

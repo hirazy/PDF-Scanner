@@ -21,15 +21,27 @@ class ScanViewModel @Inject constructor(var dataRepositorySource: DataRepository
     private var textSizeData = MutableLiveData<Resource<Int>>()
     val textSizeLive: LiveData<Resource<Int>> get() = textSizeData
 
+    private var startCamera = MutableLiveData<Resource<Boolean>>()
+    val liveStartCamera: LiveData<Resource<Boolean>> get() = startCamera
+
     init {
         fetchStartCamera()
     }
 
-    private fun fetchStartCamera(){
+    private fun fetchStartCamera() {
         viewModelScope.launch {
+
+            dataRepositorySource.requestStartCamera().collect {
+                when (it) {
+                    is Resource.Success -> {
+                        startCamera.value = Resource.Success(it.data!!)
+                    }
+                }
+            }
+
             dataRepositorySource.requestTextSize().collect {
-                when(it){
-                    is Resource.Success ->{
+                when (it) {
+                    is Resource.Success -> {
                         textSizeData.value = Resource.Success(it.data!!)
                     }
                 }

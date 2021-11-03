@@ -1,14 +1,16 @@
 package com.example.pdf_scanner.ui.component.detail_text
 
 import android.app.Dialog
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.Context
 import android.graphics.Color
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.Window
 import android.widget.Button
 import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentStatePagerAdapter
@@ -33,6 +35,7 @@ import net.lucode.hackware.magicindicator.buildins.commonnavigator.abs.IPagerTit
 import net.lucode.hackware.magicindicator.buildins.commonnavigator.indicators.LinePagerIndicator
 import net.lucode.hackware.magicindicator.buildins.commonnavigator.titles.ClipPagerTitleView
 import java.io.File
+
 
 @AndroidEntryPoint
 class DetailTextActivity : BaseActivity(), ShapeBSFragment.Properties {
@@ -72,6 +75,7 @@ class DetailTextActivity : BaseActivity(), ShapeBSFragment.Properties {
 
                 override fun onOCR(text: String) {
                     textOCR = text
+                    copyClipBoard(textOCR)
                 }
 
                 override fun onSave() {
@@ -182,6 +186,13 @@ class DetailTextActivity : BaseActivity(), ShapeBSFragment.Properties {
         }
         path = rootPath + pathName
         return path
+    }
+
+    private fun copyClipBoard(text: String){
+        val clipboard: ClipboardManager = getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
+        val clip = ClipData.newPlainText("label", text)
+        clipboard.setPrimaryClip(clip)
+        Toast.makeText(this@DetailTextActivity, "Copied to clipboard!", Toast.LENGTH_SHORT).show()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {

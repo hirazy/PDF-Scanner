@@ -72,8 +72,11 @@
     <color name="colorEditComment">#AAAAA3</color>
 
     <color name="colorBgUnDelete">#4E4E4E</color>
-    <color name="colorTextUnDelete">#878787</color>
-
+    <color name="colorTextUnDelete">#959595</color>
     <color name="colorBgDelete">#ED2828</color>
+    <color name="colorIconUnSelected">#4C4C4C</color>
+    <color name="colorTextUnSelected">#262626</color>
+    <color name="colorTextSelected">#868686</color>
 
+    <color name="colorBorderSelect">#11AE18</color>
 </resources>

@@ -30,10 +30,7 @@ import com.camerakit.CameraKitView
 import com.camerakit.type.CameraFlash
 import com.example.pdf_scanner.*
 import com.example.pdf_scanner.data.Resource
-import com.example.pdf_scanner.data.dto.DataImage
-import com.example.pdf_scanner.data.dto.DataScan
-import com.example.pdf_scanner.data.dto.OBase
-import com.example.pdf_scanner.data.dto.OptionCamera
+import com.example.pdf_scanner.data.dto.*
 import com.example.pdf_scanner.databinding.ActivityMainBinding
 import com.example.pdf_scanner.ui.base.BaseActivity
 import com.example.pdf_scanner.ui.base.listener.RecyclerItemListener
@@ -45,6 +42,7 @@ import com.example.pdf_scanner.ui.component.purchase.PurchaseActivity
 import com.example.pdf_scanner.ui.component.scan.ScanActivity
 import com.example.pdf_scanner.utils.FileUtil
 import com.example.pdf_scanner.utils.SingleEvent
+import com.example.pdf_scanner.utils.toObject
 import com.google.android.gms.ads.AdListener
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.LoadAdError
@@ -161,6 +159,8 @@ class MainActivity : BaseActivity() {
                  */
                 listImg.add(filePath)
                 if (listImg.size == 1) {
+                    binding.vpgMain.isFocusable = false
+                    binding.vpgMain.isFocusableInTouchMode = false
                     binding.btnImage.visibility = View.GONE
                     binding.layoutBadgeImage.visibility = View.VISIBLE
                     binding.circleImg.setImageBitmap(bmp!!)
@@ -172,7 +172,7 @@ class MainActivity : BaseActivity() {
                             KEY_DATA_SCAN,
                             DataScan(listImg, statusOption, false).toJSON()
                         )
-                        startActivity(intent)
+                        startActivityForResult(intent, KEY_RESULT_MAIN)
                     }
                 }
                 hud!!.dismiss()
@@ -283,6 +283,7 @@ class MainActivity : BaseActivity() {
                         binding.vpgMain.navigator = commonNavigator
                         ViewPagerHelper.bind(binding.vpgMain, binding.vpgM)
                         var msgStatus = ""
+                        changeStatusNormal()
                         when (index) {
                             KEY_WHITEBOARD -> {
                                 msgStatus = TOAST_WHITEBOARD
@@ -328,10 +329,7 @@ class MainActivity : BaseActivity() {
             }
             var btnLeave = dialog.findViewById<Button>(R.id.btnAcceptLeave)
             btnLeave.setOnClickListener {
-                listImg = ArrayList()
-                binding.btnDocument.setImageResource(R.drawable.ic_document)
-                binding.btnImage.visibility = View.VISIBLE
-                binding.layoutBadgeImage.visibility = View.GONE
+                changeStatusNormal()
                 dialog.dismiss()
             }
             dialog.show()
@@ -344,6 +342,15 @@ class MainActivity : BaseActivity() {
                 finish()
             }
         }
+    }
+
+    private fun changeStatusNormal(){
+        binding.btnDocument.setImageResource(R.drawable.ic_document)
+        binding.btnImage.visibility = View.VISIBLE
+        binding.layoutBadgeImage.visibility = View.GONE
+
+        // deleteFilesCurrent()
+        listImg = ArrayList()
     }
 
     private fun onImage() {
@@ -360,7 +367,7 @@ class MainActivity : BaseActivity() {
         } else {
             intent.putExtra(KEY_DATA_SCAN, DataScan(listImg, status, false).toJSON())
         }
-        startActivity(intent)
+        startActivityForResult(intent, KEY_RESULT_MAIN)
     }
 
     private fun deleteFileSaved() {
@@ -403,6 +410,12 @@ class MainActivity : BaseActivity() {
             if (file.exists()) {
                 applicationContext.deleteFile(file.name)
             }
+        }
+    }
+
+    private fun deleteFilesCurrent(){
+        for(i in listImg){
+            deleteFile(i)
         }
     }
 
@@ -450,9 +463,9 @@ class MainActivity : BaseActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.itemCapture -> {
-
-            }
+//            R.id.itemCapture -> {
+//
+//            }
 
             R.id.itemFlash -> {
                 when (statusCamera) {
@@ -537,6 +550,16 @@ class MainActivity : BaseActivity() {
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if(resultCode == RESULT_OK){
+            var isDeleted = data!!.getStringExtra(KEY_DATA_MAIN)!!.toObject<DataMain>().isDeleted
+            if(isDeleted){
+                changeStatusNormal()
+            }
+            else{
+                changeStatusNormal()
+                onDocument()
+            }
+        }
         super.onActivityResult(requestCode, resultCode, data)
     }
 }

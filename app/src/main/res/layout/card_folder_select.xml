@@ -6,6 +6,8 @@
 
     <data>
 
+        <import type="android.view.View" />
+
         <variable
             name="o"
             type="com.example.pdf_scanner.data.dto.FolderSelect" />
@@ -22,23 +24,29 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="15dp"
-            android:layout_marginRight="15dp"
             android:background="@color/colorApp"
             android:orientation="horizontal">
 
-            <androidx.appcompat.widget.AppCompatRadioButton
-                android:id="@+id/rBtnFolderSelected"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+            <LinearLayout
+                android:background="@drawable/bg_border_select"
                 android:layout_gravity="center"
-                android:gravity="center" />
+                android:gravity="center"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_marginLeft="15dp">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_tik"
+                    android:visibility="@{o.selected ? View.VISIBLE: View.GONE}" />
+            </LinearLayout>
 
             <RelativeLayout
-                android:layout_marginLeft="10dp"
-                android:layout_width="@dimen/_50sdp"
-                android:layout_height="@dimen/_40sdp"
+                android:layout_width="@dimen/_62sdp"
+                android:layout_height="@dimen/_48sdp"
                 android:layout_gravity="center"
+                android:layout_marginLeft="15dp"
                 android:gravity="center">
 
                 <com.google.android.material.imageview.ShapeableImageView
@@ -46,6 +54,7 @@
                     image="@{o.folder.list[0]}"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
+                    android:adjustViewBounds="true"
                     android:scaleType="centerCrop"
                     android:src="@drawable/paris_tower"
                     app:cardCornerRadius="20dp"
@@ -63,9 +72,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textColor="@color/white"
-
-                        />
+                        android:textColor="@color/white" />
                 </LinearLayout>
             </RelativeLayout>
 
@@ -79,7 +86,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Scan 2021"
+                    android:text="@{o.folder.name}"
                     android:textColor="@color/white"
                     android:textSize="17sp"
                     android:textStyle="bold" />
@@ -106,26 +113,13 @@
                             android:layout_gravity="center"
                             android:layout_marginLeft="10dp"
                             android:gravity="center"
-                            android:text="/"
+                            android:text="@{o.folder.list.size() &lt; 10 ? `0` + o.folder.list.size(): o.folder.list.size() }"
                             android:textColor="@color/colorPageFolder"
-                            android:textSize="14sp"
-                            tools:ignore="XmlEscapeNeeded" />
+                            android:textSize="14sp" />
 
                     </LinearLayout>
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentRight="true"
-                        android:layout_centerVertical="true"
-                        android:text="@{o.folder.time}"
-                        android:textColor="@color/colorPageFolder"
-                        android:textSize="14sp" />
                 </RelativeLayout>
             </LinearLayout>
         </LinearLayout>
-
     </androidx.cardview.widget.CardView>
-
-
 </layout>

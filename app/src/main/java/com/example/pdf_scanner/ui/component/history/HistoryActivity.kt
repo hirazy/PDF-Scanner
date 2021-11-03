@@ -7,7 +7,6 @@ import android.net.Uri
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -22,16 +21,17 @@ import com.example.pdf_scanner.data.dto.*
 import com.example.pdf_scanner.databinding.ActivityHistoryBinding
 import com.example.pdf_scanner.ui.base.BaseActivity
 import com.example.pdf_scanner.ui.base.listener.RecycleFolderListener
+import com.example.pdf_scanner.ui.base.listener.RecyclerItemListener
 import com.example.pdf_scanner.ui.component.detail.DetailActivity
 import com.example.pdf_scanner.ui.component.detail.dialog.BottomShare
 import com.example.pdf_scanner.ui.component.detail.dialog.BottomShareEvent
 import com.example.pdf_scanner.ui.component.history.adapter.FolderAdapter
+import com.example.pdf_scanner.ui.component.history.adapter.FolderSelectAdapter
 import com.example.pdf_scanner.ui.component.history.dialog.BottomMore
 import com.example.pdf_scanner.ui.component.history.dialog.BottomMoreEvent
 import com.example.pdf_scanner.ui.component.image.ImageActivity
 import com.example.pdf_scanner.ui.component.main.MainActivity
 import com.example.pdf_scanner.ui.component.search.SearchActivity
-import com.example.pdf_scanner.ui.component.select.SelectActivity
 import com.example.pdf_scanner.ui.component.settings.SettingsActivity
 import com.example.pdf_scanner.utils.FileUtil
 import com.itextpdf.io.image.ImageDataFactory
@@ -41,7 +41,6 @@ import com.itextpdf.layout.Document
 import com.itextpdf.layout.element.Image
 import com.oneadx.vpnclient.utils.observe
 import com.pranavpandey.android.dynamic.toasts.DynamicToast
-import com.yalantis.ucrop.util.FileUtils
 import dagger.hilt.android.AndroidEntryPoint
 import java.io.File
 import java.text.SimpleDateFormat
@@ -55,9 +54,12 @@ class HistoryActivity : BaseActivity() {
     val viewModel: HistoryViewModel by viewModels()
     lateinit var binding: ActivityHistoryBinding
     lateinit var adapter: FolderAdapter
+    lateinit var adapterSelect: FolderSelectAdapter
     lateinit var listFolder: ArrayList<ImageFolder>
     private var isExitAgain: Boolean = false
-    lateinit var dataFolder: ImageFolder
+    lateinit var listFolderSelect: ArrayList<FolderSelect>
+    lateinit var dataFolder: ArrayList<ImageFolder>
+    var menuItem: Menu? = null
 
     override fun initViewBinding() {
 
@@ -86,22 +88,53 @@ class HistoryActivity : BaseActivity() {
             var intent = Intent(this@HistoryActivity, ImageActivity::class.java)
             intent.putExtra(KEY_INTENT_IMAGE, DataImage(status = KEY_FOLDER).toJSON())
             startActivity(intent)
-            if(viewModel.liveStartCamera.value!!.data == true){
+            if (viewModel.liveStartCamera.value!!.data == true) {
                 finish()
             }
         }
 
         binding.btnCancelCopyHistory.setOnClickListener {
-            statusFolder()
+            statusFolderCopy()
         }
 
         binding.btnConfirmCopyHistory.setOnClickListener {
-            onCopy(dataFolder)
+            onCopyFolders(dataFolder)
+        }
+
+        binding.btnCancelSelectHistory.setOnClickListener {
+            statusFolderSelect()
+        }
+
+        binding.btnConfirmSelectHistory.setOnClickListener {
+            onSelectAll()
+        }
+
+        binding.layoutSelectMove.setOnClickListener {
+            statusFolderCopy()
+        }
+
+        binding.layoutSelectDelete.setOnClickListener {
+            onDeleteSelect()
+        }
+
+        binding.layoutSelectCopy.setOnClickListener {
+            onSelectCopy()
+        }
+
+        binding.layoutSelectEmail.setOnClickListener {
+            onEmailSelect()
         }
 
         binding.animFolderEmpty.setAnimation(R.raw.empty_box)
         binding.animFolderEmpty.playAnimation()
 
+        initFolderSelect()
+
+        initFolder()
+        fetchFolder()
+    }
+
+    private fun initFolder() {
         adapter = FolderAdapter(object : RecycleFolderListener {
             override fun onItemSelected(index: Int, data: OBase) {
                 var o = data as ImageFolder
@@ -187,13 +220,10 @@ class HistoryActivity : BaseActivity() {
                 var folderSavedPath = fileRoot + pathNameSaved + nameFolder
 
                 var bottomMore = BottomMore(object : BottomMoreEvent {
-                    override fun onMove() {
-
-                    }
-
                     override fun onCopy() {
                         statusCopyMove()
-                        dataFolder = o
+                        dataFolder = ArrayList()
+                        dataFolder.add(o)
                     }
 
                     override fun onShare() {
@@ -239,10 +269,121 @@ class HistoryActivity : BaseActivity() {
 
         binding.rcclvFolder.layoutManager = LinearLayoutManager(this)
         binding.rcclvFolder.adapter = adapter
-        fetchFolder()
     }
 
-    private fun onCopy(o: ImageFolder) {
+    private fun initFolderSelect() {
+        adapterSelect = FolderSelectAdapter(object : RecyclerItemListener {
+            override fun onItemSelected(index: Int, data: OBase) {
+                var isSelected = listFolderSelect[index].isSelected
+                listFolderSelect[index].isSelected = !isSelected
+                adapterSelect.notifyItemChanged(index)
+                var cnt = 0
+                for (i in 0 until listFolderSelect.size) {
+                    if (listFolderSelect[i].isSelected) {
+                        cnt++
+                    }
+                }
+
+                if (cnt > 0) {
+                    isActiveSelect()
+                } else {
+                    noItemSelect()
+                }
+            }
+
+            override fun onOption(index: Int, data: OBase) {
+
+            }
+        })
+
+        binding.rcvSelectHistory.layoutManager = LinearLayoutManager(this)
+        binding.rcvSelectHistory.adapter = adapterSelect
+    }
+
+    private fun onSelectCopy() {
+        statusCopyMove()
+
+        dataFolder = ArrayList()
+
+        for (i in 0 until listFolderSelect.size) {
+            if (listFolderSelect[i].isSelected) {
+                dataFolder.add(listFolderSelect[i].folder)
+            }
+        }
+    }
+
+    private fun onDeleteSelect() {
+        var dialog = Dialog(this)
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.window!!.setBackgroundDrawableResource(android.R.color.transparent)
+        dialog.setCancelable(false)
+        dialog.setContentView(R.layout.dialog_leave_scan)
+
+        var txtContent = dialog.findViewById<TextView>(R.id.tvContentLeaveScan)
+        txtContent.setText(R.string.tvDeleteSelect)
+
+        var btnCancel = dialog.findViewById<Button>(R.id.btnDecline)
+        btnCancel.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        var btnAccept = dialog.findViewById<Button>(R.id.btnAcceptLeave)
+        btnAccept.setOnClickListener {
+            for (i in 0 until listFolderSelect.size) {
+                if (listFolderSelect[i].isSelected) {
+                    deletePathFolders(listFolderSelect[i].folder)
+                }
+            }
+            fetchFolder()
+            dialog.dismiss()
+            statusFolderCopy()
+        }
+
+        dialog.show()
+    }
+
+    private fun deletePathFolders(o: ImageFolder) {
+        var pathUtil = FileUtil(this@HistoryActivity).getRootFolder()
+        var filePath = pathUtil + "/saved/" + o.name
+        var file = File(filePath)
+        recursiveDelete(file)
+    }
+
+    private fun onEmailSelect() {
+        var date = SimpleDateFormat("yyyyMMdd_HHmmss")
+
+        val fileRoot = FileUtil(this@HistoryActivity).getRootFolder()
+        val pathNameSaved = "/saved/"
+        var folderRoot = fileRoot + pathNameSaved
+        var filePath = folderRoot + "FILE_" + date.format(Date())
+
+        var fileShare = File(filePath)
+
+        for(i in 0 until listFolderSelect.size){
+            var pathFolder = folderRoot + listFolderSelect[i].folder.name
+            fileShare.writeText(pathFolder)
+        }
+
+        val sharingIntent = Intent(Intent.ACTION_SEND)
+        sharingIntent.putExtra(
+            Intent.EXTRA_STREAM,
+            uriFromFile(this@HistoryActivity, fileShare)
+        )
+        sharingIntent.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
+        startActivity(Intent.createChooser(sharingIntent, "Email"))
+    }
+
+    private fun onSelectAll() {
+        for (i in 0 until listFolderSelect.size) {
+            if (!listFolderSelect[i].isSelected) {
+                listFolderSelect[i].isSelected = true
+                adapterSelect.notifyItemChanged(i)
+            }
+        }
+        isActiveSelect()
+    }
+
+    private fun onCopyFolders(list: ArrayList<ImageFolder>) {
         var dialog = Dialog(this)
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.window!!.setBackgroundDrawableResource(android.R.color.transparent)
@@ -250,40 +391,16 @@ class HistoryActivity : BaseActivity() {
         dialog.setContentView(R.layout.dialog_copy)
 
         var txtContent = dialog.findViewById<TextView>(R.id.tvContentCopy)
-        txtContent.text = o.name + TIPS_CONTENT
+        txtContent.text = list[0].name + TIPS_CONTENT
 
         var btnConfirm = dialog.findViewById<Button>(R.id.btnConfirmCopy)
         btnConfirm.setOnClickListener {
-            binding.layoutCopy.visibility = View.GONE
-
-            var nameFolder = o.name
-            val fileRoot = FileUtil(this@HistoryActivity).getRootFolder()
-            val pathNameSaved = "/saved/"
-            var folderRoot = fileRoot + pathNameSaved
-            var pathFolderCur = folderRoot + nameFolder
-
-            var cnt = 1
-            var plusName = "($cnt)"
-            var folderCopy = File("$pathFolderCur$plusName/")
-
-            while (folderCopy.exists()) {
-                cnt++
-                plusName = "($cnt)"
-                folderCopy = File("$pathFolderCur$plusName/")
+            binding.layoutHistorySelect.visibility = View.GONE
+            for (i in 0 until list.size) {
+                copyFolder(list[i])
             }
-
-            folderCopy.mkdirs()
-
-            for(i in 0 until o.list.size){
-                var cnt = i + 1
-                var fileCur = File(o.list[i])
-                var fileCopy = File("$pathFolderCur$plusName/$cnt$JPG")
-                fileCur.copyTo(fileCopy)
-            }
-
             dialog.dismiss()
-
-            statusFolder()
+            statusFolderCopy()
             fetchFolder()
         }
 
@@ -298,6 +415,67 @@ class HistoryActivity : BaseActivity() {
         }
 
         dialog.show()
+    }
+
+    private fun copyFolder(o: ImageFolder) {
+        var nameFolder = o.name
+        val fileRoot = FileUtil(this@HistoryActivity).getRootFolder()
+        val pathNameSaved = "/saved/"
+        var folderRoot = fileRoot + pathNameSaved
+        var pathFolderCur = folderRoot + nameFolder
+
+        var cnt = 1
+        var plusName = "($cnt)"
+        var folderCopy = File("$pathFolderCur$plusName/")
+
+        while (folderCopy.exists()) {
+            cnt++
+            plusName = "($cnt)"
+            folderCopy = File("$pathFolderCur$plusName/")
+        }
+
+        folderCopy.mkdirs()
+
+        for (i in 0 until o.list.size) {
+            var cnt = i + 1
+            var fileCur = File(o.list[i])
+            var fileCopy = File("$pathFolderCur$plusName/$cnt$JPG")
+            fileCur.copyTo(fileCopy)
+        }
+    }
+
+    private fun noItemSelect() {
+        binding.layoutSelectMove.isClickable = false
+        binding.layoutSelectCopy.isClickable = false
+        binding.layoutSelectEmail.isClickable = false
+        binding.layoutSelectDelete.isClickable = false
+
+        binding.icSelectMove.setImageResource(R.drawable.ic_select_no_move)
+        binding.icSelectCopy.setImageResource(R.drawable.ic_select_no_copy)
+        binding.icSelectEmail.setImageResource(R.drawable.ic_select_no_email)
+        binding.icSelectDelete.setImageResource(R.drawable.ic_select_no_delete)
+
+        binding.tvSelectMove.setTextColor(resources.getColor(R.color.colorTextUnSelected))
+        binding.tvSelectCopy.setTextColor(resources.getColor(R.color.colorTextUnSelected))
+        binding.tvSelectEmail.setTextColor(resources.getColor(R.color.colorTextUnSelected))
+        binding.tvSelectDelete.setTextColor(resources.getColor(R.color.colorTextUnSelected))
+    }
+
+    private fun isActiveSelect() {
+        binding.layoutSelectMove.isClickable = true
+        binding.layoutSelectCopy.isClickable = true
+        binding.layoutSelectEmail.isClickable = true
+        binding.layoutSelectDelete.isClickable = true
+
+        binding.icSelectMove.setImageResource(R.drawable.ic_select_move)
+        binding.icSelectCopy.setImageResource(R.drawable.ic_select_copy)
+        binding.icSelectEmail.setImageResource(R.drawable.ic_select_email)
+        binding.icSelectDelete.setImageResource(R.drawable.ic_select_delete)
+
+        binding.tvSelectMove.setTextColor(resources.getColor(R.color.colorTextSelected))
+        binding.tvSelectCopy.setTextColor(resources.getColor(R.color.colorTextSelected))
+        binding.tvSelectEmail.setTextColor(resources.getColor(R.color.colorTextSelected))
+        binding.tvSelectDelete.setTextColor(resources.getColor(R.color.colorTextSelected))
     }
 
     private fun fetchFolder() {
@@ -331,6 +509,11 @@ class HistoryActivity : BaseActivity() {
             list.add(ImageFolder(files[i].name, fileTimeCreated, listPath))
         }
         listFolder = list
+
+        if (menuItem != null) {
+            (listFolder.size != 0).also { menuItem!!.findItem(R.id.itemSelectAll).isVisible = it }
+        }
+
         viewModel.fetchData(list)
     }
 
@@ -487,18 +670,39 @@ class HistoryActivity : BaseActivity() {
         var nameFile = "FILE_$date2" + "_Scan $date1"
         var fileRoot = FileUtil(this@HistoryActivity).getRootFolder()
         var path = "$fileRoot/saved/$nameFolder$nameFile$typePath"
-        Log.e("filePath", path)
         return path
     }
 
-    private fun statusFolder() {
+    private fun statusFolderCopy() {
         binding.layoutHistoryFolder.visibility = View.VISIBLE
-        binding.layoutCopy.visibility = View.GONE
+        binding.layoutHistoryCopy.visibility = View.GONE
+        binding.layoutHistorySelect.visibility = View.GONE
     }
 
     private fun statusCopyMove() {
         binding.layoutHistoryFolder.visibility = View.GONE
-        binding.layoutCopy.visibility = View.VISIBLE
+        binding.layoutHistoryCopy.visibility = View.VISIBLE
+        binding.layoutHistorySelect.visibility = View.GONE
+    }
+
+    private fun statusSelect() {
+        binding.layoutHistoryFolder.visibility = View.GONE
+        binding.layoutHistoryCopy.visibility = View.GONE
+        binding.layoutHistorySelect.visibility = View.VISIBLE
+
+        listFolderSelect = ArrayList()
+        for (i in 0 until listFolder.size) {
+            listFolderSelect.add(FolderSelect(folder = listFolder[i]))
+        }
+
+        adapterSelect.setData(listFolderSelect)
+    }
+
+    private fun statusFolderSelect() {
+        binding.layoutHistoryFolder.visibility = View.VISIBLE
+        binding.layoutHistoryCopy.visibility = View.GONE
+        binding.layoutHistorySelect.visibility = View.GONE
+
     }
 
     override fun observeViewModel() {
@@ -524,7 +728,6 @@ class HistoryActivity : BaseActivity() {
     private fun handleCamera(data: Resource<Boolean>) {
         when (data) {
             is Resource.Success -> {
-                Log.e("handleCamera", data.data.toString())
                 if (data.data!!) {
                     binding.tbHistory.setNavigationIcon(R.drawable.ic_back)
                 }
@@ -534,11 +737,18 @@ class HistoryActivity : BaseActivity() {
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.item_action_history, menu)
+        menuItem = menu!!
+        (listFolder.size != 0).also { menuItem!!.findItem(R.id.itemSelectAll).isVisible = it }
         return super.onCreateOptionsMenu(menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
+            R.id.itemSelectAll -> {
+                noItemSelect()
+                statusSelect()
+            }
+
             R.id.itemSettings -> {
                 var intent = Intent(this, SettingsActivity::class.java)
                 startActivity(intent)
@@ -557,6 +767,7 @@ class HistoryActivity : BaseActivity() {
         if (isStartedCamera == false) {
             if (isExitAgain) {
                 super.onBackPressed()
+                finishAffinity()
             }
 
             isExitAgain = true

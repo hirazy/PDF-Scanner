@@ -80,7 +80,6 @@ class ScanActivity : BaseActivity(), ShapeBSFragment.Properties {
     lateinit var binding: ActivityScanBinding
     val viewModel: ScanViewModel by viewModels()
     lateinit var adapterImg: ImagePageAdapter
-    lateinit var adapterFilter: ImageFilterAdapter
     lateinit var adapterLanguageSelected: LanguageSelectedAdapter
     lateinit var listImg: ArrayList<String>
     lateinit var listFilter: ArrayList<ImageFilter>
@@ -208,13 +207,15 @@ class ScanActivity : BaseActivity(), ShapeBSFragment.Properties {
             }
 
             override fun onAnimationEnd(animation: Animator?) {
-                Log.e("onAnimationEnd", "animation")
+
                 showAds()
             }
 
             override fun onAnimationCancel(animation: Animator?) {
-                Log.e("onAnimationEnd", "animation")
                 showAds()
+                for(i in 0 until listImg.size){
+                    adapterImg.listFrg[i].setScanned()
+                }
             }
 
             override fun onAnimationRepeat(animation: Animator?) {
@@ -301,9 +302,10 @@ class ScanActivity : BaseActivity(), ShapeBSFragment.Properties {
      */
     private fun showAds() {
         val rand = (0..100).random()
-        Log.e("showAds", rand.toString())
         if (mInterstitialAd != null) {
-            mInterstitialAd?.show(this)
+            if (rand < 50) {
+                mInterstitialAd?.show(this)
+            }
         } else {
             Log.d("TAG", "The interstitial ad wasn't ready yet.")
         }
@@ -323,6 +325,9 @@ class ScanActivity : BaseActivity(), ShapeBSFragment.Properties {
         }
         var btnLeave = dialog.findViewById<Button>(R.id.btnAcceptLeave)
         btnLeave.setOnClickListener {
+            var intent = Intent()
+            intent.putExtra(KEY_DATA_MAIN, DataMain(true).toJSON())
+            setResult(RESULT_OK, intent)
             finish()
         }
         dialog.show()
@@ -336,6 +341,9 @@ class ScanActivity : BaseActivity(), ShapeBSFragment.Properties {
     private fun addImage() {
         var bottomDialog = BottomScan(object : BottomScanEvent {
             override fun takePhoto() {
+                var intent = Intent()
+                intent.putExtra(KEY_DATA_MAIN, DataMain(true).toJSON())
+                setResult(RESULT_OK, intent)
                 finish()
             }
 
@@ -432,49 +440,6 @@ class ScanActivity : BaseActivity(), ShapeBSFragment.Properties {
             DataFilter(listImg.size > 1, listImg[binding.vpgImg.currentItem]).toJSON()
         )
         startActivityForResult(intent, KEY_RESULT_FILTER)
-
-
-//        /**
-//         * Path image
-//         */
-//        var path = listImg[binding.vpgImg.currentItem]
-//
-//        var file = File(path)
-//        val uri: Uri = Uri.fromFile(file)
-//        binding.imgFilter.source.setImageURI(uri)
-//
-//        adapterFilter = ImageFilterAdapter(object : RecyclerItemListener {
-//            override fun onItemSelected(index: Int, data: OBase) {
-//                var o = data as ImageFilter
-//                if (!o.isSelected) {
-//                    mPhotoEditor.setFilterEffect(o.filter)
-//                    for (i in 0 until listFilter.size) {
-//                        if (listFilter[i].isSelected) {
-//                            listFilter[i].isSelected = false
-//                            break
-//                        }
-//                    }
-//                }
-//                listFilter[index].isSelected = true
-//            }
-//
-//            override fun onOption(index: Int, data: OBase) {
-//
-//            }
-//        }, this)
-//
-//        listFilter = ArrayList()
-//
-//        listFilter.add(ImageFilter(path, PhotoFilter.BLACK_WHITE))
-//        listFilter.add(ImageFilter(path, PhotoFilter.GRAIN))
-//        listFilter.add(ImageFilter(path, PhotoFilter.GRAIN))
-//        listFilter.add(ImageFilter(path, PhotoFilter.FISH_EYE))
-//
-//        adapterFilter.setData(listFilter)
-//        binding.rcclvFilter.layoutManager =
-//            LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
-//        binding.rcclvFilter.adapter = adapterFilter
-
     }
 
     private fun deleteImage() {
@@ -491,6 +456,9 @@ class ScanActivity : BaseActivity(), ShapeBSFragment.Properties {
         var btnLeave = dialog.findViewById<Button>(R.id.btnAcceptLeave)
         btnLeave.setOnClickListener {
             dialog.dismiss()
+            var intent = Intent()
+            intent.putExtra(KEY_DATA_MAIN, DataMain(true).toJSON())
+            setResult(RESULT_OK, intent)
             finish()
         }
         dialog.show()
@@ -755,6 +723,9 @@ class ScanActivity : BaseActivity(), ShapeBSFragment.Properties {
                         }
 
                         override fun dismiss() {
+                            var intent = Intent()
+                            intent.putExtra(KEY_DATA_MAIN, DataMain(false).toJSON())
+                            setResult(RESULT_OK, intent)
                             finish()
                         }
                     })
@@ -768,21 +739,69 @@ class ScanActivity : BaseActivity(), ShapeBSFragment.Properties {
 
                 var layoutToAlbum = dialog.findViewById<RelativeLayout>(R.id.layoutSaveToAlbum)
                 layoutToAlbum.setOnClickListener {
-                    var intent = Intent(this@ScanActivity, HistoryActivity::class.java)
-                    startActivity(intent)
+//                    if (viewModel.liveStartCamera.value!!.data == true) {
+//                        var intent = Intent(this@ScanActivity, HistoryActivity::class.java)
+//                        startActivity(intent)
+//                    }
+                    var intent = Intent()
+                    intent.putExtra(KEY_DATA_MAIN, DataMain(false).toJSON())
+                    setResult(RESULT_OK, intent)
                     finish()
                 }
 
                 var layoutEmail = dialog.findViewById<RelativeLayout>(R.id.layoutSaveEmail)
                 layoutEmail.setOnClickListener {
-                    // var filePDF =
+                    var filePDF = File(filePath(strTime, PDF))
+                    var isSuccess = filePDF.createNewFile()
+
+                    if (!isSuccess) {
+                        DynamicToast.makeError(this@ScanActivity, "Create file error!")
+                            .show()
+                        return@setOnClickListener
+                    }
+                    val pdfWriter = PdfWriter(filePDF)
+                    val pdfDocument = PdfDocument(pdfWriter)
+                    val document = Document(pdfDocument)
+
+                    for (i in 0 until listImg.size) {
+                        var count = i + 1
+                        var name = ""
+                        if (count < 10) {
+                            name = "0$count"
+                        } else {
+                            name = count.toString()
+                        }
+                        var filePath = "$fileRoot/saved/$folderName/$name.jpg"
+                        if (!File(filePath).exists()) {
+                            DynamicToast.makeError(this@ScanActivity, "Create file error!")
+                                .show()
+                            return@setOnClickListener
+                        }
+
+                        val imageData = ImageDataFactory.create(filePath)
+                        val pdfImg = Image(imageData)
+                        document.add(pdfImg)
+                    }
+
+                    document.close()
+                    val sharingIntent = Intent(Intent.ACTION_SEND)
+                    sharingIntent.putExtra(
+                        Intent.EXTRA_STREAM,
+                        uriFromFile(this@ScanActivity, filePDF)
+                    )
+                    sharingIntent.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
+                    sharingIntent.type = "application/pdf"
+                    startActivity(Intent.createChooser(sharingIntent, "Share PDF"))
                 }
 
                 var btnClose = dialog.findViewById<ImageButton>(R.id.btnCloseSave)
                 btnClose.setOnClickListener {
                     dialog.dismiss()
-                    var intent = Intent(this@ScanActivity, HistoryActivity::class.java)
-                    startActivity(intent)
+//                    var intent = Intent(this@ScanActivity, HistoryActivity::class.java)
+//                    startActivity(intent)
+                    var intent = Intent()
+                    intent.putExtra(KEY_DATA_MAIN, DataMain(false).toJSON())
+                    setResult(RESULT_OK, intent)
                     finish()
                 }
 
@@ -995,7 +1014,6 @@ class ScanActivity : BaseActivity(), ShapeBSFragment.Properties {
                      * Set Filter for current page
                      */
                     var filter = data!!.getStringExtra(KEY_FILTER)!!.toObject<DataResultFilter>()
-                    //if (filter.filter != PhotoFilter.NONE) {
                     if (filter.isFilterAll) {
                         for (i in 0 until listImg.size) {
                             adapterImg.listFrg[i].setFilter(filter.filter)
@@ -1003,7 +1021,6 @@ class ScanActivity : BaseActivity(), ShapeBSFragment.Properties {
                     } else {
                         adapterImg.listFrg[binding.vpgImg.currentItem].setFilter(filter.filter)
                     }
-                    //}
                 }
 
                 UCrop.REQUEST_CROP -> {
@@ -1070,8 +1087,6 @@ class ScanActivity : BaseActivity(), ShapeBSFragment.Properties {
             mShapeBuilder = ShapeBuilder()
             mPhotoEditor!!.setShape(mShapeBuilder)
 
-            mPhotoEditor!!.setFilterEffect(PhotoFilter.BLACK_WHITE)
-
             var act = activity as ScanActivity
             act.setOnEdit(object : onEditPhoto {
                 override fun addText(inputText: String, styleBuilder: TextStyleBuilder) {
@@ -1097,6 +1112,7 @@ class ScanActivity : BaseActivity(), ShapeBSFragment.Properties {
         }
 
         fun resetSrc() {
+            Log.e("resetSrc", "resetSrc")
             val number = requireArguments().getInt(NUMBER)
             var file = File(list[number])
 
@@ -1150,6 +1166,11 @@ class ScanActivity : BaseActivity(), ShapeBSFragment.Properties {
 
         fun setFilter(filter: PhotoFilter) {
             mPhotoEditor.setFilterEffect(filter)
+        }
+
+        fun setScanned(){
+            mPhotoEditor.setFilterEffect(PhotoFilter.BLACK_WHITE)
+            Log.e("setScanned", "setScanned")
         }
 
         fun save(folderName: String, name: String) {

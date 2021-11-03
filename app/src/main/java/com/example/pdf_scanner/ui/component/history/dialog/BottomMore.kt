@@ -20,11 +20,6 @@ class BottomMore(val e: BottomMoreEvent) : BottomSheetDialogFragment() {
         savedInstanceState: Bundle?
     ): View? {
         var view = inflater.inflate(R.layout.dialog_bottom_more, container, false)
-        var layoutMove = view.findViewById<LinearLayout>(R.id.layoutMove)
-        layoutMove.setOnClickListener {
-            e.onMove()
-            dismiss()
-        }
 
         var layoutCopy = view.findViewById<LinearLayout>(R.id.layoutCopy)
         layoutCopy.setOnClickListener {

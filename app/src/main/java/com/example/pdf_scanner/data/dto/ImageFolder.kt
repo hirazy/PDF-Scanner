@@ -8,5 +8,5 @@ data class ImageFolder(
 
     var time: String = "",
 
-    var list: ArrayList<String>
+    var list: ArrayList<String> = ArrayList()
 ): OBase()

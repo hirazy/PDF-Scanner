@@ -8,8 +8,12 @@ import com.example.pdf_scanner.data.Resource
 import com.example.pdf_scanner.data.dto.ImageFolder
 import com.example.pdf_scanner.ui.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 
@@ -37,5 +41,11 @@ class HistoryViewModel @Inject constructor(var dataRepositorySource: DataReposit
 
     fun fetchData(list: ArrayList<ImageFolder>) {
         listData.value = Resource.Success(list)
+    }
+
+    fun foo(): Flow<Int> = flow{
+        withContext(Dispatchers.Default){
+
+        }
     }
 }

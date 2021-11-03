@@ -102,7 +102,6 @@ class DetailActivity : BaseActivity() {
         }
 
         binding.btnAddImage.setOnClickListener {
-            // var intent = Intent(this@DetailActivity, )
             var intent = Intent(this@DetailActivity, ImageActivity::class.java)
             var folderRoot = FileUtil(this@DetailActivity).getRootFolder()
             var pathNameSaved = "/saved/"
@@ -454,11 +453,11 @@ class DetailActivity : BaseActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.itemListSelected -> {
-                if(!isListSelected()){
-                    changeListSelected()
-                }
-            }
+//            R.id.itemListSelected -> {
+//                if(!isListSelected()){
+//                    changeListSelected()
+//                }
+//            }
         }
         return super.onOptionsItemSelected(item)
     }

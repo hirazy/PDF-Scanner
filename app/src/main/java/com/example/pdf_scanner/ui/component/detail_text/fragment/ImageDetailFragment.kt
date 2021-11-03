@@ -8,6 +8,7 @@ import android.content.pm.PackageManager
 import android.graphics.pdf.PdfDocument
 import android.graphics.pdf.PdfDocument.PageInfo
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.print.PrintAttributes
 import android.print.PrintManager
@@ -21,11 +22,9 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
+import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
-import com.example.pdf_scanner.DIALOG_CONTENT_DELETE
-import com.example.pdf_scanner.DIALOG_TITLE_DELETE
-import com.example.pdf_scanner.PDF
-import com.example.pdf_scanner.R
+import com.example.pdf_scanner.*
 import com.example.pdf_scanner.ui.component.detail.dialog.BottomShare
 import com.example.pdf_scanner.ui.component.detail.dialog.BottomShareEvent
 import com.example.pdf_scanner.utils.FileUtil
@@ -42,6 +41,9 @@ import ja.burhanrashid52.photoeditor.SaveSettings
 import ja.burhanrashid52.photoeditor.shape.ShapeBuilder
 import ja.burhanrashid52.photoeditor.shape.ShapeType
 import java.io.File
+import java.text.SimpleDateFormat
+import java.util.*
+import kotlin.collections.ArrayList
 
 
 class ImageDetailFragment(var path: String, var e: OnImageTextListener,
@@ -200,13 +202,34 @@ class ImageDetailFragment(var path: String, var e: OnImageTextListener,
     }
 
     private fun sharePDFDetail() {
-        val document = PdfDocument()
-        val pageInfo = PageInfo.Builder(300, 600, 1).create()
-        val myPage: PdfDocument.Page = document.startPage(pageInfo)
+        var splitPath = path.split("/")
 
+        var filePDF = File(filePath(splitPath[splitPath.size - 2], PDF))
+        var isSuccess = filePDF.createNewFile()
 
-        // var file = File()
-        document.finishPage(myPage)
+        if (!isSuccess) {
+            DynamicToast.makeError(requireContext(), "Create file error!")
+                .show()
+            return
+        }
+        val pdfWriter = PdfWriter(filePDF)
+        val pdfDocument = com.itextpdf.kernel.pdf.PdfDocument(pdfWriter)
+        val document = Document(pdfDocument)
+
+        val imageData = ImageDataFactory.create(path)
+        val pdfImg = Image(imageData)
+        document.add(pdfImg)
+
+        document.close()
+        val sharingIntent = Intent(Intent.ACTION_SEND)
+        sharingIntent.putExtra(
+            Intent.EXTRA_STREAM,
+            uriFromFile(requireActivity(), filePDF)
+        )
+        sharingIntent.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
+        sharingIntent.type = "application/pdf"
+        startActivity(Intent.createChooser(sharingIntent, "Share PDF"))
+
     }
 
     private fun shareImageDetail() {
@@ -289,8 +312,24 @@ class ImageDetailFragment(var path: String, var e: OnImageTextListener,
         e.onSign()
     }
 
+    private fun uriFromFile(context: Context, file: File): Uri {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            return FileProvider.getUriForFile(
+                context,
+                BuildConfig.APPLICATION_ID + ".provider",
+                file
+            )
+        } else {
+            return Uri.fromFile(file)
+        }
+    }
+
     private fun filePath(nameFolder: String, typePath: String): String {
-        var nameFile = "FILE_$nameFolder"
+        var date = Date()
+        var date1 = SimpleDateFormat("yyyy-MM-dd HH.mm.ss").format(date)
+        var date2 = SimpleDateFormat("yyyyMMdd_HHmmss").format(date)
+        var nameFile = "FILE_$date2" + "_Scan $date1"
+
         var fileRoot = FileUtil(requireContext()).getRootFolder()
         var path = "$fileRoot/saved/$nameFolder/$nameFile$typePath"
         Log.e("filePath", path)
